@@ -1,0 +1,200 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class=" mt-4">
+
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información de la factura</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" enctype="multipart/form-data" class="row g-3 mt-2">
+      {% csrf_token %}
+
+      {% if user_rol == 'admin' %}
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <select id="unidad_responsable" name="unidad_responsable" class="" required>
+              <option value="">Seleccione una unidad</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="unidad_responsable" class="form-label">Unidad Responsable</label>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="col-md-6 mb-3">
+        <div class="material-input">
+          <select id="subestacion" name="subestacion" class="" required>
+            <option value="">Seleccione una subestación</option>
+          </select>
+          <label for="subestacion" class="form-label">Subestación</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <select id="tipo_tarifa" name="tipo_tarifa" class="" required>
+            <option value="">Seleccione tipo</option>
+            <option value="GDMTH">GDMTH</option>
+            <option value="GDMTO">GDMTO</option>
+            <option value="GDBT">GDBT</option>
+          </select>
+          <label for="tipo_tarifa" class="form-label">Tipo de Tarifa</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="text" class="" name="periodo" id="periodo" required>
+          <label for="periodo" class="form-label">Periodo</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" class="" name="dias_periodo" id="dias_periodo" required>
+          <label for="dias_periodo" class="form-label">Días del Periodo</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="consumo" id="consumo" required>
+          <label for="consumo" class="form-label">Consumo (kWh)</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" class="" name="demanda_maxima" id="demanda_maxima" required>
+          <label for="demanda_maxima" class="form-label">Demanda Máxima (kW)</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="factor_potencia" id="factor_potencia" required>
+          <label for="factor_potencia" class="form-label">Factor de Potencia</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" class="" name="factor_carga" id="factor_carga" required>
+          <label for="factor_carga" class="form-label">Factor de Carga (%)</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="cargo_energia" id="cargo_energia" required>
+          <label for="cargo_energia" class="form-label">Cargo Energía</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="importe_demanda_maxima" id="importe_demanda_maxima" required>
+          <label for="importe_demanda_maxima" class="form-label">Importe Demanda Máxima</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="importe_bt" id="importe_bt" required>
+          <label for="importe_bt" class="form-label">Importe BT</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="importe_fp" id="importe_fp" required>
+          <label for="importe_fp" class="form-label">Importe FP</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="dap" id="dap" required>
+          <label for="dap" class="form-label">DAP</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="iva" id="iva" required>
+          <label for="iva" class="form-label">IVA</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="number" step="0.01" class="" name="total_a_pagar" id="total_a_pagar" required>
+          <label for="total_a_pagar" class="form-label">Total a Pagar</label>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <div class="material-input">
+          <input type="date" class="" name="fecha_vencimiento" id="fecha_vencimiento" required>
+          <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <div class="material-input">
+          <input type="file" class="" name="archivo_pdf" id="archivo_pdf" accept="application/pdf" required>
+          <label for="archivo_pdf" class="form-label">Archivo PDF</label>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+        <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
+        <a href="{% url 'listar_facturas_admin' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+document.getElementById('unidad_responsable')?.addEventListener('change', function () {
+  const urId = this.value;
+  fetch(`/api/subestaciones/${urId}/`)
+    .then(response => response.json())
+    .then(data => {
+      const subSelect = document.getElementById('subestacion');
+      subSelect.innerHTML = '';
+
+      // Validar si ocurrió un error en el backend
+      if (data.error) {
+        console.error("Error en respuesta:", data.error);
+        const option = document.createElement('option');
+        option.textContent = '⚠ Error al cargar subestaciones';
+        option.disabled = true;
+        subSelect.appendChild(option);
+        return;
+      }
+
+      // Llenar subestaciones si no hay error
+      subSelect.innerHTML = '<option value="">Seleccione una subestación</option>';
+      data.forEach(sub => {
+        const option = document.createElement('option');
+        option.value = sub.id;
+        option.textContent = sub.nombre;
+        subSelect.appendChild(option);
+      });
+    })
+    .catch(err => {
+      console.error("Error al conectar con API:", err);
+    });
+});
+</script>
+
+{% endblock %}

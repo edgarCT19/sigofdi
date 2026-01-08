@@ -1,0 +1,138 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.illustration-dark {
+  display: none;
+}
+
+body.dark-mode .illustration-light {
+  display: none;
+}
+
+body.dark-mode .illustration-dark {
+  display: inline;
+}
+
+/* Íconos de la segunda sección */
+.icon-feature {
+  font-size: 2.5rem;
+  color: var(--color-uacam-black);
+  margin-bottom: 0.5rem;
+}
+
+body.dark-mode .icon-feature {
+  color: #f8f9fa;
+}
+</style>
+
+<div class="card border-0 shadow-sm rounded-4 my-2">
+  <div class="card-body py-5 px-4">
+    <div class="row align-items-center">
+      <div class="col-md-6 text-start">
+        <h1 class="fw-bold display-5 mb-3 text-secondary">
+          Bienvenido al <span style="color: var(--color-uacam-black);">
+            Sistema Integrado de Gestión Online
+          </span>
+        </h1>
+        <p class="lead text-secondary mb-4">
+          Ha llegado el momento de optimizar el consumo energético de tu organización a través del software.
+        </p>
+      </div>
+
+      <div class="col-md-6 text-center position-relative">
+        <!-- Imagen modo claro -->
+        <img src="{% static 'images/ilustraciones_svg/data-storage-light.svg' %}"
+             alt="Ilustración eficiencia energética modo claro"
+             class="img-fluid illustration-light" style="max-height: 350px;">
+
+        <!-- Imagen modo oscuro -->
+        <img src="{% static 'images/ilustraciones_svg/data-storage.svg' %}"
+             alt="Ilustración eficiencia energética modo oscuro"
+             class="img-fluid illustration-dark" style="max-height: 350px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-semibold text-secondary">Gestión de la información</h2>
+    <p>
+      Gestiona, analiza y controla la información de tu organización desde aquí.
+    </p>
+  </div>
+  
+  <div class="row text-center g-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 p-4">
+        <i class="bi bi-clipboard-data icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Inventarios periódicos</h5>
+        <p class="text-secondary">
+          Realiza el inventario energético que se requiera desde Aires Acondicionados hasta los 
+          cargadores de dispositivos electrónicos.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 p-4">
+        <i class="bi bi-file-earmark-excel icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Reportes automáticos</h5>
+        <p class="text-secondary">
+          Genera reportes y compara periodos para decisiones basadas en datos (en hojas de cálculo).
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100 p-4">
+        <i class="bi bi-bell icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Alertas inteligentes</h5>
+        <p class="text-secondary">
+          Recibe notificaciones cuando el consumo supere los límites establecidos.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-2">
+  <div class="text-center mb-5">
+    <h2 class="fw-semibold text-secondary">Sistema Integrado de Gestión</h2>
+    <p>
+      Herramientas integradas para gestión energética y gestión ambiental.
+    </p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <!-- Tarjeta 1 -->
+    <div class="col-md-5">
+      <div class="card border-0 shadow-lg rounded-4 d-flex flex-row align-items-center p-3 h-100">
+        <img src="{% static 'images/gest-energia.jpg' %}" class="img-fluid rounded-3 me-3" alt="Dashboard energético" style="width: 40%;">
+        <div>
+          <h5 class="fw-bold" style="color: var(--color-uacam-black);">Gestión energética</h5>
+          <p class="text-secondary mb-0">
+            Visualiza indicadores clave de consumo, compara áreas y detecta oportunidades de mejora.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta 2 -->
+    <div class="col-md-5">
+      <div class="card border-0 shadow-lg rounded-4 d-flex flex-row align-items-center p-3 h-100">
+        <img src="{% static 'images/gest-ambiental.jpg' %}" class="img-fluid rounded-3 me-3" alt="Aplicación móvil" style="width: 40%;">
+        <div>
+          <h5 class="fw-bold" style="color: var(--color-uacam-black);">Gestión Ambiental</h5>
+          <p class="text-secondary mb-0">
+            Accede a tu información registrada para su análisis detallado y mejorar la toma de decisiones.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}

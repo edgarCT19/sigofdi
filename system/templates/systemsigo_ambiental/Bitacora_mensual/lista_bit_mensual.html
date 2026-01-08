@@ -1,0 +1,129 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div>
+  <div class="card">
+
+    <!-- Search + Botón Agregar -->
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+      <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+          type="text"
+          id="input-search"
+          placeholder="Buscar..."
+          oninput="toggleClearButton(this)"
+        />
+        <button
+          id="clear-search"
+          type="button"
+          class="btn btn-sm btn-link text-secondary px-2 d-none"
+          onclick="clearSearch()"
+          title="Borrar búsqueda"
+        >
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </div>
+
+      <a href="{% url 'bitacora_mensual_crear_admin' %}">
+        <button class="btn btn-primary">Agregar</button>
+      </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead>
+            <tr class="text-center">
+              <th colspan="18" class="table-title"
+                  style="background-color: var(--color-uacam-table-header); font-size: 15px;">
+                Lista de Bitácoras Mensuales
+              </th>
+            </tr>
+            <tr class="text-center">
+              <th>Unidad Responsable</th>
+              <th>Laboratorio</th>
+              <th>Tipo Residuo</th>
+              <th>Cantidad</th>
+              <th>Estado Físico</th>
+              <th>Tipo Envase</th>
+              <th>Capacidad Medida</th>
+              <th>Fecha Registro</th>
+              <th>Creado por</th>
+              <th>Última actualización</th>
+              <th>Actualizado por</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for b in bitacoras %}
+            <tr>
+              <td>{{ b.unidad_responsable.nombre }}</td>
+              <td>{{ b.laboratorio }}</td>
+              <td>{{ b.tipo_residuo }}</td>
+              <td>{{ b.cantidad }}</td>
+              <td>{{ b.estado_fisico }}</td>
+              <td>{{ b.tipo_envase }}</td>
+              <td>{{ b.capacidad_medida }}</td>
+              <td>{{ b.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+              <td>{{ b.creado_por }}</td>
+              <td>{{ b.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+              <td>{{ b.actualizado_por }}</td>
+              <td>
+                <div class="d-flex actions justify-content-center gap-2">
+                  <a href="{% url 'bitacora_mensual_editar_admin' b.id %}"
+                     class="btn btn-light rounded rounded-circle btn-sm"
+                     title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button class="btn btn-danger btn-sm rounded rounded-circle"
+                          onclick="eliminarBitacora('{{ b.id }}')"
+                          title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+      <ul class="pagination" id="pagination"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+function eliminarBitacora(bitacoraId) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: "El registro será eliminado",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: '¡Eliminado!',
+        text: 'La bitácora fue eliminada correctamente.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = `/bitacora_mensual/eliminar/${bitacoraId}/`;
+      });
+    }
+  });
+}
+</script>
+
+{% endblock content %}

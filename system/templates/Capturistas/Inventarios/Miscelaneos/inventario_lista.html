@@ -1,0 +1,133 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-2">
+  <div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        <a href="{% if periodo_activo %}{% url 'registrar_inventario_miscelaneos' %}{% else %}#{% endif %}" 
+        class="btn btn-primary mx-2 {% if not periodo_activo %}disabled{% endif %}">Registrar</a>
+    </div>
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                <tr class="text-center">
+                    <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                        Inventario energético de Misceláneos
+                    </th>
+                </tr>
+                <tr class="text-center"> 
+                    <th>Edificio</th>
+                    <th>Nivel</th>
+                    <th>Área</th>
+                    <th>Misceláneo</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Voltaje</th>
+                    <th>Amperaje</th>
+                    <th>Potencia</th>
+                    <th>Potencia Total</th>
+                    <th>Horas/Mes</th>
+                    <th>Consumo Mensual</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reg in registros %}
+                <tr>
+                    <td>{{ reg.edificio.nombre }}</td>
+                    <td>{{ reg.nivel }}</td>
+                    <td>{{ reg.area.nombre }}</td>
+                    <td>{{ reg.miscelaneos }}</td>
+                    <td>{{ reg.marca }}</td>
+                    <td>{{ reg.modelo }}</td>
+                    <td>{{ reg.voltaje }}</td>
+                    <td>{{ reg.amperaje }}</td>
+                    <td>{{ reg.potencia }}</td>
+                    <td>{{ reg.potencia_total }}</td>
+                    <td>{{ reg.horas_mes }}</td>
+                    <td>{{ reg.consumo_mensual }}</td>
+                    <td>{{ reg.fecha_registro|date:"d/m/Y" }}</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% if periodo_activo %}{% url 'editar_inventario_miscelaneos' reg.id %}{% else %}#{% endif %}" 
+                            class="btn btn-sm btn-light rounded-circle {% if not periodo_activo %}disabled{% endif %}" 
+                             title="Editar"><i class="bi bi-pencil"></i></a>
+                            
+                            <button type="button"
+                                class="btn btn-sm btn-danger rounded-circle delete-btn"
+                                data-url="{% url 'eliminar_inventario_miscelaneos' reg.id %}"
+                                {% if not periodo_activo %}disabled{% endif %}
+                                title="Eliminar">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="14" class="text-center">No hay registros disponibles.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const url = this.dataset.url;
+
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            }
+          })
+          .then(response => {
+            if (response.ok) {
+              Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success')
+                .then(() => location.reload());
+            } else {
+              Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

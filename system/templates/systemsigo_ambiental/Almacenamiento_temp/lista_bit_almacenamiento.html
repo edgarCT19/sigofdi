@@ -1,0 +1,111 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div>
+   <div class="card">
+       <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+           <div class="searchBox position-relative d-flex align-items-center mx-2">
+               <i class="bi bi-search me-2 text-secondary"></i>
+               <input type="text" id="input-search" placeholder="Buscar..." oninput="toggleClearButton(this)" />
+               <button id="clear-search" type="button" class="btn btn-sm btn-link text-secondary px-2 d-none" onclick="clearSearch()" data-bs-toggle="tooltip" title="Borrar búsqueda">
+                   <i class="bi bi-x-circle-fill"></i>
+               </button>
+           </div>
+
+           <a href="{% url 'almacenamiento_temporal_crear_admin' %}">
+               <button class="btn btn-primary">Agregar</button>
+           </a>
+       </div>
+
+       <div class="d-flex align-items-center justify-content-center">
+           <div class="table-container">
+               <table class="styled-table text-center">
+                   <thead>
+                       <tr class="text-center">
+                           <th colspan="18" style='background-color: var(--color-uacam-table-header); font-size: 15px;'>Lista de Almacenamientos Temporales</th>
+                       </tr>
+                       <tr class="text-center">
+                           <th>Unidad Responsable</th>
+                           <th>Campus</th>
+                           <th>Centro de Acopio</th>
+                           <th>Tipo Residuo</th>
+                           <th>Cantidad</th>
+                           <th>Estado Físico</th>
+                           <th>CRETI</th>
+                           <th>Tipo Envase</th>
+                           <th>Capacidad Medida</th>
+                           <th>Creado por</th>
+                           <th>Fecha de registro</th>
+                            <th>Actualizado por</th>
+                           <th>Última actualización</th>
+                           <th>Acciones</th>
+                       </tr>
+                   </thead>
+                   <tbody id="table-body">
+                       {% for alm in almacenamientos %}
+                       <tr>
+                           <td>{{ alm.unidad_responsable.nombre }}</td>
+                           <td>{{ alm.unidad_responsable.campus.nomenclatura }}</td>
+                           <td>{{ alm.centro_acopio }}</td>
+                           <td>{{ alm.tipo_residuo }}</td>
+                           <td>{{ alm.cantidad }}</td>
+                           <td>{{ alm.estado_fisico }}</td>
+                           <td>{{ alm.creti }}</td>
+                           <td>{{ alm.tipo_envase }}</td>
+                           <td>{{ alm.capacidad_medida }}</td>
+                           <td>{{ alm.creado_por }}</td>
+                           <td>{{ alm.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+                           <td>{{ alm.actualizado_por }}</td>
+                           <td>{{ alm.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                           <td>
+                               <div class="d-flex actions justify-content-center gap-2">
+                                   <a href="{% url 'almacenamiento_temporal_editar_admin' alm.id %}" class="btn btn-light rounded-circle btn-sm" title="Editar">
+                                       <i class="bi bi-pencil"></i>
+                                   </a>
+                                   <button class="btn btn-danger btn-sm rounded-circle" onclick="eliminarAlmacenamiento('{{ alm.id }}')">
+                                       <i class="bi bi-trash"></i>
+                                   </button>
+                               </div>
+                           </td>
+                       </tr>
+                       {% endfor %}
+                   </tbody>
+               </table>
+           </div>
+       </div>
+
+       <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+           <ul class="pagination" id="pagination"></ul>
+       </div>
+   </div>
+</div>
+
+<script>
+function eliminarAlmacenamiento(id) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "El registro será eliminado",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: '¡Eliminado!',
+                text: 'El registro ha sido eliminado correctamente.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = `/almacenamiento_temporal/eliminar/${id}/`;
+            });
+        }
+    });
+}
+</script>
+
+{% endblock content %}

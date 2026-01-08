@@ -1,0 +1,78 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2 shadow-sm">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información de bitácora de centro de acopio (RRR)</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" required>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if ur.id == acopio.unidad_responsable.id %}selected{% endif %}>
+                  {{ ur.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="centro_acopio" value="{{ acopio.centro_acopio }}" required>
+            <label>Centro de Acopio</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="dependencia" value="{{ acopio.dependencia }}" required>
+            <label>Dependencia</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 mt-4">
+          <div class="material-input">
+            <input type="text" name="pet" value="{{ acopio.pet }}">
+            <label>PET</label>
+          </div>
+        </div>
+        <div class="col-md-3 mt-4">
+          <div class="material-input">
+            <input type="text" name="papel" value="{{ acopio.papel }}">
+            <label>Papel</label>
+          </div>
+        </div>
+        <div class="col-md-3 mt-4">
+          <div class="material-input">
+            <input type="text" name="carton" value="{{ acopio.carton }}">
+            <label>Cartón</label>
+          </div>
+        </div>
+        <div class="col-md-3 mt-4">
+          <div class="material-input">
+            <input type="text" name="metales" value="{{ acopio.metales }}">
+            <label>Metales</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+        <a href="{% url 'centro_acopio_rrr_admin' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="{% static 'js/inputs_mayusculas.js' %}"></script>
+{% endblock %}

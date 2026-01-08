@@ -1,0 +1,142 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container mt-4">
+  <h3>Facturas PDBT</h3>
+
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Lista de facturas registradas con tarifa PDBT</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="get" class="row g-3 mt-4">
+      <div class="col-md-6">
+        <div class="material-input">
+          <select name="subestacion" onchange="this.form.submit()">
+            <option value="">-- Todas las Subestaciones --</option>
+            {% for sub in subestaciones %}
+              <option value="{{ sub.id }}" {% if filtros.subestacion_id == sub.id|stringformat:"s" %}selected{% endif %}>
+                {{ sub.no_servicio }} - {{ sub.no_medidor }} - {{ sub.tarifa }}
+              </option>
+            {% endfor %}
+          </select>
+          <label for="subestacion">Filtrar por Subestación</label>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="material-input">
+          <select name="anio" onchange="this.form.submit()">
+            <option value="">-- Todos los Años --</option>
+            {% for a in anios_disponibles %}
+              <option value="{{ a }}" {% if filtros.anio == a|stringformat:"s" %}selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+          </select>
+          <label for="anio">Filtrar por Año</label>
+        </div>
+      </div>
+    </form>
+
+  </div>
+  <div class="card p-4 mt-4">
+    <div class="d-flex justify-content-end">
+        <a href="{% url 'exportar_facturas_pdbt' %}" class="btn btn-success mx-1" title="Descargar reporte">Excel</a>
+        <a href="{% url 'listar_facturas_pdbt' %}" class="btn btn-secondary mx-1">Limpiar</a>
+       <a href="{% url 'agregar_factura_pdbt' %}" class="btn btn-primary mx-1">Agregar</a>
+    </div>
+
+    <div class="table-container">
+      <table class="styled-table text-center">
+          <thead>
+            <tr class="text-center">
+                <th colSpan="22" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    Lista de facturas registradas
+                </th>
+            </tr>
+            <tr class="text-center">
+              <th>#</th>
+              <th>Periodo</th>
+              <th>Consumo (kWh)</th>
+              <th>Subestación</th>
+              <th>Días</th>
+              <th>Cargo Energía</th>
+              <th>Importe DM</th>
+              <th>DAP</th>
+              <th>IVA</th>
+              <th>Creado por</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actualizado por</th>
+              <th>Última actualización</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for factura in facturas %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ factura.periodo }}</td>
+                <td>{{ factura.consumo }}</td>
+                <td>{{ factura.subestacion.no_medidor }}</td>
+                <td>{{ factura.dias_periodo }}</td>
+                <td>{{ factura.cargo_energia }}</td>
+                <td>{{ factura.importe_demanda_maxima }}</td>
+                <td>{{ factura.dap }}</td>
+                <td>{{ factura.iva }}</td>
+                <td>{{ factura.creado_por }}</td>
+                <td>{{ factura.total_a_pagar }}</td>
+                <td>
+                    {% if factura.status == "Pagada" %}
+                      <span class="badge bg-success">Pagada</span>
+                    {% elif factura.status == "Pendiente" %}
+                      <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif factura.status == "Vencida" %}
+                      <span class="badge bg-danger">Vencida</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Sin estado</span>
+                    {% endif %}
+                </td>
+                <td>{{ factura.actualizado_por }}</td>
+                <td>{{ factura.ultima_actualizacion|date:"d/m/Y H:i:s" }}</td>
+                <td>
+                  <div class="d-flex actions justify-content-center gap-2">
+                    <a href="{% url 'descargar_factura_pdbt' factura.id %}" title="Ver PDF" class="btn btn-primary btn-sm rounded rounded-circle">
+                      <i class="bi bi-filetype-pdf"></i></a>
+                    <a href="{% url 'editar_factura_pdbt' factura.id %}" title="Editar información" class="btn btn-sm btn-light rounded rounded-circle">
+                      <i class="bi bi-pencil"></i></a></a>
+                    <button class="btn btn-danger btn-sm rounded rounded-circle" title="Eliminar registro"
+                     onclick="confirmarEliminacion('{{ factura.id }}')"><i class="bi bi-trash-fill"></i></button>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="13" class="text-center">No hay facturas registradas.</td></tr>
+            {% endfor %}
+          </tbody>
+      </table>
+    </div>
+  </div>
+        <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+            <ul class="pagination" id="pagination"></ul>
+        </div>
+</div>
+
+<script>
+function confirmarEliminacion(facturaId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/facturas/pdbt/eliminar/${facturaId}/`;
+        }
+    });
+}
+</script>
+{% endblock %}

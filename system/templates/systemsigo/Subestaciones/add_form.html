@@ -1,0 +1,83 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2" style="font-size: 18px;">
+      Crear Nueva Subestación
+    </p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+
+    <form method="post" action="">
+      {% csrf_token %}
+
+      <!-- Datos de servicio -->
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" id="no_servicio" name="no_servicio" required>
+            <label for="no_servicio">Número de Servicio</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" id="no_medidor" name="no_medidor" required>
+            <label for="no_medidor">Número de Medidor</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarifa y multiplicador -->
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="tarifa" id="tarifa" required>
+              <option value="">-- Selecciona --</option>
+              <option value="GDMTH">GDMTH</option>
+              <option value="GDMTO">GDMTO</option>
+              <option value="GDBT">GDBT</option>
+              <option value="PDBT">PDBT</option>
+            </select>
+            <label for="tarifa">Tarifa</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="number" id="multiplicador" name="multiplicador" step="0.01" required>
+            <label for="multiplicador">Multiplicador</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unidad responsable -->
+      <div class="row">
+        <div class="col-md-12 mt-4">
+          <div class="material-input">
+            <select id="unidad_responsable" name="unidad_responsable" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in unidades_responsables %}
+                <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="unidad_responsable">Unidad Responsable</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">
+          Guardar
+        </button>
+        <a href="{% url 'admin_subestaciones' %}" class="btn btn-danger">
+          Cancelar
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock content %}

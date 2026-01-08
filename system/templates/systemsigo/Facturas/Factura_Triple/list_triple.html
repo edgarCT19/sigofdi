@@ -1,0 +1,225 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+  <div class="card mt-4 p-2">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+            type="text"
+            id="input-search"
+            class=""
+            placeholder="Buscar..."
+            oninput="toggleClearButton(this)"
+        />
+        <button
+            id="clear-search"
+            type="button"
+            class="btn btn-sm btn-link text-secondary px-2 d-none"
+            onclick="clearSearch()"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Borrar búsqueda"
+        >
+            <i class="bi bi-x-circle-fill"></i>
+        </button>
+        </div>
+
+        <a href="{% url 'crear_factura' %}" class="btn btn-primary mx-2">Agregar</a>
+
+    </div>
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead class="table-light">
+            <tr class="text-center">
+                <th colSpan="28" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    Lista de facturas GDMTH / GDMTO / GDBT
+                </th>
+            </tr>
+            <tr  class="text-center">
+                <th>Unidad Responsable</th>
+                <th>Tipo</th>
+                <th>Subestación</th>
+                <th>Periodo</th>
+                <th>Días del periodo</th>
+                <th>Consumo en kwh</th>
+                <th>Demanda máxima (kw)</th>
+                <th>Factor potecnia</th>
+                <th>Factor de carga</th>
+                <th>Cargo por energía</th>
+                <th>Importe demanda máxima</th>
+                <th>Importe de medición BT</th>
+                <th>Importe FP</th>
+                <th>DAP</th>
+                <th>IVA</th>
+                <th>Total a pagar</th>
+                <th>Registrado por</th>
+                <th>Fecha de registro</th>
+                <th>Actualizado por</th>
+                <th>Última actualización</th>
+                <th>Status</th>
+                <th>Factura en PDF</th>
+                <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for f in facturas %}
+            <tr>
+                <td>{{ f.subestacion.unidad_responsable.nombre }}</td>
+                <td>{{ f.tipo_tarifa }}</td>
+                <td>{{ f.subestacion.no_servicio }} - {{ f.subestacion.no_medidor }}</td>
+                <td>{{ f.periodo }}</td>
+                <td>{{ f.dias_periodo }}</td>
+                <td>{{ f.consumo }}</td>
+                <td>{{ f.demanda_maxima }}</td>
+                <td>
+                  {% if f.factor_potencia is not None %}
+                    {% with f.factor_potencia|floatformat:2 as potencia %}
+                      {% if f.factor_potencia < 0.89 %}
+                        <span class="danger-text">{{ potencia }}</span>
+                        <span class="alert-danger-custom">⚠ Riesgo</span>
+                      {% elif f.factor_potencia >= 0.89 and f.factor_potencia < 1 %}
+                        <span class="warning-text">{{ potencia }}</span>
+                        <span class="alert-warning-custom">⚠ Advertencia</span>
+                      {% else %}
+                        {{ potencia }}
+                      {% endif %}
+                    {% endwith %}
+                  {% else %}
+                    --
+                  {% endif %}
+                </td>
+                <td>{{ f.factor_carga }}</td>
+                <td>{{ f.cargo_energia }}</td>
+                <td>{{ f.importe_demanda_maxima }}</td>
+                <td>{{ f.importe_bt }}</td>
+                <td>{{ f.importe_fp }}</td>
+                <td>{{ f.dap }}</td>
+                <td>{{ f.iva }}</td>
+                <td>$ {{ f.total_a_pagar }}</td>
+                <td>{{ f.creado_por }}</td>
+                <td>{{ f.fecha_registro|date:"d/m/Y H:i:s" }}</td>
+                <td>{{ f.actualizado_por }}</td>
+                <td>{{ f.ultima_actualizacion|date:"d/m/Y H:i:s" }}</td>
+                <td>
+                    {% if f.status == "Pagada" %}
+                      <span class="badge bg-success">Pagada</span>
+                    {% elif f.status == "Pendiente" %}
+                      <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif f.status == "Vencida" %}
+                      <span class="badge bg-danger">Vencida</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Sin estado</span>
+                    {% endif %}
+                </td>
+              <td><a href="{% url 'descargar_pdf_factura' f.id %}" class="btn btn-sm btn-primary rounded rounded-circle" 
+                target="_blank" title="Ver PDF">
+                <i class="bi bi-filetype-pdf"></i>
+              </a></td>
+              <td>
+                <div class="d-flex actions justify-content-center gap-2">
+                  <a href="{% url 'editar_factura_triple_admin' f.id %}" class=
+                  "btn btn-sm btn-light btn-sm rounded rounded-circle" title="Editar información"><i class="bi bi-pencil"></i></a>
+                  <button onclick="confirmarEliminacion('{{ f.id }}')" class=
+                  "btn btn-sm btn-danger btn-sm rounded rounded-circle" title="Eliminar registro"><i class="bi bi-trash-fill"></i></button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="25" class="text-center">No hay facturas registradas.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+        <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+            <ul class="pagination" id="pagination"></ul>
+        </div>
+  </div>
+
+  <script>
+function confirmarEliminacion(facturaId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `factura-triple/eliminar/${facturaId}/`;
+        }
+    });
+}
+
+ function confirmarEliminacion(facturaId) {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará la factura permanentemente.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33',  
+      cancelButtonColor: '#6c757d',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/factura-triple/eliminar/${facturaId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Eliminado', 'La factura ha sido eliminada.', 'success')
+              .then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.message, 'error');
+          }
+        });
+      }
+    });
+  }
+
+    function eliminarFacturaPDBT(facturaId) {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción no se puede deshacer.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',     
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/factura-pdbt/eliminar/${facturaId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Eliminado', 'La factura fue eliminada.', 'success')
+              .then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.error || 'No se pudo eliminar.', 'error');
+          }
+        })
+        .catch(() => {
+          Swal.fire('Error', 'Error al conectar con el servidor.', 'error');
+        });
+      }
+    });
+  }
+
+  </script>
+{% endblock %}

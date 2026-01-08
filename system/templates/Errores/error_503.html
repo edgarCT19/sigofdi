@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 503 - Servicio no disponible</title>
+    <link rel="icon" type="image/vnd.icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'libs/bootstrap-icons/bootstrap-icons.min.css' %}">
+
+    <style>
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--color-uacam-main-bg);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-code {
+            font-size: 10rem;
+            font-weight: bold;
+            color: var(--color-uacam-primary);
+            line-height: 1;
+            animation: bounce 2s infinite;
+        }
+
+        .error-message {
+            font-size: 1.8rem;
+            color: var(--color-uacam-black);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .error-description {
+            color: var(--color-uacam-input-label);
+            margin-bottom: 2rem;
+        }
+
+        /* Animación bounce (igual que el 404 y 500) */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Icono decorativo (igual estilo que el 404) */
+        .icon-service {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="error-container">
+        <i class="bi bi-gear icon-service text-secondary"></i>
+        <div class="error-code">503</div>
+        <h2 class="error-message">Servicio no disponible</h2>
+        <p class="error-description">
+            El servidor está temporalmente fuera de servicio.<br>
+            Intenta de nuevo más tarde.
+        </p>
+        <button class="btn btn-secondary btn-lg" onclick="window.history.back();">
+             Volver atrás
+        </button>
+    </div>
+
+    <script src="{% static 'libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/darkmode.js' %}"></script>
+</body>
+</html>

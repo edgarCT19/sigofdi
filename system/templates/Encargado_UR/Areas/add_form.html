@@ -1,0 +1,72 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-2">
+  <div class="card mt-1 p-4">
+        <p class="text-center mb-2"  style="font-size: 18px;">Agregar información del área</p>
+        <hr class="text-center" style="color: var(--color-uacam-primary);">
+        <form method="post" class="mt-3">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="material-input">
+                <input type="text" name="nombre" class="" required value="{{ area.nombre|default:'' }}">
+                <label for="nombre">Nombre del Área</label>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <div class="material-input">
+                <select name="edificio" class="" required>
+                  <option value="">-- Selecciona un Edificio --</option>
+                  {% for edificio in edificios %}
+                    <option value="{{ edificio.id }}" {% if area.edificio.id == edificio.id %}selected{% endif %}>
+                      {{ edificio.nombre }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <label for="edificio">Edificio</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="mb-3 col-md-6">
+              <div class="material-input">
+                <input type="text" name="telefono" class="" value="{{ area.telefono|default:'' }}">
+                <label for="telefono">Teléfono</label>
+              </div>
+            </div>
+
+            <div class="mb-3 col-md-6">
+              <div class="material-input">
+                <input type="text" name="cargo" class="" value="{{ area.cargo|default:'' }}">
+                <label for="cargo">Cargo</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="material-input">
+              <input type="text" class="" id="responsable" name="responsable" required>
+              <label for="responsable" class="form-label">Responsable</label>
+            </div> 
+          </div>
+
+          <div class="mb-3">
+            <div class="material-input"> 
+              <input type="text" name="grado_estudio" class="" value="{{ area.grado_estudio|default:'' }}">
+              <label for="grado_estudio">Grado de Estudio</label>
+            </div>
+          </div>
+          
+          <div class="d-grid mx-auto gap-2 align-items-center justify-content-center">
+             <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
+             <a href="{% url 'lista_areas' %}" class="btn btn-danger">Cancelar</a>
+          </div>
+        </form>
+
+  </div>
+
+</div>
+{% endblock content %}

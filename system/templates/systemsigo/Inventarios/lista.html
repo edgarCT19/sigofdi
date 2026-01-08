@@ -1,0 +1,253 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+
+  <!-- Formulario de Filtro -->
+   <div class="card p-4 mt-2">
+      <p class="text-center mb-2"  style="font-size: 18px;">Filtro de datos de Inventarios Energéticos</p>
+      <hr class="text-center" style="color: var(--color-uacam-primary);">
+      <form method="get" class="row g-3 mt-3">
+        <div class="col-md-4">
+          <div class="material-input">
+            <select class="" name="unidad" id="unidad" required>
+              <option value="">-- Selecciona --</option>
+              {% for unidad in unidades %}
+                <option value="{{ unidad.id }}" {% if unidad_seleccionada == unidad.id|stringformat:"s" %}selected{% endif %}>{{ unidad.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="unidad" class="">Unidad Responsable</label>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="material-input">
+            <select class="" name="periodo" id="periodo" required>
+              <option value="">-- Selecciona --</option>
+              {% for periodo in periodos %}
+                <option value="{{ periodo.id }}" {% if periodo_seleccionado == periodo.id|stringformat:"s" %}selected{% endif %}>{{ periodo.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="periodo" class="">Periodo</label>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="material-input">
+            <select class="" name="tipo" id="tipo" required>
+              <option value="">-- Selecciona --</option>
+              {% for t in tipos %}
+                <option value="{{ t }}" {% if tipo_seleccionado == t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+            <label for="tipo" class="">Tipo de Inventario</label>
+          </div>
+        </div>
+      </form>
+   </div>
+
+  <!-- Tabla de Resultados -->
+  {% if registros %}
+   <div class="card mt-2">
+    <div class="d-flex justify-content-end align-items-center p-2 mx-1">
+        {% if registros %}
+          <a href="{% url 'exportar_excel_inventario' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}&tipo={{ tipo_seleccionado }}" 
+          class="btn btn-success mx-2" title="Exportar a Excel">Exportar</a>
+          <a href="{% url 'inventarios_filtro_triple' %}" class="btn btn-secondary mx-2">Limpiar</a>
+        {% endif %}
+    </div>
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="table-container">
+        <table class="styled-table text-center mt-2">
+          <thead class="">
+            <tr class="text-center">
+                <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    Lista de registros del inventario seleccionado
+                </th>
+            </tr>
+            <tr>
+              <th>#</th>
+              <th>Edificio</th>
+              <th>Nivel</th>
+              <th>Área</th>              
+
+              {% if tipo_seleccionado == "Climatización" %}
+                <th>Tipo Clima</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Capacidad BTU</th>
+                <th>Voltaje</th>
+                <th>Amperaje</th>
+                <th>Potencia</th>
+                <th>Potencia total</th>
+                <th>Horas al mes</th>
+                <th>Consumo</th>
+                <th>Creado por</th>
+                <th>Actualizado por</th>
+                <th>Ultima actualización</th>
+              {% elif tipo_seleccionado == "Luminarias" %}
+                <th>Tipo Lámpara</th>
+                <th>Número de Luminarias</th>
+                <th>Lámparas/Luminaria</th>
+                <th>Potencia por lámpara</th>
+                <th>Potencia Total</th>
+                <th>Horas al mes</th>
+                <th>Consumo</th>
+                <th>Creado por</th>
+                <th>Actualizado por</th>
+                <th>Ultima actualización</th>
+              {% elif tipo_seleccionado == "Misceláneos" %}
+                <th>Misceláneo</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Voltaje</th>
+                <th>Amperaje</th>
+                <th>Potencia</th>
+                <th>Potencia total</th>
+                <th>Horas al mes</th>
+                <th>Consumo</th>
+                <th>Creado por</th>
+                <th>Actualizado por</th>
+                <th>Ultima actualización</th>
+              {% endif %}
+
+              <th>Fecha de Registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in registros %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ r.edificio.nombre }}</td>
+                <td>{{ r.nivel }}</td>
+                <td>{{ r.area.nombre }}</td>
+
+                {% if tipo_seleccionado == "Climatización" %}
+                  <td>{{ r.tipo_clima }}</td>
+                  <td>{{ r.marca }}</td>
+                  <td>{{ r.modelo }}</td>
+                  <td>{{ r.capacidad }}</td>
+                  <td>{{ r.voltaje }}</td>
+                  <td>{{ r.amperaje }}</td>
+                  <td>{{ r.potencia }}</td>
+                  <td>{{ r.potencia_total }}</td>
+                  <td>{{ r.horas_mes }}</td>
+                  <td>{{ r.consumo_mensual }}</td>
+                  <td>{{ r.creado_por }}</td>
+                  <td>{{ r.actualizado_por }}</td>
+                  <td>{{ r.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                {% elif tipo_seleccionado == "Luminarias" %}
+                  <td>{{ r.tipo_lampara }}</td>
+                  <td>{{ r.num_luminarias }}</td>
+                  <td>{{ r.lamp_luminarias }}</td>
+                  <td>{{ r.potencia_lamp }}</td>
+                  <td>{{ r.potencia_total_lum }}</td>
+                  <td>{{ r.consumo_mensual_horas }}</td>
+                  <td>{{ r.consumo_mensual }}</td>
+                  <td>{{ r.creado_por }}</td>
+                  <td>{{ r.actualizado_por }}</td>
+                  <td>{{ r.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                {% elif tipo_seleccionado == "Misceláneos" %}
+                  <td>{{ r.miscelaneos }}</td>
+                  <td>{{ r.marca }}</td>
+                  <td>{{ r.modelo }}</td>
+                  <td>{{ r.voltaje }}</td>
+                  <td>{{ r.amperaje }}</td>
+                  <td>{{ r.potencia }}</td>
+                  <td>{{ r.potencia_total }}</td>
+                  <td>{{ r.horas_mes }}</td>
+                  <td>{{ r.consumo_mensual }}</td>
+                  <td>{{ r.creado_por }}</td>
+                  <td>{{ r.actualizado_por }}</td>
+                  <td>{{ r.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                {% endif %}
+
+                <td>{{ r.fecha_registro|date:"Y-m-d H:i" }}</td>
+              </tr>
+            {% endfor %}
+             {% if tipo_seleccionado == "Climatización" %}
+            <tr colspan="20" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
+              <th>Total:</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>{{ total_potencia_clim }}</th>
+              <th>{{ total_horas_clim }}</th>
+              <th>{{ total_consumo_clim }}</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+             {% elif tipo_seleccionado == "Luminarias" %}
+            <tr colspan="20" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
+              <th>Total:</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>{{ total_potencia_lum }}</th>
+              <th>{{ total_horas_lum }}</th>
+              <th>{{ total_consumo_lum }}</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+             {% elif tipo_seleccionado == "Misceláneos" %}
+            <tr colspan="20" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
+              <th>Total:</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>{{ total_potencia_misc }}</th>
+              <th>{{ total_horas_misc }}</th>
+              <th>{{ total_consumo_misc }}</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+             {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+   </div>
+  {% elif unidad_seleccionada and periodo_seleccionado and tipo_seleccionado %}
+    <div class="custom-alert-warning">No se encontraron registros para los filtros seleccionados.</div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+    const selects = form.querySelectorAll("select");
+
+    selects.forEach(select => {
+      select.addEventListener("change", () => {
+        form.submit();
+      });
+    });
+  });
+</script>
+
+{% endblock %}

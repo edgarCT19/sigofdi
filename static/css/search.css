@@ -1,0 +1,55 @@
+.searchBox {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  background: var(--color-uacam-background-light);
+  border-radius: 6px;
+  padding: 3px 15px;
+  width: 100%;
+  position: relative;
+}
+
+.searchBox input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding-left: 5px;
+  font-size: 15px;
+  color: var(--color-uacam-text-search);
+  min-width: 0;
+}
+
+.searchBox .clear-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--color-uacam-primary);
+  cursor: pointer;
+}
+
+.searchBox .clear-btn svg {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.searchBox .clear-btn:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.searchBox input::placeholder {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.searchBox svg {
+  font-size: 18px;
+  color: var(--color-uacam-primary);
+}
+
+/* Responsivo */
+@media (min-width: 576px) {
+  .searchBox {
+    max-width: 300px;
+  }
+}

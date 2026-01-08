@@ -1,0 +1,91 @@
+{% extends 'systemsigo/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="custom-alert-warning">
+    <strong>Nota:</strong> Si algún dato de está mal favor de comunicarse con el administrador o encargado de unidad.
+</div>
+
+<div class="mt-2">
+<div class="row d-flex align-items-stretch">
+    <div class="col-lg-4">
+        <div class="card mb-4 shadow-sm h-100">
+            <div class="card-body text-center">
+                {% if usuario.foto_perfil %}
+                    <div class="text-center mb-3">
+                    <img src="{{ MEDIA_URL }}{{ usuario.foto_perfil }}" 
+                        class="rounded-circle" 
+                        style="width: 150px; height: 150px; object-fit: cover;">
+                    </div>
+                {% else %}
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center mx-auto"
+                        style="width: 150px; height: 150px; font-size: 3rem; background-color: #CB4C4C;">
+                        {{ usuario.nombres|first|upper }}
+                    </div>
+                {% endif %}
+            <h5 class="my-3" style="color: var(--color-uacam-datatext);">{{ usuario.nombres }} {{ usuario.apellidos }}</h5>
+            <div class="text-center mt-4">
+            <a href="{% url 'cambiar_foto' %}">
+                <button class="btn btn-secondary">Colocar foto de perfil</button>
+            </a>
+            </div>
+            <div class="text-center mt-2">
+            <a href="{% url 'cambiar_contrasena' %}">
+                <button class="btn btn-light">Cambiar contraseña</button>
+            </a>
+            </div>
+            <div class="text-center mt-2">
+                {% if usuario.is_active %}
+                <h5><span class="badge text-bg-success">Cuenta activa</span></h5>
+                {% endif %}
+            </div>
+            </div>        
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card mb-4 shadow-sm h-100">
+            <div class="card-body">
+            <form>
+                <!-- Sección de Información Básica -->
+                <p>Información de usuario</p>
+                <div class="row">
+                <div class="col-md-6 mt-4 material-input">
+                    <input type="text" class="" id="unidad_responsable" value="{{ usuario.unidad_responsable.nombre|default:"No asignada" }}" disabled>
+                    <label for="name" class="">Unidad Responsable</label>
+                </div>
+                <div class="col-md-6 mt-4 material-input">
+                    <input type="email" class="" id="email" value="{{ usuario.email|default:"No registrado" }}" disabled>
+                    <label for="email" class="">Correo electrónico</label>
+                </div>
+                </div>
+                
+                <div class="row">
+                <div class="col-md-6 mt-4 material-input">
+                    <input type="text" class="" id="telefono" value="{{ usuario.telefono|default:"No registrado" }}" disabled>
+                    <label for="phone" class="">Teléfono</label>
+                </div>
+                <div class="col-md-6 mt-4 material-input">
+                    <input type="text" class="" id="rol" value="{{ usuario.rol|title  }}" disabled>
+                    <label for="dob" class="">Rol</label>
+                </div>
+                </div>
+
+                <div class="row">
+                <div class="col-md-6 mt-4 material-input">
+                    <input type="text" class="" id="matricula" value="{{ usuario.matricula|default:"No registrada" }}" disabled>
+                    <label for="address" class="">Matrícula</label>
+                </div>
+                <div class="col-md-6 mt-4 material-input">
+                    <input type="text" class="" id="fecha_alta" value="{{ usuario.fecha_alta|date:"d M Y H:i" }}" disabled>
+                    <label for="zip" class="">Fecha de alta</label>
+                </div>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

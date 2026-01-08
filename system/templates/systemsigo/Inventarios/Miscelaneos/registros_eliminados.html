@@ -1,0 +1,184 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        
+        <a href="{% url 'listado_inventario_miscelaneos' %}" class="btn btn-primary">Inventario</a>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-cente">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="20" style='background-color: var(--color-uacam-table-header); font-size: 15px;'>
+                            Registros de Misceláneos (Dado de Baja)
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>UR</th>
+                        <th>Edificio</th>
+                        <th>Nivel</th>
+                        <th>Área</th>
+                        <th>Marca</th>
+                        <th>Misceláneo</th>
+                        <th>Modelo</th>
+                        <th>Voltaje</th>
+                        <th>Amperaje</th>
+                        <th>Potencia</th>
+                        <th>Potencia Total</th>
+                        <th>Horas Mes</th>
+                        <th>Consumo Mensual</th>
+                        <th>Creado por</th>
+                        <th>Fecha Registro</th>
+                        <th>Actualizado por</th>
+                        <th>Última Actualización</th>
+                        <th>Fecha Baja</th>
+                        <th>Dado de Baja Por</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reg in miscelaneos_inactivos %}
+                    <tr>
+                        <td>{{ reg.unidad_responsable.nombre }}</td>
+                        <td>{{ reg.edificio.nombre }}</td>
+                        <td>{{ reg.nivel }}</td>
+                        <td>{{ reg.area.nombre }}</td>
+                        <td>{{ reg.marca }}</td>
+                        <td>{{ reg.miscelaneos }}</td>
+                        <td>{{ reg.modelo }}</td>
+                        <td>{{ reg.voltaje }}</td>
+                        <td>{{ reg.amperaje }}</td>
+                        <td>{{ reg.potencia }}</td>
+                        <td>{{ reg.potencia_total }}</td>
+                        <td>{{ reg.horas_mes }}</td>
+                        <td>{{ reg.consumo_mensual }}</td>
+                        <td>{{ reg.creado_por }}</td>
+                        <td>{{ reg.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ reg.actualizado_por }}</td>
+                        <td>{{ reg.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ reg.fecha_baja|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ reg.dado_baja_por }}</td>
+                        <td>
+                            <div class="d-flex justify-content-center gap-2">
+                                <button class="btn btn-secondary btn-sm rounded-circle"
+                                        title="Reactivar"
+                                        onclick="reactivarMiscelaneo('{{ reg.id }}')">
+                                    <i class="bi bi-toggle-on"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-danger rounded rounded-circle btn-sm"
+                                        title="Eliminar registro"
+                                        onclick="eliminarInventario('{{ reg.id }}')">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="20" class="text-center">No hay registros de misceláneos dados de baja.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function reactivarMiscelaneo(regId) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "El registro será reactivado y volverá a estar activo.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, reactivar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/inventario/miscelaneos/restaurar/${regId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Reactivado", "El registro fue reactivado correctamente.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Error", data.error || "No se pudo reactivar.", "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Hubo un problema con la petición.", "error");
+            });
+        }
+    });
+}
+
+function eliminarInventario(regId) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Este registro será eliminado permanentemente.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/inventario/miscelaneos/admin/eliminar/${regId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Eliminado", "El registro fue eliminado correctamente.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Error", data.error || "No se pudo eliminar.", "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Hubo un problema con la petición.", "error");
+            });
+        }
+    });
+}
+</script>
+
+{% endblock content %}

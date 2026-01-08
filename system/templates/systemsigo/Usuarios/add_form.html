@@ -1,0 +1,137 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+select#unidad_responsable {
+  max-width: 100%;
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: block;
+}
+</style>
+
+{% if messages %}
+<div class="mt-3">
+    {% for message in messages %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" style="box-shadow: none; outline: none;" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="container mt-2">
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información del usuario</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="mt-3">
+      {% csrf_token %}
+
+      <!-- Primera fila: Matrícula y Nombres -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <input type="number" class="" id="matricula" name="matricula" required>
+            <label for="matricula">Matrícula</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <input type="text" class="" id="nombres" name="nombres" required>
+            <label for="nombres">Nombres</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segunda fila: Apellidos, Email, Teléfono -->
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            <input type="text" class="" id="apellidos" name="apellidos" required>
+            <label for="apellidos">Apellidos</label>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            <input type="email" class="" id="email" name="email" required>
+            <label for="email">Correo Electrónico</label>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            <input type="number" class="" id="telefono" name="telefono">
+            <label for="telefono">Teléfono</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tercera fila: Rol y Unidad Responsable -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <select class="" id="rol" name="rol" required>
+              <option value="" style="color: black;">-- Selecciona un rol --</option>
+              <option value="admin" style="color: black;">Administrador General</option>
+              <option value="admin_energia" style="color: black;">Administrador Energía</option>
+              <option value="admin_ambiental" style="color: black;">Administrador Ambiental</option>
+              <!-- <option value="admin_salud" style="color: black;">Administrador Salud</option>-->
+              <!-- <option value="rector" style="color: black;">Rector (a)</option>-->
+              <!-- <option value="director" style="color: black;">Director</option>-->
+              <option value="encargado_ur" style="color: black;">Encargado UR</option>
+              <option value="capturista" style="color: black;">Capturista</option>
+              <!-- <option value="auditor" style="color: black;">Auditor</option>-->
+            </select>
+            <label for="rol">Rol</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <select class="" id="unidad_responsable" name="unidad_responsable">
+              <option value="">-- Ninguna --</option>
+              {% for ur in unidades %}
+              <option value="{{ ur.id }}" title="{{ ur.nombre }}" style="color: black;">{{ ur.nombre|truncatechars:45 }}</option>
+              {% endfor %}
+            </select>
+            <label for="unidad_responsable">Unidad Responsable</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+        <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
+        <a href="{% url 'usuarios' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const rolSelect = document.getElementById('rol');
+  const urSelect = document.getElementById('unidad_responsable');
+
+  document.querySelector('form').addEventListener('submit', function () {
+    document.getElementById('loader').classList.remove('d-none');
+  });
+
+  function toggleUnidadResponsable() {
+    const rolesSinUR = ["admin", "admin_ambiental", "admin_energia", "admin_salud"];
+    if (rolesSinUR.includes(rolSelect.value)) {
+      urSelect.value = "";  // Limpia la selección
+      urSelect.disabled = true;
+    } else {
+      urSelect.disabled = false;
+    }
+  }
+
+  rolSelect.addEventListener('change', toggleUnidadResponsable);
+
+  // Ejecuta al cargar por si se recarga el form
+  window.onload = toggleUnidadResponsable;
+</script>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+<!-- Spinner de carga oculto por defecto -->
+<div id="loader" class="loader-overlay d-none">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+</div>
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del Capturista de Datos</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+
+   <!-- {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}-->
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <!-- Primera fila: Matrícula y Nombres -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <input type="text" id="matricula" name="matricula" value="{{ usuario.matricula }}" required>
+            <label for="matricula">Matrícula</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <input type="text" id="nombres" name="nombres" value="{{ usuario.nombres }}" required>
+            <label for="nombres">Nombres</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segunda fila: Apellidos, Email, Teléfono -->
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            <input type="text" id="apellidos" name="apellidos" value="{{ usuario.apellidos }}" required>
+            <label for="apellidos">Apellidos</label>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            <input type="email" id="email" name="email" value="{{ usuario.email }}" required>
+            <label for="email">Correo Electrónico</label>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            <input type="text" id="telefono" name="telefono" value="{{ usuario.telefono }}" required>
+            <label for="telefono">Teléfono</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tercera fila: Rol y Unidad Responsable -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <input type="text" value="{{ usuario.rol|capfirst }}" disabled>
+            <label>Rol asignado</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            <input type="text" value="{{ usuario.unidad_responsable.nombre }}" disabled>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+        <button type="submit" class="btn-uacam-primary-especial">Guardar cambios</button>
+        <a href="{% url 'lista_capturistas' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelector('form').addEventListener('submit', function () {
+    document.getElementById('loader').classList.remove('d-none');
+  });
+</script>
+{% endblock %}

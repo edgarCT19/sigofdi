@@ -1,0 +1,80 @@
+/* Estilos personalizados para evitar conflicto con Bootstrap */
+.material-input {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.material-input input,
+.material-input textarea,
+.material-input select {
+    width: 100%;
+    padding: 0.8rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: transparent;
+    outline: none;
+    transition: all 0.3s ease;
+    color: var(--color-uacam-input-text);
+}
+
+.material-input input::placeholder,
+.material-input textarea::placeholder {
+    color: var(--color-uacam-input-placeholder);
+    opacity: 1;
+}
+
+.material-input label {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--color-uacam-input-label);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.material-input input:focus,
+.material-input textarea:focus,
+.material-input select:focus {
+    border-color: var(--color-uacam-primary);
+}
+
+.material-input input:focus ~ label,
+.material-input input:not(:placeholder-shown) ~ label,
+.material-input textarea:focus ~ label,
+.material-input textarea:not(:placeholder-shown) ~ label,
+.material-input select:focus ~ label,
+.material-input select:not([value=""]) ~ label {
+    top: -0.8rem;
+    left: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--color-uacam-primary);
+}
+
+.material-input input[type="file"] {
+    border: none !important;
+}
+
+.material-input input:placeholder-shown ~ label {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Responsivo para pantallas pequeñas */
+@media (max-width: 575px) {
+  .searchBox {
+    max-width: 100%;
+  }
+
+  .searchBox input {
+    width: 100%; /* Asegura que el input ocupe todo el ancho */
+  }
+
+  .btn-uacam-primary-especial {
+    width: 100%; /* El botón se adapta a todo el ancho en móviles */
+    margin-top: 10px; /* Separación entre el input y el botón */
+  }
+}

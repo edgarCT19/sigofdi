@@ -1,0 +1,170 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información de la luminaria</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <!-- Unidad Responsable -->
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" id="urSelect" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="urSelect">Unidad Responsable</label>
+          </div>
+        </div>
+
+        <!-- Periodo -->
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="periodo" required>
+              <option value="">-- Selecciona --</option>
+              {% for p in periodos %}
+                <option value="{{ p.id }}">{{ p.nombre }} ({{ p.status }})</option>
+              {% endfor %}
+            </select>
+            <label>Periodo</label>
+          </div>
+        </div>
+
+        <!-- Nivel -->
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="nivel" id="nivelSelect" required>
+              <option value="">-- Nivel --</option>
+              {% for nivel in niveles %}
+                <option value="{{ nivel }}">{{ nivel }}</option>
+              {% endfor %}
+            </select>
+            <label for="nivelSelect">Nivel</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Edificio -->
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="edificio" id="edificioSelect" required>
+              <option value="">-- Selecciona --</option>
+            </select>
+            <label for="edificioSelect">Edificio</label>
+          </div>
+        </div>
+
+        <!-- Área -->
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="area" id="areaSelect" required>
+              <option value="">-- Selecciona --</option>
+            </select>
+            <label for="areaSelect">Área</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tipo de Lámpara -->
+      <div class="material-input mt-4">
+        <input type="text" name="tipo_lampara" required oninput="this.value=this.value.toUpperCase()">
+        <label>Tipo de Lámpara</label>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3 material-input mt-4">
+          <input type="number" name="num_luminarias" id="num_luminarias" required>
+          <label>Número de Luminarias</label>
+        </div>
+        <div class="col-md-3 material-input mt-4">
+          <input type="number" name="lamp_luminarias" id="lamp_luminarias" required>
+          <label>Lámparas por Luminaria</label>
+        </div>
+        <div class="col-md-3 material-input mt-4">
+          <input type="number" step="0.01" name="potencia_lamp" id="potencia_lamp" required>
+          <label>Potencia de Lámpara (W)</label>
+        </div>
+        <div class="col-md-3 material-input mt-4">
+          <input type="number" name="consumo_mensual_horas" id="horas_mes" required>
+          <label>Horas al Mes</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 material-input mt-4">
+          <input type="number" name="potencia_total_lum" id="potencia_total_lum" step="0.001" readonly>
+          <label>Potencia Total (kW)</label>
+        </div>
+        <div class="col-md-6 material-input mt-4">
+          <input type="number" name="consumo_mensual" id="consumo_mensual" step="0.01" readonly>
+          <label>Consumo Mensual (kWh)</label>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
+        <a href="{% url 'listado_inventario_luminarias' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // AJAX carga edificios y áreas según UR
+  document.getElementById('urSelect').addEventListener('change', async (e) => {
+    const urId = e.target.value;
+    const edificiosSel = document.getElementById('edificioSelect');
+    const areasSel = document.getElementById('areaSelect');
+
+    edificiosSel.innerHTML = '<option value="">Cargando...</option>';
+    areasSel.innerHTML = '<option value="">Cargando...</option>';
+
+    const [edRes, arRes] = await Promise.all([
+      fetch(`{% url 'ajax_edificios_por_ur' %}?ur_id=${urId}`),
+      fetch(`{% url 'ajax_areas_por_ur' %}?ur_id=${urId}`)
+    ]);
+
+    const edData = await edRes.json();
+    const arData = await arRes.json();
+
+    edificiosSel.innerHTML = '<option value="">-- Selecciona --</option>';
+    if (edData.ok) {
+      edData.data.forEach(e => {
+        edificiosSel.insertAdjacentHTML('beforeend', `<option value="${e.id}">${e.nombre}</option>`);
+      });
+    }
+
+    areasSel.innerHTML = '<option value="">-- Selecciona --</option>';
+    if (arData.ok) {
+      arData.data.forEach(a => {
+        areasSel.insertAdjacentHTML('beforeend', `<option value="${a.id}">${a.nombre}</option>`);
+      });
+    }
+  });
+
+  // Cálculo automático de potencia y consumo
+  const calcFields = ['num_luminarias', 'lamp_luminarias', 'potencia_lamp', 'horas_mes'];
+  calcFields.forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      const n = +document.getElementById('num_luminarias').value || 0;
+      const l = +document.getElementById('lamp_luminarias').value || 0;
+      const p = +document.getElementById('potencia_lamp').value || 0;
+      const h = +document.getElementById('horas_mes').value || 0;
+
+      const potenciaTotal = n * l * p / 1000; // W → kW
+      const consumo = potenciaTotal * h;
+
+      document.getElementById('potencia_total_lum').value = potenciaTotal;
+      document.getElementById('consumo_mensual').value = consumo;
+    });
+  });
+</script>
+
+{% endblock %}

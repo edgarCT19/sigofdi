@@ -1,0 +1,105 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="mt-2">
+    <div class="card p-4">
+        <p class="text-center mb-2"  style="font-size: 18px;">Filtro de Áreas por Edificio de Unidad Responsable</p>
+        <hr class="text-center" style="color: var(--color-uacam-primary);">
+        <form method="get" id="filterForm" class="row mt-3">
+            <div class="col-md-6">
+                <div class="material-input">
+                    <select name="unidad_responsable" id="unidad_responsable" class="" onchange="document.getElementById('filterForm').submit();">
+                        <option value="">-- Selecciona una UR --</option>
+                        {% for unidad in unidades %}
+                            <option value="{{ unidad.id }}" {% if ur_id == unidad.id|stringformat:"s" %}selected{% endif %}>
+                                {{ unidad.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label for="unidad_responsable" class="form-label">Unidad Responsable</label>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="material-input">
+                    <select name="edificio" id="edificio" class="material-input" onchange="document.getElementById('filterForm').submit();">
+                        <option value="">-- Todos los edificios --</option>
+                        {% for edificio in edificios %}
+                            <option value="{{ edificio.id }}" {% if edificio_id == edificio.id|stringformat:"s" %}selected{% endif %}>
+                                {{ edificio.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <label for="edificio" class="">Edificio</label>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <div class="card mt-3">
+        <div class="d-flex justify-content-end mt-2">
+            <a href="{% url 'todas_las_areas' %}"><button class="btn btn-secondary mx-2">Limpiar</button></a>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="table-container">
+                {% if areas %}
+                <table class="styled-table text-center">
+                    <thead class="">
+                        <tr class="text-center">
+                            <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                                Lista de áreas de los edificios de Unidades Responsables
+                            </th>
+                        </tr>
+                        <tr class="text-center">
+                            <th>Nombre del Área</th>
+                            <th>Edificio</th>
+                            <th>Responsable</th>
+                            <th>Teléfono</th>
+                            <th>Cargo</th>
+                            <th>Grado de Estudio</th>
+                            <th>Fecha de Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for area in areas %}
+                        <tr>
+                            <td>{{ area.nombre }}</td>
+                            <td>{{ area.edificio.nombre }}</td>
+                            <td>{{ area.responsable }}</td>
+                            <td>{{ area.telefono }}</td>
+                            <td>{{ area.cargo }}</td>
+                            <td>{{ area.grado_estudio }}</td>
+                            <td>{{ area.fecha_registro|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                    <table class="styled-table text-center">
+                        <thead class="">
+                            <tr class="text-center">
+                                <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                                    Lista de áreas de los edificios de Unidades Responsables
+                                </th>
+                            </tr>
+                            <tr class="text-center">
+                                <th>Nombre del Área</th>
+                                <th>Edificio</th>
+                                <th>Responsable</th>
+                                <th>Teléfono</th>
+                                <th>Cargo</th>
+                                <th>Grado de Estudio</th>
+                                <th>Fecha de Registro</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <p class="text-center">No hay áreas para mostrar.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

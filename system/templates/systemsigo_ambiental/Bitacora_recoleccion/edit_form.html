@@ -1,0 +1,59 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información de bitácora de recolección (RPBI)</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if bitacora.unidad_responsable.id == ur.id %}selected{% endif %}>
+                  {{ ur.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="area_dependencia" value="{{ bitacora.area_dependencia }}" required>
+            <label>Área / Dependencia</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="cultivos_cepas" value="{{ bitacora.cultivos_cepas }}"><label>Cultivos / Cepas</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="punzocortantes" value="{{ bitacora.punzocortantes }}"><label>Punzocortantes</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="patologicos" value="{{ bitacora.patologicos }}"><label>Patológicos</label></div></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="no_anatomicos" value="{{ bitacora.no_anatomicos }}"><label>No Anatómicos</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="sangre" value="{{ bitacora.sangre }}"><label>Sangre</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="number" name="bolsas_rojas" value="{{ bitacora.bolsas_rojas }}"><label>Bolsas Rojas</label></div></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4"><div class="material-input"><input type="number" name="bolsas_amarillas" value="{{ bitacora.bolsas_amarillas }}"><label>Bolsas Amarillas</label></div></div>
+        <div class="col-md-6 mt-4"><div class="material-input"><input type="number" name="contenedores_punzocortantes" value="{{ bitacora.contenedores_punzocortantes }}"><label>Contenedores Punzocortantes</label></div></div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+        <a href="{% url 'bitacora_recoleccion_rpbi' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="{% static 'js/inputs_mayusculas.js' %}"></script>
+{% endblock content %}

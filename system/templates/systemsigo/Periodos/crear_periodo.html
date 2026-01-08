@@ -1,0 +1,39 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información del nuevo periodo de inventario energético</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="date" name="fecha_inicio" class="" required>
+            <label>Fecha de Inicio</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="date" name="fecha_fin" class="" required>
+            <label>Fecha de Fin</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 material-input">
+        <textarea name="observaciones" class="" rows="4" required></textarea>
+        <label>Observaciones / Instrucciones</label>
+      </div>
+
+      <div class="d-grid mx-auto gap-2 align-items-center justify-content-center">
+        <button type="submit" class="btn-uacam-primary-especial">Crear</button>
+        <a href="{% url 'listar_periodos' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div>
+
+   <div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+            type="text"
+            id="input-search"
+            class=""
+            placeholder="Buscar..."
+            oninput="toggleClearButton(this)"
+        />
+        <button
+            id="clear-search"
+            type="button"
+            class="btn btn-sm btn-link text-secondary px-2 d-none"
+            onclick="clearSearch()"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Borrar búsqueda"
+        >
+            <i class="bi bi-x-circle-fill"></i>
+        </button>
+        </div>
+
+        <a href="{% url 'registrar_inventario_luminarias_admin' %}"><button class="btn btn-primary">Agregar</button></a>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+        <table class="styled-table text-center">
+            <thead>
+                <tr class="text-center">
+                    <th colSpan="22" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                        Lista de de inventarios de Iluminación
+                    </th>
+                </tr>
+                <tr class="text-center">
+                    <th>Unidad Responsable</th>
+                    <th>Edificio</th>
+                    <th>Nivel</th>
+                    <th>Área</th>
+                    <th>Tipo Lámpara</th>
+                    <th>Número de Luminarias</th>
+                    <th>Lámparas/Luminaria</th>
+                    <th>Potencia por lámpara</th>
+                    <th>Potencia Total</th>
+                    <th>Horas al mes</th>
+                    <th>Consumo</th>
+                    <th>Creado por</th>
+                    <th>Fecha de registro</th>
+                    <th>Actualizado por</th>
+                    <th>Ultima actualización</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                {% for luminarias in luminarias %}
+                <tr>
+                    <td>{{ luminarias.unidad_responsable.nombre }}</td>
+                    <td>{{ luminarias.edificio.nombre }}</td>
+                    <td>{{ luminarias.nivel }}</td>
+                    <td>{{ luminarias.area.nombre }}</td>
+                    <td>{{ luminarias.tipo_lampara }}</td>
+                    <td>{{ luminarias.num_luminarias }}</td>
+                    <td>{{ luminarias.lamp_luminarias }}</td>
+                    <td>{{ luminarias.potencia_lamp }}</td>
+                    <td>{{ luminarias.potencia_total_lum }}</td>
+                    <td>{{ luminarias.consumo_mensual_horas }}</td>
+                    <td>{{ luminarias.consumo_mensual }}</td>
+                    <td>{{ luminarias.creado_por }}</td>
+                    <td>{{ luminarias.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+                    <td>{{ luminarias.actualizado_por }}</td>
+                    <td>{{ luminarias.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                    <td> 
+                        <div class="d-flex actions justify-content-center gap-2">
+                            <a href="{% url 'editar_inventario_luminarias_admin' luminarias.id %}" class="btn btn-light rounded rounded-circle btn-sm" title="Actualizar información">
+                                <i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-success rounded rounded-circle btn-sm" title="Dar de baja" onclick="darBajaLuminaria('{{ luminarias.id }}')">
+                                <i class="bi bi-toggle-on"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+        <ul class="pagination" id="pagination"></ul>
+    </div>
+
+   </div>
+
+</div>
+
+<script>
+function darBajaLuminaria(id) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "La luminaria será dada de baja y pasará al historial.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, dar de baja',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `/inventario/luminarias/dar_baja/admin/${id}/`;
+        }
+    });
+}
+</script>
+
+{% endblock content %}

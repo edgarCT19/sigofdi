@@ -1,0 +1,64 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información de bitácora de recolección (RPBI)</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="post" class="">
+      {% csrf_token %}
+
+      <!-- Unidad Responsable + Área Dependencia -->
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if registro and registro.unidad_responsable.id == ur.id %}selected{% endif %}>
+                  {{ ur.nombre }} ({{ ur.campus.nomenclatura }})
+                </option>
+              {% endfor %}
+            </select>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="area_dependencia" value="{{ registro.area_dependencia|default:'' }}" required>
+            <label>Área Dependencia</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campos principales -->
+      <div class="row">
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="cultivos_cepas" value="{{ registro.cultivos_cepas|default:'' }}"><label>Cultivos Cepas</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="punzocortantes" value="{{ registro.punzocortantes|default:'' }}"><label>Punzocortantes</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="patologicos" value="{{ registro.patologicos|default:'' }}"><label>Patológicos</label></div></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="no_anatomicos" value="{{ registro.no_anatomicos|default:'' }}"><label>No Anatómicos</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="text" name="sangre" value="{{ registro.sangre|default:'' }}"><label>Sangre</label></div></div>
+        <div class="col-md-4 mt-4"><div class="material-input"><input type="number" name="bolsas_rojas" value="{{ registro.bolsas_rojas|default:'' }}"><label>Bolsas Rojas</label></div></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4"><div class="material-input"><input type="number" name="bolsas_amarillas" value="{{ registro.bolsas_amarillas|default:'' }}"><label>Bolsas Amarillas</label></div></div>
+        <div class="col-md-6 mt-4"><div class="material-input"><input type="number" name="contenedores_punzocortantes" value="{{ registro.contenedores_punzocortantes|default:'' }}"><label>Contenedores Punzocortantes</label></div></div>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">
+          {% if registro %}Actualizar{% else %}Guardar{% endif %}
+        </button>
+        <a href="{% url 'bitacora_recoleccion_rpbi' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="{% static 'js/inputs_mayusculas.js' %}"></script>
+{% endblock content %}

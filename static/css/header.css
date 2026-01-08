@@ -1,0 +1,45 @@
+/* Navbar */
+.navbar-custom {
+    background-color: var(--color-uacam-navbar-bg);
+    color: var(--color-uacam-navbar-text);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding-left: 265px;
+}
+
+.navbar-custom .menu-toggle {
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+.navbar-custom .brand {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Quitar padding-left en pantallas pequeñas */
+@media (max-width: 768px) {
+  .navbar-custom {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .alert-nav {
+    font-size: 0.75rem; /* más pequeño */
+    padding: 2px 8px;
+    width: 100%;
+    font-size: 10px;
+    margin-right: 5px;
+  }
+}

@@ -1,0 +1,30 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card p-4">
+        <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información de la Unidad Responsable</p>
+        <hr class="text-center" style="color: var(--color-uacam-primary);">
+
+        <form method="post" class="mt-3">
+            {% csrf_token %}
+            <div class="material-input">
+                {{ form.nombre }}
+                <label for="{{ form.nombre.id_for_label }}">Nombre de Unidad</label>
+            </div>
+            <div class="material-input">
+                {{ form.campus }}
+                <label for="{{ form.campus.id_for_label }}">Campus al que pertenece</label>
+            </div>
+            <div class="material-input">
+                {{ form.total_personas }}
+                <label for="{{ form.total_personas.id_for_label }}">Total de personas</label>
+            </div>
+            <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+                <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+                <a href="{% url 'listar_unidades' %}" class="btn btn-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

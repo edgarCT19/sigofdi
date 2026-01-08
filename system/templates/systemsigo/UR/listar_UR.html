@@ -1,0 +1,143 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        <a href="{% url 'crear_unidad' %}" class="btn btn-primary">Agregar</a>
+    </div>
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                            Lista de Unidades Responsables
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>Nombre</th>
+                        <th>Campus</th>
+                        <th>Total de personas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for unidad in unidades %}
+                    <tr>
+                        <td>{{ unidad.nombre }}</td>
+                        <td>{{ unidad.campus.nomenclatura }}</td>
+                        <td>{{ unidad.total_personas }}</td>
+                        <td>
+                            <a href="{% url 'editar_unidad' unidad.id %}" 
+                            class="btn btn-light btn-sm rounded rounded-circle" title="Editar información">
+                            <i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-danger btn-sm rounded rounded-circle" onclick="confirmarEliminacion('{{ unidad.id }}')"
+                            title="Eliminar UR"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(unidadId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡Esta acción eliminará la Unidad Responsable!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/unidades/eliminar/${unidadId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire('Eliminado', 'La unidad fue eliminada.', 'success')
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire('Error', data.message || 'No se pudo eliminar.', 'error');
+                }
+            });
+        }
+    });
+}
+
+ //Tiempo de duración de alerta
+  setTimeout(function() {
+    var alert = document.querySelector('.alert');
+    if (alert) {
+      var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+      bsAlert.close();
+    }
+  }, 3000); // 3 segundos
+
+        //Buscador dinámico
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("input-search");
+    const clearBtn = document.getElementById("clear-search");
+    const tableRows = document.querySelectorAll("table tbody tr");
+
+    // Filtrado en tiempo real
+    searchInput.addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+
+      // Mostrar/ocultar botón de limpiar
+      if (query !== "") {
+        clearBtn.classList.remove("d-none");
+      } else {
+        clearBtn.classList.add("d-none");
+      }
+
+      // Filtrar filas
+      tableRows.forEach((row) => {
+        const rowText = row.innerText.toLowerCase();
+        row.style.display = rowText.includes(query) ? "" : "none";
+      });
+    });
+
+    // Botón de limpiar búsqueda
+    clearBtn.addEventListener("click", function () {
+      searchInput.value = "";
+      clearBtn.classList.add("d-none");
+
+      // Mostrar todas las filas al limpiar
+      tableRows.forEach((row) => {
+        row.style.display = "";
+      });
+    });
+  });
+</script>
+{% endblock content %}

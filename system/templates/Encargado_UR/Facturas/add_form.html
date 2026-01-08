@@ -1,0 +1,85 @@
+
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información de la factura</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" enctype="multipart/form-data" class="mt-3">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6 material-input mt-4">
+          <select name="subestacion" class="" required>
+            <option value="">-- Selecciona --</option>
+            {% for sub in subestaciones %}
+              <option value="{{ sub.id }}">{{ sub.no_servicio }} - {{ sub.no_medidor }} - {{ sub.tarifa }}</option>
+            {% endfor %}
+          </select>
+          <label>Subestación</label>
+        </div>
+        <div class="col-md-6 material-input mt-4">
+          <select name="tipo_tarifa" class="" required>
+            <option value="">-- Selecciona --</option>
+            <option value="GDMTH">GDMTH</option>
+            <option value="GDMTO">GDMTO</option>
+            <option value="GDBT">GDBT</option>
+          </select>
+          <label>Tipo de Tarifa</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 material-input mt-4"><input type="number" name="dias_periodo" class="" required><label>Días del período</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="text" name="periodo" class="" required><label>Período</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="date" name="fecha_vencimiento" class="" required><label>Fecha vencimiento</label></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="consumo" class="" required><label>Consumo (kWh)</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="number" name="demanda_maxima" class="" required><label>Demanda Máxima</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="factor_potencia" class="" required><label>Factor Potencia</label></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 material-input mt-4"><input type="number" name="factor_carga" class="" required><label>Factor Carga</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="cargo_energia" class="" required><label>Cargo Energía</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="importe_demanda_maxima" class="" required><label>Importe Demanda Máxima</label></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="importe_bt" class="" required><label>Importe BT (Si no tiene, escriba 0)</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="importe_fp" class="" required><label>Bonificación FP</label></div>
+        <div class="col-md-4 material-input mt-4"><input type="number" step="any" name="dap" class="" required><label>DAP</label></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 material-input mt-4"><input type="number" step="any" name="iva" class="" required><label>IVA</label></div>
+        <div class="col-md-6 material-input mt-4"><input type="number" step="any" name="total_a_pagar" class="" required><label>Total a Pagar</label></div>
+      </div>
+
+      <div class="material-input mt-4">
+        <input type="file" name="archivo_pdf" class="" accept="application/pdf" required>
+        <label>Archivo PDF</label>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 material-input mt-4">
+          <select class="" name="status" id="status" required>
+            <option value="">-- Selecciona un estado --</option>
+            <option value="Pendiente" {% if factura.status == "Pendiente" %}selected{% endif %}>Pendiente</option>
+            <option value="Pagada" {% if factura.status == "Pagada" %}selected{% endif %}>Pagada</option>
+            <option value="Vencida" {% if factura.status == "Vencida" %}selected{% endif %}>Vencida</option>
+          </select>
+          <label for="status" class="form-label">Estatus</label>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+        <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
+        <a href="{% url 'listar_facturas_triple' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

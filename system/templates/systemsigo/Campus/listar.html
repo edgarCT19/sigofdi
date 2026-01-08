@@ -1,0 +1,106 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        <a href="{% url 'crear_campus' %}" class="btn btn-primary">Agregar</a>
+    </div>
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                            Lista de Campus de la Universidad
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>M<sup>2</sup> de construcción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campus in campus_list %}
+                    <tr id="campus-row-{{ campus.id }}">
+                        <td>{{ campus.nomenclatura }}</td>
+                        <td>{{ campus.ubicacion }}</td>
+                        <td>{{ campus.metros_cuadrados }}</td>
+                        <td>
+                            <a href="{% url 'editar_campus' campus.id %}" title="Editar información" class="btn btn-sm btn-light rounded rounded-circle">
+                                <i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-danger eliminar-btn rounded rounded-circle" title="Eliminar campus" data-id="{{ campus.id }}">
+                                <i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.eliminar-btn').forEach(button => {
+    button.addEventListener('click', function () {
+        const campusId = this.getAttribute('data-id');
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡Esta acción no se puede deshacer!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/campus/eliminar/${campusId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('¡Eliminado!', 'El campus ha sido eliminado.', 'success');
+                        document.getElementById(`campus-row-${campusId}`).remove();
+                    } else {
+                        Swal.fire('Error', data.message || 'No se pudo eliminar.', 'error');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Hubo un problema al procesar la solicitud.', 'error');
+                });
+            }
+        });
+    });
+});
+
+ //Borré buscador dinámico y tiempo de alerta porque los importo desde otros archivo, si no fucniona solo copio y pego de regreso
+ 
+</script>
+{% endblock %}

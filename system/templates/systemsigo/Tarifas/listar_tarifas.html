@@ -1,0 +1,171 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+    <div class="card">
+        <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+            <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+            </div>
+
+            <a href="{% url 'crear_tarifa' %}"><button class="btn btn-primary">Agregar</button></a>
+        </div>
+        <div class="d-flex align-items-center justify-content-center">
+          <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                            Lista de tarifas
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Tarifa</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarifa in tarifas %}
+                    <tr>
+                        <td>{{ tarifa.nombre }}</td>
+                        <td>{{ tarifa.descripcion }}</td>
+                        <td>{{ tarifa.tarifa }}</td>
+                        <td>
+                            <div class="d-flex actions justify-content-center gap-2">
+                            <a href="{% url 'editar_tarifa' tarifa.id %}"><button class="btn btn-light rounded rounded-circle btn-sm" 
+                                title="Editar información"><i class="bi bi-pencil"></i></button></a> 
+                            <button 
+                                class="btn btn-danger rounded rounded-circle btn-sm"
+                                onclick="confirmarEliminacion('{{ tarifa.id }}')" 
+                                title="Eliminar tarifa"
+                            >
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+           <!-- Aquí puedes agregar paginación u otros controles si es necesario -->
+        </div>
+    </div>
+
+<script>
+ //Eliminar alerta con sweetAlert2 (confirmación)   
+function confirmarEliminacion(id) {
+    Swal.fire({
+        title: '¿Eliminar tarifa?',
+        text: 'Esta acción no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            eliminarTarifa(id);
+        }
+    });
+}
+
+//Alerta de sweetAlert2 de eliminar (exitoso)
+function eliminarTarifa(id) {
+    fetch(`/tarifas/eliminar/${id}/`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': '{{ csrf_token }}',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: '¡Eliminada!',
+                text: 'La tarifa ha sido eliminada.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                location.reload(); // Solo recarga después de cerrar el alert
+            });
+        } else {
+            Swal.fire('Error', data.error || 'No se pudo eliminar.', 'error');
+        }
+    })
+    .catch(error => {
+        Swal.fire('Error', 'Ocurrió un error al eliminar.', 'error');
+    });
+}
+
+ //Tiempo de duración de alerta
+  setTimeout(function() {
+    var alert = document.querySelector('.alert');
+    if (alert) {
+      var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+      bsAlert.close();
+    }
+  }, 3000); // 3 segundos
+
+
+      //Buscador dinámico
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("input-search");
+    const clearBtn = document.getElementById("clear-search");
+    const tableRows = document.querySelectorAll("table tbody tr");
+
+    // Filtrado en tiempo real
+    searchInput.addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+
+      // Mostrar/ocultar botón de limpiar
+      if (query !== "") {
+        clearBtn.classList.remove("d-none");
+      } else {
+        clearBtn.classList.add("d-none");
+      }
+
+      // Filtrar filas
+      tableRows.forEach((row) => {
+        const rowText = row.innerText.toLowerCase();
+        row.style.display = rowText.includes(query) ? "" : "none";
+      });
+    });
+
+    // Botón de limpiar búsqueda
+    clearBtn.addEventListener("click", function () {
+      searchInput.value = "";
+      clearBtn.classList.add("d-none");
+
+      // Mostrar todas las filas al limpiar
+      tableRows.forEach((row) => {
+        row.style.display = "";
+      });
+    });
+  });
+</script>
+
+{% endblock %}

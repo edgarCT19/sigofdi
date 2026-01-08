@@ -1,0 +1,129 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div>
+  <div class="card">
+
+    <!-- Search + Botón Agregar -->
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+      <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+          type="text"
+          id="input-search"
+          placeholder="Buscar..."
+        />
+        <button
+          id="clear-search"
+          type="button"
+          class="btn btn-sm btn-link text-secondary px-2 d-none"
+          title="Borrar búsqueda"
+        >
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </div>
+
+      <a href="{% url 'vertedero_municipal_crear_admin' %}">
+        <button class="btn btn-primary">Agregar</button>
+      </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead>
+            <tr class="text-center">
+              <th colspan="9" class="table-title"
+                  style="background-color: var(--color-uacam-table-header); font-size: 15px;">
+                Vertederos Municipales
+              </th>
+            </tr>
+            <tr class="text-center">
+              <th>Unidad Responsable</th>
+              <th>Dependencia</th>
+              <th>Tipo de Desecho</th>
+              <th>Capacidad</th>
+              <th>Fecha Registro</th>
+              <th>Creado por</th>
+              <th>Última actualización</th>
+              <th>Actualizado por</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for v in vertederos %}
+            <tr>
+              <td>{{ v.unidad_responsable.nombre }}</td>
+              <td>{{ v.dependencia }}</td>
+              <td>{{ v.tipo_desecho }}</td>
+              <td>{{ v.capacidad }}</td>
+              <td>{{ v.fecha_registro|date:"d/m/Y H:i" }}</td>
+              <td>{{ v.creado_por }}</td>
+              <td>{{ v.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+              <td>{{ v.actualizado_por }}</td>
+              <td>
+                <div class="d-flex actions justify-content-center gap-2">
+                  <a href="{% url 'vertedero_municipal_editar_admin' v.id %}"
+                     class="btn btn-light rounded-circle btn-sm"
+                     title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button class="btn btn-danger btn-sm rounded-circle"
+                          onclick="eliminarVertedero('{{ v.id }}', '{{ v.tipo_desecho }}')"
+                          title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <form id="form-eliminar-{{ v.id }}" action="{% url 'vertedero_municipal_eliminar_admin' v.id %}" method="POST" style="display:none;">
+                    {% csrf_token %}
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="9" class="text-center">No hay registros</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+      <ul class="pagination" id="pagination"></ul>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// SweetAlert para eliminar registros
+function eliminarVertedero(id, nombre) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: `El vertedero "${nombre}" será eliminado`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: '¡Eliminado!',
+        text: `El vertedero "${nombre}" fue eliminado correctamente.`,
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById(`form-eliminar-${id}`).submit();
+      });
+    }
+  });
+}
+</script>
+
+{% endblock content %}

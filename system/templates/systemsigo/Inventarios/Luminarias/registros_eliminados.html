@@ -1,0 +1,171 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div>
+
+   <div class="card">
+    <!-- Buscador + Botón Inventario -->
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        <a href="{% url 'listado_inventario_luminarias' %}" class="btn btn-primary">Inventario</a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="9" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;'>
+                            Historial de Inventarios de Luminarias (Dado de Baja)
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>Unidad Responsable</th>
+                        <th>Edificio</th>
+                        <th>Nivel</th>
+                        <th>Área</th>
+                        <th>Tipo Lámpara</th>
+                        <th>Número de Luminarias</th>
+                        <th>Fecha de Baja</th>
+                        <th>Dado de baja por</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for lum in luminarias_inactivas %}
+                    <tr>
+                        <td>{{ lum.unidad_responsable.nombre }}</td>
+                        <td>{{ lum.edificio.nombre }}</td>
+                        <td>{{ lum.nivel }}</td>
+                        <td>{{ lum.area.nombre }}</td>
+                        <td>{{ lum.tipo_lampara }}</td>
+                        <td>{{ lum.num_luminarias }}</td>
+                        <td>{{ lum.fecha_baja|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ lum.dado_baja_por.username }}</td>
+                        <td>
+                            <div class="d-flex actions justify-content-center gap-2">
+                                <button class="btn btn-secondary btn-sm rounded rounded-circle" 
+                                        onclick="reactivarLuminaria('{{ lum.id }}')" 
+                                        title="Restaurar registro">
+                                    <i class="bi bi-toggle-off"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-danger rounded rounded-circle btn-sm"
+                                        title="Eliminar registro"
+                                        onclick="eliminarInventario('{{ lum.id }}')">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No hay luminarias dadas de baja.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+        <ul class="pagination" id="pagination"></ul>
+    </div>
+        
+   </div>
+
+</div>
+
+<script>
+function reactivarLuminaria(lumId) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "El registro será reactivado y volverá a estar activo.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, reactivar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/inventario/luminarias/restaurar/${lumId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Reactivado", "El registro fue reactivado correctamente.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Error", data.error || "No se pudo reactivar.", "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Hubo un problema con la petición.", "error");
+            });
+        }
+    });
+}
+
+function eliminarInventario(lumId) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "Este registro será eliminado permanentemente.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/inventario/luminarias/admin/eliminar/${lumId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Eliminado", "El registro fue eliminado correctamente.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Error", data.error || "No se pudo eliminar.", "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Hubo un problema con la petición.", "error");
+            });
+        }
+    });
+}
+</script>
+{% endblock %}

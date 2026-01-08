@@ -1,0 +1,178 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del aire acondicionado</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select id="unidad_responsable" name="unidad_responsable" class="" required>
+              <option value="">-- Seleccionar UR --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if climatizacion.unidad_responsable.id == ur.id %}selected{% endif %}>
+                  {{ ur.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label for="unidad_responsable">Unidad Responsable</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select id="periodo" name="periodo" class="" required>
+              <option value="">-- Seleccionar Periodo --</option>
+              {% for p in periodos %}
+                <option value="{{ p.id }}" {% if climatizacion.periodo.id == p.id %}selected{% endif %}>
+                  {{ p.nombre }} ({{ p.fecha_inicio|date:"d/m/Y" }} - {{ p.fecha_fin|date:"d/m/Y" }})
+                </option>
+              {% endfor %}
+            </select>
+            <label for="periodo">Periodo</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select id="edificio" name="edificio" class="" required>
+              <option value="">-- Seleccionar Edificio --</option>
+              {% for e in edificios %}
+                <option value="{{ e.id }}" {% if climatizacion.edificio.id == e.id %}selected{% endif %}>{{ e.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="edificio">Edificio</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select id="area" name="area" class="" required>
+              <option value="">-- Seleccionar Área --</option>
+              {% for a in areas %}
+                <option value="{{ a.id }}" {% if climatizacion.area.id == a.id %}selected{% endif %}>{{ a.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="area">Área</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select id="nivel" name="nivel" class="" required>
+              <option value="">-- Seleccionar Nivel --</option>
+              {% for n in niveles %}
+                <option value="{{ n }}" {% if climatizacion.nivel == n %}selected{% endif %}>{{ n }}</option>
+              {% endfor %}
+            </select>
+            <label for="nivel">Nivel</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="material-input mt-4">
+        <input type="text" id="tipo_clima" name="tipo_clima" value="{{ climatizacion.tipo_clima }}" required>
+        <label for="tipo_clima">Tipo de Climatización</label>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" id="marca" name="marca" value="{{ climatizacion.marca }}" required>
+            <label for="marca">Marca</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" id="modelo" name="modelo" value="{{ climatizacion.modelo }}" required>
+            <label for="modelo">Modelo</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" id="capacidad" name="capacidad" value="{{ climatizacion.capacidad }}" required>
+            <label for="capacidad">Capacidad (BTU)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="any" id="voltaje" name="voltaje" value="{{ climatizacion.voltaje }}" required>
+            <label for="voltaje">Voltaje (V)</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="any" id="amperaje" name="amperaje" value="{{ climatizacion.amperaje }}" required>
+            <label for="amperaje">Amperaje (A)</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="any" id="potencia" name="potencia" value="{{ climatizacion.potencia }}" required>
+            <label for="potencia">Potencia (kW)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="number" step="any" id="potencia_total" name="potencia_total" value="{{ climatizacion.potencia_total }}" required>
+            <label for="potencia_total">Potencia Total (kW)</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="number" step="any" id="horas_mes" name="horas_mes" value="{{ climatizacion.horas_mes }}" required>
+            <label for="horas_mes">Horas al Mes</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consumo mensual automático -->
+      <div class="row">
+        <div class="col-md-12 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" id="consumo_mensual" name="consumo_mensual"
+                   value="{{ climatizacion.consumo_mensual }}" readonly required>
+            <label for="consumo_mensual">Consumo Mensual (kWh)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+        <a href="{% url 'listado_inventario_climatizacion' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Calcular Potencia, Potencia Total y Consumo
+  function actualizarCalculos() {
+    const v = parseFloat(document.getElementById('voltaje').value) || 0;
+    const a = parseFloat(document.getElementById('amperaje').value) || 0;
+    const h = parseFloat(document.getElementById('horas_mes').value) || 0;
+
+    const potencia = v * a;
+    const potTotal = potencia / 1000;
+    const consumo = potTotal * h;
+
+    document.getElementById('potencia').value = potencia.toFixed(2);
+    document.getElementById('potencia_total').value = potTotal.toFixed(4);
+    document.getElementById('consumo_mensual').value = consumo.toFixed(2);
+  }
+
+  ['voltaje','amperaje','horas_mes'].forEach(id => {
+    document.getElementById(id).addEventListener('input', actualizarCalculos);
+  });
+</script>
+{% endblock %}

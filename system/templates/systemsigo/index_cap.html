@@ -1,0 +1,106 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+.illustration-dark {
+  display: none;
+}
+
+body.dark-mode .illustration-light {
+  display: none;
+}
+
+body.dark-mode .illustration-dark {
+  display: inline;
+}
+</style>
+
+{% if periodo_activo %}
+  <div class="custom-alert-warning d-flex align-items-center justify-content-between shadow-sm" role="alert">
+    <div>
+      <strong>📢 Periodo Activo:</strong> {{ periodo_activo.nombre }}<br>
+      <small><strong>Vigencia:</strong> {{ periodo_activo.fecha_inicio|date:"d/m/Y" }} - {{ periodo_activo.fecha_fin|date:"d/m/Y" }}</small><br>
+      <em>{{ periodo_activo.observaciones }}</em>
+    </div>
+  </div>
+{% endif %}
+
+<!-- ===== SECCIÓN DE BIENVENIDA ===== -->
+<div class="card border-0 shadow-sm rounded-4 my-2">
+  <div class="card-body py-5 px-4">
+    <div class="row align-items-center">
+      <div class="col-md-6 text-start">
+        <h1 class="fw-bold display-5 mb-3 text-secondary">
+          Bienvenido al <span style="color: var(--color-uacam-black);">
+            Sistema de Captura de Datos de Inventarios Energéticos ISO 50001:2018
+          </span>
+        </h1>
+        <p class="lead text-secondary mb-4">
+          Ha llegado el momento de optimizar el consumo energético de tu organización a través del software.
+        </p>
+      </div>
+
+      <div class="col-md-6 text-center position-relative">
+        <!-- Imagen modo claro -->
+        <img src="{% static 'images/ilustraciones_svg/data-storage-light.svg' %}"
+             alt="Ilustración eficiencia energética modo claro"
+             class="img-fluid illustration-light" style="max-height: 350px;">
+
+        <!-- Imagen modo oscuro -->
+        <img src="{% static 'images/ilustraciones_svg/data-storage.svg' %}"
+             alt="Ilustración eficiencia energética modo oscuro"
+             class="img-fluid illustration-dark" style="max-height: 350px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN DE DESCRIPCIÓN GENERAL ===== -->
+<div class="rounded-4 my-1">
+  <div class="card-body py-5 px-4">
+    <div class="text-center mb-5">
+      <h2 class="fw-semibold text-secondary">Módulos de Captura de Datos</h2>
+      <p class="">
+        Registros, modificaciones en los datos, capacidad de eliminarlos y buscarlos ágilmente entre grandes
+        volumenes de datos es lo que este sistema te permite hacer.
+      </p>
+    </div>
+    <div class="row text-center">
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body">
+            <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Inventario de Aires Acondicionados</h5>
+            <p class="text-secondary">
+              Realliza un seguimiento y captura de información detallado de los equipos de climatización instalados en la organización.
+            </p>
+            <a href="{% url 'listar_inventario_climatizacion' %}" class="btn btn-primary">Inventario</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body">
+            <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Inventario de Luminarias</h5>
+            <p class="text-secondary">
+              Realliza un seguimiento y captura de información detallado de las luminarias instaladas en la organización.
+            </p>
+            <a href="{% url 'listar_inventario_luminarias' %}" class="btn btn-primary">Inventario</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body">
+            <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Inventario de Misceláneos</h5>
+            <p class="text-secondary">
+              Realliza un seguimiento y captura de información detallado de objetos misceláneos que consuman energía.
+            </p>
+            <a href="{% url 'listar_inventario_miscelaneos' %}" class="btn btn-primary">Inventario</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

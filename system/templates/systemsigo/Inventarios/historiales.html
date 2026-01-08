@@ -1,0 +1,49 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="card text-center">
+  <div class="card-header">
+    <h5 style="color: var(--color-uacam-primary);">Aires Acondicionados</h5>
+  </div>
+  <div class="card-body">
+    <p class="card-text">Has clic en el botón "Ver registros" para ir a la lista de los registros que han sido eliminados 
+        para tener la posibilidad de restaurarlos si es necesario o eliminarlos permanentemente.
+    </p>
+    <a href="{% url 'historial_climatizacion_admin' %}" class="btn btn-secondary">Ver registros</a>
+  </div>
+  <div class="card-footer" style="color: var(--color-uacam-primary);">
+   ----------------
+  </div>
+</div>
+
+<div class="card text-center mt-2">
+  <div class="card-header">
+    <h5 style="color: var(--color-uacam-primary);">Luminarias</h5>
+  </div>
+  <div class="card-body">
+    <p class="card-text">Has clic en el botón "Ver registros" para ir a la lista de los registros que han sido eliminados 
+        para tener la posibilidad de restaurarlos si es necesario o eliminarlos permanentemente.</p>
+    <a href="{% url 'historial_luminarias_admin' %}" class="btn btn-secondary">Ver registros</a>
+  </div>
+  <div class="card-footer" style="color: var(--color-uacam-primary);">
+    ----------------
+  </div>
+</div>
+
+<div class="card text-center mt-2">
+  <div class="card-header">
+    <h5 style="color: var(--color-uacam-primary);">Misceláneos</h5>
+  </div>
+  <div class="card-body">
+    <p class="card-text">Has clic en el botón "Ver registros" para ir a la lista de los registros que han sido eliminados 
+        para tener la posibilidad de restaurarlos si es necesario o eliminarlos permanentemente.</p>
+    <a href="{% url 'historial_miscelaneos_admin' %}" class="btn btn-secondary">Ver registros</a>
+  </div>
+  <div class="card-footer" style="color: var(--color-uacam-primary);">
+    ----------------
+  </div>
+</div>
+
+{% endblock content %}

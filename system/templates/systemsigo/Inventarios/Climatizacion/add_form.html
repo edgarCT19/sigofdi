@@ -1,0 +1,196 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información del aire acondicionado</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="post" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" id="urSelect" class="" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+              {% endfor %}
+            </select>
+            <label for="urSelect">Unidad Responsable</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="periodo" class="" required>
+              {% for p in periodos %}
+                <option value="{{ p.id }}">{{ p.nombre }} ({{ p.status }})</option>
+              {% endfor %}
+            </select>
+            <label for="periodo">Periodo</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="edificio" id="edificioSelect" class="" required>
+              <option value="">-- Selecciona --</option>
+            </select>
+            <label for="edificioSelect">Edificio</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="nivel" id="nivelSelect" class="" required>
+              {% for nivel in niveles %}
+                <option value="{{ nivel }}">{{ nivel }}</option>
+              {% endfor %}
+            </select>
+            <label for="nivel">Nivel</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="area" id="areaSelect" class="" required>
+              <option value="">-- Selecciona --</option>
+            </select>
+            <label for="areaSelect">Área</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="material-input mt-4">
+        <input type="text" name="tipo_clima" required>
+        <label for="tipo_clima">Tipo de Clima</label>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" name="marca" required>
+            <label for="marca">Marca</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" name="modelo" required>
+            <label for="modelo">Modelo</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" name="capacidad" required>
+            <label for="capacidad">Capacidad (BTU/BTH)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" id="voltaje" name="voltaje" step="0.01" required>
+            <label for="voltaje">Voltaje (V)</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" id="amperaje" name="amperaje" step="0.0001" required>
+            <label for="amperaje">Amperaje (A)</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" id="potencia" name="potencia" step="0.01" readonly required>
+            <label for="potencia">Potencia (W)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="number" id="potencia_total" name="potencia_total" step="0.0001" readonly required>
+            <label for="potencia_total">Potencia Total (kW)</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="number" id="horas_mes" name="horas_mes" step="0.01" required>
+            <label for="horas_mes">Horas Mes</label>
+          </div>
+        </div>
+        <div class="col-md-12 mt-4">
+          <div class="material-input">
+            <input type="number" id="consumo_mensual" name="consumo_mensual" step="0.01" readonly required>
+            <label for="consumo_mensual">Consumo Mensual (kWh)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
+        <a href="{% url 'listado_inventario_climatizacion' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Calcular Potencia, Potencia Total y Consumo
+  function actualizarCalculos() {
+    const v = parseFloat(document.getElementById('voltaje').value) || 0;
+    const a = parseFloat(document.getElementById('amperaje').value) || 0;
+    const h = parseFloat(document.getElementById('horas_mes').value) || 0;
+
+    const potencia = v * a;
+    const potTotal = potencia / 1000;
+    const consumo = potTotal * h;
+
+    document.getElementById('potencia').value = potencia.toFixed(2);
+    document.getElementById('potencia_total').value = potTotal.toFixed(4);
+    document.getElementById('consumo_mensual').value = consumo.toFixed(2);
+  }
+
+  ['voltaje','amperaje','horas_mes'].forEach(id => {
+    document.getElementById(id).addEventListener('input', actualizarCalculos);
+  });
+
+  // Cargar edificios y áreas al cambiar UR
+  document.getElementById('urSelect').addEventListener('change', async (e) => {
+    const urId = e.target.value;
+    const edificiosSel = document.getElementById('edificioSelect');
+    const areasSel = document.getElementById('areaSelect');
+    edificiosSel.innerHTML = '<option value="">Cargando...</option>';
+    areasSel.innerHTML = '<option value="">Cargando...</option>';
+
+    const [edRes, arRes] = await Promise.all([
+      fetch(`{% url 'ajax_edificios_por_ur' %}?ur_id=${urId}`),
+      fetch(`{% url 'ajax_areas_por_ur' %}?ur_id=${urId}`)
+    ]);
+
+    const edData = await edRes.json();
+    const arData = await arRes.json();
+
+    edificiosSel.innerHTML = '<option value="">-- Selecciona --</option>';
+    if (edData.ok) {
+      edData.data.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id; opt.textContent = e.nombre;
+        edificiosSel.appendChild(opt);
+      });
+    }
+
+    areasSel.innerHTML = '<option value="">-- Selecciona --</option>';
+    if (arData.ok) {
+      arData.data.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.id; opt.textContent = a.nombre;
+        areasSel.appendChild(opt);
+      });
+    }
+  });
+</script>
+{% endblock content %}

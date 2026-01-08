@@ -1,0 +1,48 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del periodo de inventario energético</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mt-4 material-input">
+        <input type="text" class="" value="{{ periodo.nombre }}" disabled>
+        <label>Nombre</label>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4 material-input">
+          <input type="date" name="fecha_inicio" class="" value="{{ periodo.fecha_inicio|date:'Y-m-d' }}" required>
+          <label>Fecha Inicio</label>
+        </div>
+        <div class="col-md-6 mt-4 material-input">
+          <input type="date" name="fecha_fin" class="" value="{{ periodo.fecha_fin|date:'Y-m-d' }}" required>
+          <label>Fecha Fin</label>
+        </div>
+      </div>
+
+      <div class="mt-4 material-input">
+        <textarea name="observaciones" class="">{{ periodo.observaciones }}</textarea>
+        <label>Observaciones</label>
+      </div>
+
+      <div class="mt-4 material-input">
+        <select name="status" class="" disabled>
+          <option value="Pendiente" {% if periodo.status == "Pendiente" %}selected{% endif %}>Pendiente</option>
+          <option value="Activo" {% if periodo.status == "Activo" %}selected{% endif %}>Activo</option>
+          <option value="Finalizado" {% if periodo.status == "Finalizado" %}selected{% endif %}>Finalizado</option>
+        </select>
+        <label>Status (automático)</label>
+      </div>
+
+      <div class="d-grid mx-auto gap-2 align-items-center justify-content-center">
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+        <a href="{% url 'listar_periodos' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

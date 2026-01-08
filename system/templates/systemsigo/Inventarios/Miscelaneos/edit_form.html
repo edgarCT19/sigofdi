@@ -1,0 +1,176 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del misceláneo</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" id="urSelect" class="" required>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if miscelaneos.unidad_responsable.id == ur.id %}selected{% endif %}>
+                  {{ ur.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="periodo" class="" required>
+              {% for p in periodos %}
+                <option value="{{ p.id }}" {% if miscelaneos.periodo.id == p.id %}selected{% endif %}>
+                  {{ p.nombre }} ({{ p.status }})
+                </option>
+              {% endfor %}
+            </select>
+            <label>Periodo</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="edificio" id="edificioSelect" class="" required>
+              {% for e in edificios %}
+                <option value="{{ e.id }}" {% if miscelaneos.edificio.id == e.id %}selected{% endif %}>
+                  {{ e.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Edificio</label>
+          </div>
+        </div>
+
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="nivel" class="" required>
+              {% for nivel in niveles %}
+                <option value="{{ nivel }}" {% if miscelaneos.nivel == nivel %}selected{% endif %}>
+                  {{ nivel }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Nivel</label>
+          </div>
+        </div>
+
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="area" id="areaSelect" class="" required>
+              {% for a in areas %}
+                <option value="{{ a.id }}" {% if miscelaneos.area.id == a.id %}selected{% endif %}>
+                  {{ a.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Área</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" name="miscelaneos" value="{{ miscelaneos.miscelaneos }}" 
+                   oninput="this.value=this.value.toUpperCase()" required>
+            <label>Dispositivo Misceláneo</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" name="marca" value="{{ miscelaneos.marca }}" 
+                   oninput="this.value=this.value.toUpperCase()" required>
+            <label>Marca</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" name="modelo" value="{{ miscelaneos.modelo }}" 
+                   oninput="this.value=this.value.toUpperCase()" required>
+            <label>Modelo</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" name="voltaje" id="voltaje" value="{{ miscelaneos.voltaje }}" required>
+            <label>Voltaje</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" name="amperaje" id="amperaje" value="{{ miscelaneos.amperaje }}" required>
+            <label>Amperaje</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" name="horas_mes" id="horas_mes" value="{{ miscelaneos.horas_mes }}" required>
+            <label>Horas al Mes</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" name="potencia" id="potencia" 
+                   value="{{ miscelaneos.potencia }}" readonly required>
+            <label>Potencia (W)</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.0001" name="potencia_total" id="potencia_total" 
+                   value="{{ miscelaneos.potencia_total }}" readonly required>
+            <label>Potencia Total (kW)</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" name="consumo_mensual" id="consumo_mensual" 
+                   value="{{ miscelaneos.consumo_mensual }}" readonly required>
+            <label>Consumo Mensual (kWh)</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+        <a href="{% url 'listado_inventario_miscelaneos' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function actualizarCampos() {
+    const voltaje = parseFloat(document.getElementById('voltaje').value) || 0;
+    const amperaje = parseFloat(document.getElementById('amperaje').value) || 0;
+    const horas = parseFloat(document.getElementById('horas_mes').value) || 0;
+
+    const potencia = voltaje * amperaje;
+    const potenciaTotal = potencia / 1000;
+    const consumo = potenciaTotal * horas;
+
+    document.getElementById('potencia').value = potencia.toFixed(2);
+    document.getElementById('potencia_total').value = potenciaTotal.toFixed(4);
+    document.getElementById('consumo_mensual').value = consumo.toFixed(2);
+  }
+
+  ['voltaje', 'amperaje', 'horas_mes'].forEach(id => {
+    document.getElementById(id).addEventListener('input', actualizarCampos);
+  });
+</script>
+{% endblock %}

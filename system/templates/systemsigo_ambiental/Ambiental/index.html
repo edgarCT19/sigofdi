@@ -1,0 +1,127 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.illustration-dark {
+  display: none;
+}
+
+body.dark-mode .illustration-light {
+  display: none;
+}
+
+body.dark-mode .illustration-dark {
+  display: inline;
+}
+
+/* Íconos destacados */
+.icon-feature {
+  font-size: 2.5rem;
+  color: var(--color-uacam-black);
+  margin-bottom: 0.75rem;
+}
+
+/* Espaciado equilibrado entre secciones */
+.section-spacing {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+</style>
+
+<!-- ===== SECCIÓN DE BIENVENIDA ===== -->
+<div class="card border-0 shadow-sm rounded-4 my-2">
+  <div class="card-body py-5 px-4">
+    <div class="row align-items-center">
+      <div class="col-md-6 text-start">
+        <h1 class="fw-bold display-5 mb-3 text-secondary">
+          Bienvenido al <span style="color: var(--color-uacam-black);">
+            Sistema de Gestión Ambiental ISO 14001:2015
+          </span>
+        </h1>
+        <p class="lead text-secondary mb-4">
+          Implementa un control eficaz de los aspectos ambientales de tu organización con un enfoque digital y sostenible.
+        </p>
+      </div>
+
+      <div class="col-md-6 text-center position-relative">
+        <!-- Imagen principal -->
+        <img src="{% static 'images/ilustraciones_svg/data-storage-light.svg' %}"
+             alt="Ilustración gestión ambiental modo claro"
+             class="img-fluid illustration-light" style="max-height: 350px;">
+        <img src="{% static 'images/ilustraciones_svg/data-storage.svg' %}"
+             alt="Ilustración gestión ambiental modo oscuro"
+             class="img-fluid illustration-dark" style="max-height: 350px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN DE DESCRIPCIÓN GENERAL ===== -->
+<div class="section-spacing">
+  <div class="text-center mb-5">
+    <h2 class="fw-semibold text-secondary">Gestión Ambiental Inteligente</h2>
+    <p>
+      Supervisa tus indicadores ambientales y promueve una cultura sostenible dentro de tu organización.
+    </p>
+  </div>
+
+  <div class="row text-center g-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+        <i class="bi bi-clipboard2-check-fill icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Gestión de bitácoras</h5>
+        <p class="text-secondary">
+          Realiza la gestion y monitoreo de los datos de las bitácoras.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+        <i class="bi bi-recycle icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Administra datos</h5>
+        <p class="text-secondary">
+          Administra los datos de residuos sólidos, líquidos y peligrosos de manera segura y responsable.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+        <i class="bi bi-file-earmark-excel icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Reportes ambientales</h5>
+        <p class="text-secondary">
+          Genera informes automáticos sobre el desempeño ambiental de tu organización, a través de hojas de cálculo.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN DE TARJETA PRINCIPAL ===== -->
+<div class="section-spacing">
+  <div class="text-center mb-4">
+    <h2 class="fw-semibold text-secondary">Optimiza tu Desempeño Ambiental</h2>
+    <p>
+      Usa nuestras herramientas para medir, analizar y mejorar el impacto ecológico de tu organización.
+    </p>
+  </div>
+
+  <div class="d-flex justify-content-center">
+    <div class="card border-0 shadow-lg rounded-4 d-flex flex-row align-items-center p-4" style="max-width: 900px;">
+      <img src="{% static 'images/gest-ambiental.jpg' %}" 
+           class="img-fluid rounded-3 me-4" 
+           alt="Dashboard ambiental" 
+           style="width: 45%; object-fit: cover;">
+      <div>
+        <h5 class="fw-bold" style="color: var(--color-uacam-black);">Plataforma de Monitoreo Ambiental</h5>
+        <p class="text-secondary mb-0">
+          Supervisa tus indicadores ambientales clave, visualiza tendencias y aplica estrategias sostenibles de mejora continua.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

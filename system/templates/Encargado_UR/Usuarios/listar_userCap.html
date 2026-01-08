@@ -1,0 +1,101 @@
+{% extends 'systemsigo/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="card">
+  <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+     <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+            type="text"
+            id="input-search"
+            class=""
+            placeholder="Buscar..."
+            oninput="toggleClearButton(this)"
+        />
+        <button
+            id="clear-search"
+            type="button"
+            class="btn btn-sm btn-link text-secondary px-2 d-none"
+            onclick="clearSearch()"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Borrar búsqueda"
+        >
+            <i class="bi bi-x-circle-fill"></i>
+        </button>
+     </div>
+     <a href="{% url 'add_capturista_encargado' %}" class="btn btn-primary mx-2">Agregar</a>
+  </div>
+  
+  <div class="d-flex align-items-center justify-content-center">
+     <div class="table-container">
+        <table class="styled-table text-center">
+          <thead>
+            <tr class="text-center">
+                <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    Lista de usuarios capturistas en mi Unidad
+                </th>
+            </tr>
+            <tr class="text-center">
+              <th>Matrícula</th>
+              <th>Nombre completo</th>
+              <th>Rol</th>
+              <th>Correo Electrónico</th>
+              <th>Telefóno</th>
+              <th>Fecha de alta</th>
+              <th>Activa</th>
+              <th>Creado por</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for usuario in usuarios %}
+            <tr>
+              <td>{{ usuario.matricula }}</td>
+              <td>{{ usuario.nombre_completo }}</td>
+              <td>{{ usuario.rol|capfirst }}</td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ usuario.telefono }}</td>
+              <td>{{ usuario.fecha_alta|date:"d/m/Y H:i:s" }}</td>
+              <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
+              <td>{{ usuario.creado_por }}</td>
+              <td>
+                <div class="d-flex actions justify-content-around">
+                <a href="{% url 'edit_capturista' usuario.id %}" title="Editar información" class="btn btn-light rounded rounded-circle btn-sm">
+                  <i class="bi bi-pencil"></i></a>
+                <!--<button class="btn btn-danger btn-sm mx-1 rounded rounded-circle"
+                 onclick="confirmDelete('{{ usuario.id }}')" title="Eliminar"><i class="bi bi-trash-fill"></i></button>-->
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+     </div>
+  </div>
+
+  <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+   <ul class="pagination" id="pagination"></ul>
+  </div>
+  
+</div>
+
+<script>
+  function confirmDelete(id) {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "No podrás revertir esta acción",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/usuarios/eliminar/" + id + "/";
+      }
+    });
+  }
+</script>
+{% endblock %}

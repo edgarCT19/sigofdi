@@ -1,0 +1,123 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.illustration-dark {
+  display: none;
+}
+
+body.dark-mode .illustration-light {
+  display: none;
+}
+
+body.dark-mode .illustration-dark {
+  display: inline;
+}
+
+/* Íconos destacados */
+.icon-feature {
+  font-size: 2.5rem;
+  color: var(--color-uacam-black);
+  margin-bottom: 0.75rem;
+}
+
+/* Espaciado más equilibrado entre secciones */
+.section-spacing {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+</style>
+
+<!-- ===== SECCIÓN DE BIENVENIDA ===== -->
+<div class="card border-0 shadow-sm rounded-4 my-2">
+  <div class="card-body py-5 px-4">
+    <div class="row align-items-center">
+      <div class="col-md-6 text-start">
+        <h1 class="fw-bold display-5 mb-3 text-secondary">
+          Bienvenido al <span style="color: var(--color-uacam-black);">
+            Sistema de Gestión Energética ISO 50001:2018
+          </span>
+        </h1>
+        <p class="lead text-secondary mb-4">
+          Ha llegado el momento de optimizar el consumo energético de tu organización a través del software.
+        </p>
+      </div>
+
+      <div class="col-md-6 text-center position-relative">
+        <!-- Imagen principal (modo claro / oscuro) -->
+        <img src="{% static 'images/ilustraciones_svg/data-storage-light.svg' %}"
+             alt="Ilustración eficiencia energética"
+             class="img-fluid illustration-light" style="max-height: 350px;">
+        <img src="{% static 'images/ilustraciones_svg/data-storage.svg' %}"
+             alt="Ilustración eficiencia energética modo oscuro"
+             class="img-fluid illustration-dark" style="max-height: 350px;">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN DE DESCRIPCIÓN GENERAL ===== -->
+<div class="section-spacing">
+  <div class="text-center mb-5">
+    <h2 class="fw-semibold text-secondary">Gestión y Eficiencia Energética</h2>
+    <p>Centraliza, analiza y controla la información energética de tu organización desde un solo lugar.</p>
+  </div>
+
+  <div class="row text-center g-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+        <i class="bi bi-activity icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Monitoreo en tiempo real</h5>
+        <p class="text-secondary">
+          Visualiza el consumo energético con precisión y actualizaciones automáticas.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+        <i class="bi bi-file-earmark-excel icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Reportes automáticos</h5>
+        <p class="text-secondary">
+          Genera reportes y compara periodos para decisiones basadas en datos.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+        <i class="bi bi-bell icon-feature"></i>
+        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Alertas inteligentes</h5>
+        <p class="text-secondary">
+          Recibe notificaciones cuando el consumo supere los límites establecidos.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN DE TARJETA PRINCIPAL ===== -->
+<div class="section-spacing">
+  <div class="text-center mb-4">
+    <h2 class="fw-semibold text-secondary">Descubre Nuestras Soluciones</h2>
+    <p>Herramientas diseñadas para acompañarte en la transformación energética.</p>
+  </div>
+
+  <div class="d-flex justify-content-center">
+    <div class="card border-0 shadow-lg rounded-4 d-flex flex-row align-items-center p-4" style="max-width: 900px;">
+      <img src="{% static 'images/gest-energia.jpg' %}" 
+           class="img-fluid rounded-3 me-4" 
+           alt="Dashboard energético" 
+           style="width: 45%; object-fit: cover;">
+      <div>
+        <h5 class="fw-bold" style="color: var(--color-uacam-black);">Gestión Integral de Energía</h5>
+        <p class="text-secondary mb-0">
+          Visualiza indicadores clave de consumo, compara áreas y detecta oportunidades de mejora en una plataforma intuitiva.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

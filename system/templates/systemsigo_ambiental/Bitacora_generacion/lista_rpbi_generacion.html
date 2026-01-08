@@ -1,0 +1,115 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+
+        <a href="{% url 'bitacora_rpbi_crear_admin' %}">
+            <button class="btn btn-primary">Agregar</button>
+        </a>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="12" class="table-title" style="background-color: var(--color-uacam-table-header); font-size: 15px;">
+                            Lista de Bitácoras de Generación RPBI
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>Unidad Responsable</th>
+                        <th>Área / Dependencia</th>
+                        <th>Cultivos / Cepas</th>
+                        <th>Punzocortantes</th>
+                        <th>Patológicos</th>
+                        <th>No Anatómicos</th>
+                        <th>Sangre</th>
+                        <th>Creado por</th>
+                        <th>Fecha Registro</th>
+                        <th>Actualizado por</th>
+                        <th>Última Actualización</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for bitacora in bitacoras %}
+                    <tr>
+                        <td>{{ bitacora.unidad_responsable.nombre }}</td>
+                        <td>{{ bitacora.area_dependencia }}</td>
+                        <td>{{ bitacora.cultivos_cepas }}</td>
+                        <td>{{ bitacora.punzocortantes }}</td>
+                        <td>{{ bitacora.patologicos }}</td>
+                        <td>{{ bitacora.no_anatomicos }}</td>
+                        <td>{{ bitacora.sangre }}</td>
+                        <td>{{ bitacora.creado_por }}</td>
+                        <td>{{ bitacora.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ bitacora.actualizado_por }}</td>
+                        <td>{{ bitacora.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                        <td>
+                            <div class="d-flex actions justify-content-center gap-2">
+                                <a href="{% url 'bitacora_rpbi_editar_admin' bitacora.id %}" class="btn btn-light rounded-circle btn-sm" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn btn-danger btn-sm rounded-circle" onclick="eliminar('{{ bitacora.id }}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function eliminar(bitacoraId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "El registro será eliminado",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: '¡Eliminado!',
+                text: 'El registro ha sido eliminado correctamente.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = `/bitacora_rpbi/eliminar/${bitacoraId}/`;
+            });
+        }
+    });
+}
+</script>
+{% endblock content %}

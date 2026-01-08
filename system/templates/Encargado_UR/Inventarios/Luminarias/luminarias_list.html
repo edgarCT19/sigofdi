@@ -1,0 +1,84 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Inventario de Luminarias</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="GET" class="mt-3">
+      <div class="material-input">
+      <select name="periodo" id="periodo" onchange="this.form.submit()" class="">
+          <option value="">-- Todos los periodos --</option>
+          {% for p in periodos %}
+              <option value="{{ p.id }}" {% if periodo_seleccionado == p.id|stringformat:"s" %}selected{% endif %}>
+                  {{ p.nombre }} ({{ p.fecha_inicio|date:"d/m/Y" }} - {{ p.fecha_fin|date:"d/m/Y" }})
+              </option>
+          {% endfor %}
+      </select>
+      <label for="periodo"><strong>Filtrar por periodo:</strong></label>
+      </div>
+    </form>
+  </div>
+
+  <div class="card mt-4">
+    <div class="d-flex justify-content-center align-items-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead class="">
+            <tr class="text-center">
+                <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    Lista de registros de inventario de Iluminación
+                </th>
+            </tr>
+            <tr class="text-center">
+              <th>Edificio</th>
+              <th>Nivel</th>
+              <th>Área</th>
+              <th>Tipo Lámpara</th>
+              <th># Luminarias</th>
+              <th>Lámparas/Luminaria</th>
+              <th>Potencia Lámpara (W)</th>
+              <th>Potencia Total</th>
+              <th>Horas al mes</th>
+              <th>Consumo Mensual</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in registros %}
+            <tr>
+              <td>{{ r.edificio.nombre }}</td>
+              <td>{{ r.nivel }}</td>
+              <td>{{ r.area.nombre }}</td>
+              <td>{{ r.tipo_lampara }}</td>
+              <td>{{ r.num_luminarias }}</td>
+              <td>{{ r.lamp_luminarias }}</td>
+              <td>{{ r.potencia_lamp }}</td>
+              <td>{{ r.potencia_total_lum }}</td>
+              <td>{{ r.consumo_mensual_horas }}</td>
+              <td>{{ r.consumo_mensual }}</td>
+              <td>{{ r.fecha_registro|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="20">No hay registros disponibles.</td></tr>
+            {% endfor %}
+            <tr colspan="20" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
+              <th>Total:</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>{{ total_potencia }}</th>
+              <th>{{ total_horas }}</th>
+              <th>{{ total_consumo }}</th>
+              <th></th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

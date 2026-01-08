@@ -1,0 +1,94 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="card p-4">
+  <form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información de la factura</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+
+    <div class="col-md-6 mb-3">
+      <div class="material-input">
+        <select name="unidad_responsable" id="unidad_responsable" required>
+          <option value="" selected disabled>Seleccione una UR</option>
+          {% for ur in urs %}
+            <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+          {% endfor %}
+        </select>
+        <label>Unidad Responsable:</label>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="material-input">
+        <select name="subestacion" id="subestacion" required>
+          <option value="" selected disabled>Seleccione una subestación</option>
+        </select>
+        <label>Subestación:</label>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" name="dias_periodo" required><label>Días del periodo:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="text" name="periodo" required><label>Periodo:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="consumo" required><label>Consumo:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="cargo_energia" required><label>Cargo Energía:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="importe_demanda_maxima" required><label>Importe Demanda Máxima:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="dap" required><label>DAP:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="iva" required><label>IVA:</label></div></div>
+    <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="total_a_pagar" required><label>Total a Pagar:</label></div></div>
+
+    <div class="col-md-6 mb-3">
+      <div class="material-input">
+        <input type="file" name="archivo_pdf" accept=".pdf" required>
+        <label>Archivo PDF:</label>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="material-input">
+        <input type="date" name="fecha_vencimiento" required>
+        <label>Fecha de vencimiento:</label>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <div class="material-input">
+        <select name="status" required>
+          <option value="Pagada">Pagada</option>
+          <option value="No pagada">No pagada</option>
+        </select>
+        <label>Status:</label>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+      <button type="submit" class="btn-uacam-primary-especial">Agregar</button>
+      <a href="{% url 'listar_facturas_admin' %}" class="btn btn-danger">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Cargar subestaciones dinámicamente
+  document.getElementById('unidad_responsable').addEventListener('change', function () {
+    const urId = this.value;
+    fetch(`/api/subestaciones/${urId}/`)
+      .then(response => response.json())
+      .then(data => {
+        const subSelect = document.getElementById('subestacion');
+        subSelect.innerHTML = '<option value="" disabled selected>Seleccione una subestación</option>';
+        data.forEach(sub => {
+          subSelect.innerHTML += `<option value="${sub.id}">${sub.nombre}</option>`;
+        });
+      })
+      .catch(err => console.error("Error al cargar subestaciones:", err));
+  });
+</script>
+
+{% endblock %}

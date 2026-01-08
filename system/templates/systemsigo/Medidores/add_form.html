@@ -1,0 +1,54 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-2">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información del medidor</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="post" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if medidor and medidor.unidad_responsable.id == ur.id %}selected{% endif %}>
+                  {{ ur.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="no_medidor" value="{{ medidor.no_medidor|default:'' }}" maxlength="10" required>
+            <label>No. Medidor</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mt-4">
+        <div class="material-input">
+          <input type="number" step="0.01" name="capacidad_transformador" value="{{ medidor.capacidad_transformador|default:'' }}" 
+          maxlength="18" required>
+          <label>Capacidad Transformador</label>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">
+          {% if medidor %}Actualizar{% else %}Guardar{% endif %}
+        </button>
+        <a href="{% url 'medidores' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'js/inputs_mayusculas.js' %}"></script>
+{% endblock %}

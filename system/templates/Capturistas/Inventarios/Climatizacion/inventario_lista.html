@@ -1,0 +1,146 @@
+{% extends "systemsigo/base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        <a href="{% if periodo_activo %}{% url 'registrar_inventario_climatizacion' %}{% else %}#{% endif %}"
+          class="btn btn-primary mx-2 {% if not periodo_activo %}disabled{% endif %}">
+          Registrar
+        </a>
+    </div>
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead class="">
+                <tr class="text-center">
+                    <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                        Inventario energético de Aires Acondicionados
+                    </th>
+                </tr>
+                <tr class="text-center"> 
+                    <th>Edificio</th>
+                    <th>Nivel</th>
+                    <th>Área</th>
+                    <th>Tipo de Clima</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Capacidad</th>
+                    <th>Voltaje</th>
+                    <th>Amperaje</th>
+                    <th>Potencia</th>
+                    <th>Potencia Total (W)</th>
+                    <th>Horas/Mes</th>
+                    <th>Consumo Mensual (kWh)</th>
+                    <th>Fecha Registro</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reg in registros %}
+                <tr>
+                    <td>{{ reg.edificio.nombre }}</td>
+                    <td>{{ reg.nivel }}</td>
+                    <td>{{ reg.area.nombre }}</td>
+                    <td>{{ reg.tipo_clima }}</td>
+                    <td>{{ reg.marca }}</td>
+                    <td>{{ reg.modelo }}</td>
+                    <td>{{ reg.capacidad }}</td>
+                    <td>{{ reg.voltaje }}</td>
+                    <td>{{ reg.amperaje }}</td>
+                    <td>{{ reg.potencia }}</td>
+                    <td>{{ reg.potencia_total }}</td>
+                    <td>{{ reg.horas_mes }}</td>
+                    <td>{{ reg.consumo_mensual }}</td>
+                    <td>{{ reg.fecha_registro|date:"d/m/Y" }}</td>
+                    <td>
+                      <div class="d-flex actions justify-content-center gap-2">
+                          <a href="{% if periodo_activo %}{% url 'editar_inventario_climatizacion' reg.id %}{% else %}#{% endif %}"
+                            class="btn btn-sm btn-light rounded rounded-circle {% if not periodo_activo %}disabled{% endif %}"
+                            title="Editar información">
+                              <i class="bi bi-pencil"></i>
+                          </a>
+
+                          <button type="button"
+                                  class="btn btn-sm btn-danger rounded rounded-circle delete-btn"
+                                  data-id="{{ reg.id }}"
+                                  data-url="{% url 'eliminar_inventario_climatizacion' reg.id %}"
+                                  data-csrf="{{ csrf_token }}"
+                                  title="Eliminar registro"
+                                  {% if not periodo_activo %}disabled{% endif %}>
+                            <i class="bi bi-trash-fill"></i>
+                          </button>
+                      </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="16" class="text-center">No hay registros disponibles.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const url = this.getAttribute('data-url');
+      const csrfToken = this.getAttribute('data-csrf');
+      const row = this.closest('tr');
+
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': csrfToken,
+              'Content-Type': 'application/json'
+            },
+          })
+          .then(response => {
+            if (response.ok) {
+              Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
+              row.remove();
+            } else {
+              Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+
+{% endblock %}

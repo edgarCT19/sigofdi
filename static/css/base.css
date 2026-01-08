@@ -1,0 +1,142 @@
+@import url('https://fonts.cdnfonts.com/css/soberana-sans');
+
+:root {
+    --color-uacam-primary: #1e2943;
+    --color-uacam-secondary: #FFCD00;
+    --color-uacam-white: #ffffff;
+    --color-uacam-black: #000000;
+    --color-uacam-background: #ebe9e9;
+    --color-uacam-text-search: #1e2943;
+    --color-uacam-navbar-bg: #ffffff;
+    --color-uacam-navbar-text: #333333;
+    --color-uacam-sidebar-bg: #f8f9fa;
+    --color-uacam-sidebar-text: #343a40;
+    --color-uacam-sidebar-hover: #e2e6ea;
+    --color-uacam-sidebar-active-bg: #e9f2ff;
+    --color-uacam-sidebar-accent: #1e2943;
+    --color-uacam-sidebar-accent-hover: #162034;
+    --color-uacam-main-bg: #ebe9e9;
+    --color-uacam-btn-primary: #1e2943;
+    --color-uacam-btn-primary-hover: #162034;
+    --color-uacam-btn-especial: #1976d2;
+    --color-uacam-bg-card: #fff;
+    --color-uacam-datatext: #1976d2; 
+    --color-uacam-background-light: #f0f5ff;
+    --color-uacam-input-text: #333333;
+    --color-uacam-input-placeholder: #aaaaaa;
+    --color-uacam-input-label: #666666;
+    --color-uacam-danger: #d32f2f;
+    --color-uacam-danger-hover: #f9d6d5;
+    --color-uacam-table-header: #1e2943;
+    --color-uacam-tuple: #f7f7f7;
+}
+
+body.dark-mode {
+    --color-uacam-primary: #FFCD00;
+    --color-uacam-navbar-bg: #1f1f1f;
+    --color-uacam-navbar-text: #f0f0f0;
+    --color-uacam-sidebar-bg: #1f1f1f;
+    --color-uacam-sidebar-text: #f0f0f0;
+    --color-uacam-sidebar-hover: #3a3a3a;
+    --color-uacam-sidebar-active-bg: #3d4852;
+    --color-uacam-sidebar-accent: #FFCD00;
+    --color-uacam-sidebar-accent-hover: #d4b200;
+    --color-uacam-main-bg: #181818;
+    --color-uacam-btn-primary: #FFCD00;
+    --color-uacam-btn-primary-hover: #d4b200;
+    --color-uacam-white: #1f1f1f;
+    --color-uacam-bg-card: #1f1f1f;
+    --color-uacam-datatext: #6e7891; 
+    --color-uacam-black: #fff;
+    --color-uacam-input-text: #eeeeee;
+    --color-uacam-input-placeholder: #bbbbbb;
+    --color-uacam-input-label: #dddddd;
+    --color-uacam-table-header: #bbbbbb;
+    --color-uacam-tuple: #2a2a2a; 
+}
+
+body {
+    background-color: var(--color-uacam-main-bg);
+    color: var(--color-uacam-sidebar-text);
+    margin: 0;
+    font-family: "Soberana Sans Regular", sans-serif;
+}
+
+/* Estilo de scroll general */
+::-webkit-scrollbar{
+    width: 3px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: var(--color-uacam-primary);
+    border-radius: 10px;
+}
+
+/* Main content */
+#main-content {
+    margin-left: 260px;
+    padding: 20px;
+    margin-top: 60px;
+    transition: margin-left 0.3s ease;
+}
+
+.card {
+    background-color: var(--color-uacam-bg-card);
+    position: relative;
+    z-index: 0; /* o ninguno si no es necesario */
+}
+
+p{
+    color: var(--color-uacam-black);
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.dropdown-item.text-danger:active,
+.dropdown-item.text-danger:focus,
+.dropdown-item.text-danger:hover {
+    background-color: #f8d7da !important; /* Fondo danger claro */
+    color: #dc3545 !important;            /* Texto danger */
+}
+
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar {
+        transform: translateX(-100%);
+    }
+    #sidebar.show {
+        transform: translateX(0);
+    }
+    #main-content {
+        margin-left: 0;
+    }
+    .menu-toggle {
+        display: block;
+    }
+    .logo-uacam {
+        width: 80px;
+        height: 20px;
+    }
+}
+
+@media (min-width: 769px) {
+    .menu-toggle {
+        display: none;
+    }
+}

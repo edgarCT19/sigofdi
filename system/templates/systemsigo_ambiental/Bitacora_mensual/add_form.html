@@ -1,0 +1,99 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="mt-4">
+  <div class="card p-4 mt-2">
+    <p class="text-center mb-2"  style="font-size: 18px;">Agregar información de bitácora mensual</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="post" class="">
+      {% csrf_token %}
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <select name="unidad_responsable" required>
+              <option value="">-- Selecciona --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}" {% if bitacora and bitacora.unidad_responsable.id == ur.id %}selected{% endif %}>
+                  {{ ur.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+            <label>Unidad Responsable</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="laboratorio" value="{{ bitacora.laboratorio|default:'' }}" required>
+            <label>Laboratorio</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="text" name="tipo_residuo" value="{{ bitacora.tipo_residuo|default:'' }}" required>
+            <label>Tipo de Residuo</label>
+          </div>
+        </div>
+        <div class="col-md-6 mt-4">
+          <div class="material-input">
+            <input type="number" step="0.01" name="cantidad" value="{{ bitacora.cantidad|default:'' }}" required>
+            <label>Cantidad</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <input type="text" name="estado_fisico" value="{{ bitacora.estado_fisico|default:'' }}">
+            <label>Estado Físico</label>
+          </div>
+        </div>
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="creti" class="">
+              <option value="" disabled {% if not bitacora.creti %}selected{% endif %}>Selecciona una opción</option>
+              <option value="CORROSIVO" {% if bitacora.creti == "CORROSIVO" %}selected{% endif %}>CORROSIVO</option>
+              <option value="REACTIVO" {% if bitacora.creti == "REACTIVO" %}selected{% endif %}>REACTIVO</option>
+              <option value="EXPLOSIVO" {% if bitacora.creti == "EXPLOSIVO" %}selected{% endif %}>EXPLOSIVO</option>
+              <option value="TOXICO" {% if bitacora.creti == "TOXICO" %}selected{% endif %}>TÓXICO</option>
+              <option value="INFLAMABLE" {% if bitacora.creti == "INFLAMABLE" %}selected{% endif %}>INFLAMABLE</option>
+            </select>
+            <label>CRETI</label>
+          </div>
+        </div>
+
+        <div class="col-md-4 mt-4">
+          <div class="material-input">
+            <select name="tipo_envase" class="">
+              <option value="" disabled {% if not bitacora.tipo_envase %}selected{% endif %}>Selecciona un envase</option>
+              <option value="PLASTICO" {% if bitacora.tipo_envase == "PLASTICO" %}selected{% endif %}>PLÁSTICO</option>
+              <option value="VIDRIO" {% if bitacora.tipo_envase == "VIDRIO" %}selected{% endif %}>VIDRIO</option>
+            </select>
+            <label>Tipo de Envase</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 mt-4">
+        <div class="material-input">
+          <input type="text" name="capacidad_medida" value="{{ bitacora.capacidad_medida|default:'' }}">
+          <label>Capacidad Medida</label>
+        </div>
+      </div>
+
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
+        <button type="submit" class="btn-uacam-primary-especial">
+          {% if bitacora %}Actualizar{% else %}Guardar{% endif %}
+        </button>
+        <a href="{% url 'bitacora_mensual_lista_admin' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="{% static 'js/inputs_mayusculas.js' %}"></script>
+{% endblock content %}

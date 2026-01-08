@@ -1,0 +1,134 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+<div>
+  <div class="card">
+    <!-- Search + Botón Agregar -->
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+      <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+          type="text"
+          id="input-search"
+          placeholder="Buscar..."
+        />
+        <button
+          id="clear-search"
+          type="button"
+          class="btn btn-sm btn-link text-secondary px-2 d-none"
+          title="Borrar búsqueda"
+        >
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </div>
+
+      <a href="{% url 'centro_acopio_rrr_crear_admin' %}">
+        <button class="btn btn-primary">Agregar</button>
+      </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead>
+            <tr class="text-center">
+              <th colspan="12" class="table-title"
+                  style="background-color: var(--color-uacam-table-header); font-size: 15px;">
+                Lista de Centros de Acopio RRR
+              </th>
+            </tr>
+            <tr class="text-center">
+              <th>Unidad Responsable</th>
+              <th>Centro de Acopio</th>
+              <th>Dependencia</th>
+              <th>PET</th>
+              <th>Papel</th>
+              <th>Cartón</th>
+              <th>Metales</th>
+              <th>Fecha Registro</th>
+              <th>Creado por</th>
+              <th>Última actualización</th>
+              <th>Actualizado por</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for acopio in acopio %}
+            <tr>
+              <td>{{ acopio.unidad_responsable.nombre }}</td>
+              <td>{{ acopio.centro_acopio }}</td>
+              <td>{{ acopio.dependencia }}</td>
+              <td>{{ acopio.pet }}</td>
+              <td>{{ acopio.papel }}</td>
+              <td>{{ acopio.carton }}</td>
+              <td>{{ acopio.metales }}</td>
+              <td>{{ acopio.fecha_registro|date:"d/m/Y H:i" }}</td>
+              <td>{{ acopio.creado_por }}</td>
+              <td>{{ acopio.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+              <td>{{ acopio.actualizado_por }}</td>
+              <td>
+                <div class="d-flex actions justify-content-center gap-2">
+                  <a href="{% url 'centro_acopio_rrr_editar_admin' acopio.id %}"
+                     class="btn btn-light rounded-circle btn-sm"
+                     title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button class="btn btn-danger btn-sm rounded-circle"
+                          onclick="eliminarAcopioRRR('{{ acopio.id }}', '{{ acopio.centro_acopio }}')"
+                          title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                  <form id="form-eliminar-{{ acopio.id }}" action="{% url 'centro_acopio_rrr_eliminar_admin' acopio.id %}" method="POST" style="display:none;">
+                    {% csrf_token %}
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="12" class="text-center">No hay registros de centros de acopio.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+      <ul class="pagination" id="pagination"></ul>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// SweetAlert para eliminar registros
+function eliminarAcopioRRR(id, nombre) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: `El centro de acopio "${nombre}" será eliminado`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: '¡Eliminado!',
+        text: `El centro de acopio "${nombre}" fue eliminado correctamente.`,
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        document.getElementById(`form-eliminar-${id}`).submit();
+      });
+    }
+  });
+}
+</script>
+
+{% endblock content %}

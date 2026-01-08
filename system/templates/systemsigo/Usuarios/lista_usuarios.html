@@ -1,0 +1,138 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+            <i class="bi bi-search me-2 text-secondary"></i>
+            <input
+                type="text"
+                id="input-search"
+                class=""
+                placeholder="Buscar..."
+                oninput="toggleClearButton(this)"
+            />
+            <button
+                id="clear-search"
+                type="button"
+                class="btn btn-sm btn-link text-secondary px-2 d-none"
+                onclick="clearSearch()"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Borrar búsqueda"
+            >
+                <i class="bi bi-x-circle-fill"></i>
+            </button>
+        </div>
+        <a href="{% url 'crear_usuario' %}"><button class="btn btn-primary mx-2">Agregar</button></a>
+    </div>
+    
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+                <thead>
+                    <tr class="text-center">
+                        <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                            Lista de usuarios del sistema
+                        </th>
+                    </tr>
+                    <tr class="text-center">
+                        <th>Matrícula</th>
+                        <th>Nombre Completo</th>
+                        <th>Correo Electrónico</th>
+                        <th>Teléfono</th>
+                        <th>Rol</th>
+                        <th>Unidad Responsable</th>
+                        <th>Fecha Alta</th>
+                        <th>Activo</th>
+                        <th>Creado por</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.matricula|default:"—" }}</td>
+                        <td>{{ usuario.nombre_completo }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.telefono|default:"—" }}</td>
+                        <td>{{ usuario.rol|capfirst }}</td>
+                        <td>
+                            {% if usuario.unidad_responsable %}
+                                {{ usuario.unidad_responsable.nombre }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>{{ usuario.fecha_alta|date:"d/m/Y H:i:s" }}</td>
+                        <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
+                        <td>{{ usuario.creado_por }}</td>
+                        <td>
+                            <div class="d-flex actions justify-content-around">
+                                <a href="{% url 'editar_usuario' usuario.id %}" title="Editar información" 
+                                class="btn btn-light rounded rounded-circle btn-sm"><i class="bi bi-pencil"></i></a>
+
+                                <button onclick="confirmDelete('{{ usuario.id }}')" title="Desactivar cuenta del usuario"
+                                class="btn btn-success rounded rounded-circle btn-sm mx-1"><i class="bi bi-toggle-on"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No hay usuarios registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+        <ul class="pagination" id="pagination"></ul>
+    </div>
+</div>
+
+<script>
+function confirmDelete(userId) {
+    Swal.fire({
+        title: '¿Estás seguro de desactivar la cuenta del usuario?',
+        text: "No podrás revertir esta acción.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, desactivar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/usuarios/eliminar/${userId}/`, {
+                method: "POST",
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo eliminar el usuario.'
+                    });
+                }
+            });
+        }
+    });
+}
+</script>
+{% endblock %}

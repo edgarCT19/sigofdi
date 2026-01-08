@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIG-Online</title>
+    <link rel="icon" type="image/vnd.icon" href="{% static 'images/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'libs/bootstrap/css/bootstrap.min.css' %}"> <!-- Bootstrap CSS Versión 5.3.7 -->
+    <link rel="stylesheet" href="{% static 'libs/bootstrap-icons/bootstrap-icons.min.css' %}"> <!-- Bootstrap Iconos Versión 1.13.1 -->
+    <link rel="stylesheet" href="{% static 'libs/fontawesome-free/css/all.min.css' %}"> <!-- Font-awesome Versión 7.0.0 -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/botones.css' %}">
+    <link rel="stylesheet" href="{% static 'css/input.css' %}">
+    <link rel="stylesheet" href="{% static 'css/table.css' %}">
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+    <link rel="stylesheet" href="{% static 'css/selects.css' %}">
+    <link rel="stylesheet" href="{% static 'css/logo.css' %}">
+    <link rel="stylesheet" href="{% static 'css/alert.css' %}">
+    <link rel="stylesheet" href="{% static 'css/loading.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cardDashboards.css' %}">
+    <link rel="stylesheet" href="{% static 'css/alertFacturas.css' %}">
+    <script src="{% static 'js/chart.js' %}"></script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar-custom d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center ms-auto">       
+            <!-- Dropdown Usuario -->
+            <div class="dropdown mx-2">
+                <button class="btn btn-light rounded rounded-pill btn-header dropdown-toggle" type="button" id="userMenu" 
+                data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--color-uacam-background-light); border: none;">
+                    Mi cuenta
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                    <li class="dropdown-item-text text-center">
+                        <strong style="color: var(--color-uacam-datatext);">{{ request.session.rol|title }}</strong><br>
+                        <small>{{ request.session.email }}</small>
+
+                        <!-- Botón Dark Mode -->
+                        <button class="btn btn-light btn-header rounded rounded-circle mx-2" id="darkModeToggle" data-bs-toggle="tooltip" 
+                            data-bs-placement="bottom" title="Cambiar a modo oscuro" 
+                            style="background-color: var(--color-uacam-background-light);">
+                            <i class="bi bi-moon"></i>
+                        </button>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li><a class="dropdown-item" href="{% url 'perfil_usuario' %}"><i class="bi bi-person-check"></i> Mi cuenta</a></li>
+                    <li><a class="dropdown-item" href="https://wa.me"><i class="bi bi-whatsapp"></i> WhatsApp</a></li>
+                    <li><a class="dropdown-item" href="https://mail.google.com/"><i class="bi bi-envelope-at"></i> Gmail</a></li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+                        <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Botón hamburguesa solo visible en móvil -->
+            <button class="btn btn-light btn-header d-md-none me-2 rounded rounded-circle" id="menu-toggle" 
+            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menú" style="background-color: var(--color-uacam-background-light);">
+                <i class="bi bi-list"></i>
+            </button>
+        </div>        
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        
+        <div class="logo-container text-center my-1">
+        {% if request.session.rol == 'admin' %}
+        <a href="{% url 'inicio' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'admin_energia' %}
+        <a href="{% url 'admin_energia_inicio' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'admin_ambiental' %}
+        <a href="{% url 'admin_ambiental_inicio' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'admin_salud' %}
+        <a href="#" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'capturista' %}
+        <a href="{% url 'capturista' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'encargado_ur' %}
+        <a href="{% url 'encargado_ur' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'rector' %}
+        <a href="{% url 'rector' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'director' %}
+        <a href="{% url 'director' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% elif request.session.rol == 'auditor' %}
+        <a href="{% url 'auditor' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% else %}
+        <a href="{% url 'inicio' %}" style="color: inherit; background-color: transparent; display: flex; border-left: transparent;">
+        {% endif %}
+            <img src="{% static 'images/LogoUacamWeb.png' %}" 
+                data-logo-light="{% static 'images/LogoUacamWeb.png' %}" 
+                data-logo-dark="{% static 'images/LogoBlanco.png' %}" 
+                id="logo" alt="Logo UACAM" class="logo-uacam img-fluid">
+            </a>
+        </div>
+
+        <section class="mt-2">
+
+        {% if request.session.rol == "admin" %}
+            <div class="d-flex justify-content-center text-center align-items-center" style="height: 45px;">
+                <h6>Gestión de usuarios <i class="bi bi-person-check"></i></h6>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-people"></i> Usuarios</a>
+                <div class="submenu">
+                    <a href="{% url 'usuarios' %}">Lista de Usuarios</a>
+                    <a href="{% url 'usuarios_inactivos' %}">Lista de bajas</a>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center text-center align-items-center mt-3" style="height: 45px;">
+                <h6>Gestión energética <i class="bi bi-lightning-fill"></i></h6>
+            </div>
+            <!-- Admin General: aquí van todas las secciones completas -->
+            <div class="has-submenu active">
+                <a href="#"><i class="bi bi-clipboard-check-fill"></i> Inventarios</a>
+                <div class="submenu">
+                    <a href="{% url 'listado_inventario_climatizacion' %}">Aires Acondicionados</a>
+                    <a href="{% url 'listado_inventario_luminarias' %}">Luminarias</a>
+                    <a href="{% url 'listado_inventario_miscelaneos' %}">Misceláneos</a>
+                    <a href="{% url 'historiales_registros_inventarios_admin' %}">Historial de registros</a>
+                    <a href="{% url 'inventarios_filtro_triple' %}">Filtro triple</a>
+                    <a href="{% url 'listar_periodos' %}">Periodos</a>
+                </div>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-building-fill"></i> Unidad Responsable</a>
+                <div class="submenu">
+                    <a href="{% url 'listar_campus' %}">Campus</a>
+                    <a href="{% url 'listar_unidades' %}">Unidad</a>
+                    <a href="{% url 'todos_edificios' %}">Edificio</a>
+                    <a href="{% url 'todas_las_areas' %}">Área</a>
+                </div>
+            </div>
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-bar-chart-steps"></i> Indicadores</a>
+                <div class="submenu">
+                    <a href="#">Inventarios</a>
+                    <a href="#">Indicadores globales</a>
+                    <a href="#">Concentrados</a>
+                    <a href="#">Indicadores de concentrados</a>
+                    <a href="#">Indicadores finales</a>
+                </div>
+            </div>-->
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-clipboard2-pulse"></i> Desempeño de procesos</a>
+                <div class="submenu">
+                    <a href="#">Gestión meta (5%)</a>
+                    <a href="#">Gestión (proyección 10%)</a>
+                    <a href="#">Indicador de proyección</a>
+                </div>
+            </div>-->
+            <a href="{% url 'lista_tarifas' %}"><i class="bi bi-currency-dollar"></i> Tarifas</a>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-receipt"></i> Facturas</a>
+                <div class="submenu">
+                    <a href="{% url 'listar_facturas_admin' %}">Filtro y reporte</a>
+                    <a href="{% url 'listar_facturas_triple_admin' %}">GDMTH/GDMTO/GDBT</a>
+                    <a href="{% url 'listar_facturas_pdbt_admin' %}">PDBT</a>
+                </div>
+            </div>
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-clipboard2-data-fill"></i> Reportes</a>
+                <div class="submenu">
+                    <a href="#">Bitácoras</a>
+                    <a href="#">M<sup>2</sup> de construcción</a>
+                </div>
+            </div>-->
+            <!--<a href="#"><i class="bi bi-graph-up"></i> Lineas base</a>-->
+            <a href="{% url 'admin_subestaciones' %}"><i class="bi bi-box2-fill"></i> Subestaciones</a>
+            <a href="{% url 'medidores' %}"><i class="bi bi-clock"></i> Medidores</a>
+
+            <!-- Sección ambiental -->
+            <div class="d-flex justify-content-center text-center align-items-center mt-3" style="height: 45px;">
+                <h6>Gestión ambiental <i class="bi bi-leaf-fill"></i></h6>
+            </div>
+            <section class="mt-2">
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-calendar-check"></i> Bitácora RP</a>
+                    <div class="submenu">
+                        <a href="{% url 'bitacora_mensual_lista_admin' %}">Bitácora mensual</a>
+                        <a href="{% url 'almacenamiento_temporal' %}">Almacenamiento temporal</a>
+                    </div>
+                </div>
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-trash3-fill"></i> Bitácoras RPBI</a>
+                    <div class="submenu">
+                        <a href="{% url 'bitacora_generacion_rpbi' %}">De generación</a>
+                        <a href="{% url 'bitacora_recoleccion_rpbi' %}">De recolección</a>
+                    </div>
+                </div>
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-recycle"></i> Bitácora RSU/ME</a>
+                    <div class="submenu">
+                        <a href="{% url 'centro_acopio_rme_admin' %}">Centro de acopio-RME</a>
+                        <a href="{% url 'vertedero_municipal_admin' %}">Vertedero Municipal</a>
+                        <a href="{% url 'centro_acopio_rrr_admin' %}">Centro de Acopio (RRR)</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección salud 
+            <div class="d-flex justify-content-center text-center align-items-center mt-3" style="height: 45px;">
+                <h6>Gestión en salud <i class="bi bi-heart-pulse-fill"></i></h6>
+            </div>
+            <section class="mt-2">
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-hospital"></i> Salud</a>
+                    <div class="submenu">
+                         Aquí irán los links de salud 
+                    </div>
+                </div>
+            </section>-->
+
+        {% elif request.session.rol == "admin_energia" %}
+            <!-- Admin Energía: colocar secciones correspondientes -->
+            <div class="d-flex justify-content-center text-center align-items-center" style="height: 45px;">
+                <h6>Gestión energética <i class="bi bi-lightning-fill"></i></h6>
+            </div>
+            <section class="mt-2">
+            <!-- Admin de Energías: secciones unicamente de este rol -->
+            <div class="has-submenu active">
+                <a href="#"><i class="bi bi-clipboard-check-fill"></i> Inventarios</a>
+                <div class="submenu">
+                    <a href="{% url 'listado_inventario_climatizacion' %}">Aires Acondicionados</a>
+                    <a href="{% url 'listado_inventario_luminarias' %}">Luminarias</a>
+                    <a href="{% url 'listado_inventario_miscelaneos' %}">Misceláneos</a>
+                    <a href="{% url 'historiales_registros_inventarios_admin' %}">Historial de registros</a>
+                    <a href="{% url 'inventarios_filtro_triple' %}">Filtro triple</a>
+                    <a href="{% url 'listar_periodos' %}">Periodos</a>
+                </div>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-building-fill"></i> Unidad Responsable</a>
+                <div class="submenu">
+                    <a href="{% url 'listar_campus' %}">Campus</a>
+                    <a href="{% url 'listar_unidades' %}">Unidad</a>
+                    <a href="{% url 'todos_edificios' %}">Edificio</a>
+                    <a href="{% url 'todas_las_areas' %}">Área</a>
+                </div>
+            </div>
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-bar-chart-steps"></i> Indicadores</a>
+                <div class="submenu">
+                    <a href="#">Inventarios</a>
+                    <a href="#">Indicadores globales</a>
+                    <a href="#">Concentrados</a>
+                    <a href="#">Indicadores de concentrados</a>
+                    <a href="#">Indicadores finales</a>
+                </div>
+            </div>-->
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-clipboard2-pulse"></i> Desempeño de procesos</a>
+                <div class="submenu">
+                    <a href="#">Gestión meta (5%)</a>
+                    <a href="#">Gestión (proyección 10%)</a>
+                    <a href="#">Indicador de proyección</a>
+                </div>
+            </div>-->
+            <a href="{% url 'lista_tarifas' %}"><i class="bi bi-currency-dollar"></i> Tarifas</a>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-receipt"></i> Facturas</a>
+                <div class="submenu">
+                    <a href="{% url 'listar_facturas_admin' %}">Filtro</a>
+                    <a href="#">GDMTH/GDMTO/GDBT</a>
+                    <a href="#">PDBT</a>
+                </div>
+            </div>
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-clipboard2-data-fill"></i> Reportes</a>
+                <div class="submenu">
+                    <a href="#">Bitácoras</a>
+                    <a href="#">M<sup>2</sup> de construcción</a>
+                </div>
+            </div>-->
+            <!--<a href="#"><i class="bi bi-graph-up"></i> Lineas base</a>-->
+            <a href="{% url 'admin_subestaciones' %}"><i class="bi bi-box2-fill"></i> Subestaciones</a>
+            <a href="{% url 'medidores' %}"><i class="bi bi-clock"></i> Medidores</a>
+            </section>
+
+        {% elif request.session.rol == "admin_ambiental" %}
+            <!-- Admin Ambiental: links correspondientes -->
+            <div class="d-flex justify-content-center text-center align-items-center" style="height: 45px;">
+                <h6>Gestión ambiental <i class="bi bi-leaf-fill"></i></h6>
+            </div>
+            <section class="mt-2">
+                                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-calendar-check"></i> Bitácora RP</a>
+                    <div class="submenu">
+                        <a href="{% url 'bitacora_mensual_lista_admin' %}">Bitácora mensual</a>
+                        <a href="{% url 'almacenamiento_temporal' %}">Almacenamiento temporal</a>
+                    </div>
+                </div>
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-trash3-fill"></i> Bitácoras RPBI</a>
+                    <div class="submenu">
+                        <a href="{% url 'bitacora_generacion_rpbi' %}">De generación</a>
+                        <a href="{% url 'bitacora_recoleccion_rpbi' %}">De recolección</a>
+                    </div>
+                </div>
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-recycle"></i> Bitácora RSU/ME</a>
+                    <div class="submenu">
+                        <a href="{% url 'centro_acopio_rme_admin' %}">Centro de acopio-RME</a>
+                        <a href="{% url 'vertedero_municipal_admin' %}">Vertedero Municipal</a>
+                        <a href="{% url 'centro_acopio_rrr_admin' %}">Centro de Acopio (RRR)</a>
+                    </div>
+                </div>
+            </section>
+
+        {% elif request.session.rol == "admin_salud" %}
+            <!-- Admin Salud: colocar secciones correspondientes -->
+            <div class="d-flex justify-content-center text-center align-items-center" style="height: 45px;">
+                <h6>Gestión en salud <i class="bi bi-heart-pulse-fill"></i></h6>
+            </div>
+            <section class="mt-2">
+                <div class="has-submenu">
+                    <a href="#"><i class="bi bi-hospital"></i> Salud</a>
+                    <div class="submenu">
+                        <!-- Aquí irán los links de salud -->
+                    </div>
+                </div>
+            </section>
+
+        {% elif request.session.rol == "rector" %}
+            <!-- Links de Rector -->
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-arrows-move"></i> Vista del rector</a>
+                <div class="submenu">
+                    <a href="#">Uno</a>
+                    <a href="#">Dos</a>
+                    <a href="#">Tres</a>
+                    <a href="#">Cuatro</a>
+                </div>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-arrows-move"></i> Vista del rector 2</a>
+                <div class="submenu">
+                    <a href="#">Uno</a>
+                    <a href="#">Dos</a>
+                    <a href="#">Tres</a>
+                    <a href="#">Cuatro</a>
+                </div>
+            </div>
+
+        {% elif request.session.rol == "director" %}
+            <!-- Links de Director -->
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-arrows-move"></i> Vista del director</a>
+                <div class="submenu">
+                    <a href="#">Uno</a>
+                    <a href="#">Dos</a>
+                    <a href="#">Tres</a>
+                    <a href="#">Cuatro</a>
+                </div>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-arrows-move"></i> Vista del director 2</a>
+                <div class="submenu">
+                    <a href="#">Uno</a>
+                    <a href="#">Dos</a>
+                    <a href="#">Tres</a>
+                    <a href="#">Cuatro</a>
+                </div>
+            </div>
+
+        {% elif request.session.rol == "encargado_ur" %}
+            <!-- Links de Encargado de UR -->
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-building-fill"></i> Unidad Responsable</a>
+                <div class="submenu">
+                    <a href="{% url 'lista_edificios' %}">Edificio</a>
+                    <a href="{% url 'lista_areas' %}">Área</a>
+                </div>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-people"></i> Usuarios</a>
+                <div class="submenu">
+                    <a href="{% url 'lista_capturistas' %}">Lista de Usuarios</a>
+                </div>
+            </div>
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-clipboard-check-fill"></i> Inventarios</a>
+                <div class="submenu">
+                    <a href="{% url 'listar_climatizacion_encargado' %}">Aires Acondicionados</a>
+                    <a href="{% url 'listar_luminarias_encargado' %}">Luminarias</a>
+                    <a href="{% url 'listar_miscelaneos_encargado' %}">Misceláneos</a>
+                </div>
+            </div>
+            <!--<div class="has-submenu">
+                <a href="#"><i class="bi bi-bar-chart-steps"></i> Indicadores</a>
+                <div class="submenu">
+                    <a href="#">Inventarios</a>
+                    <a href="#">Otros</a>
+                </div>
+            </div>-->
+            <div class="has-submenu">
+                <a href="#"><i class="bi bi-receipt"></i>Facturas</a>
+                <div class="submenu">
+                    {% if 'GDBT' in tarifas_disponibles or 'GDMTH' in tarifas_disponibles or 'GDMTO' in tarifas_disponibles %}
+                    <a href="{% url 'listar_facturas_triple' %}">GDMTH / GDMTO / GDBT</a>
+                    {% endif %}
+                    {% if 'PDBT' in tarifas_disponibles %}
+                    <a href="{% url 'listar_facturas_pdbt' %}">Factura PDBT</a>
+                    {% endif %}
+                </div>
+            </div>
+            <a href="{% url 'listar_subestaciones_encargado' %}"><i class="bi bi-box2-fill"></i> Subestación</a>
+
+        {% elif request.session.rol == "capturista" %}
+            <!-- Links de Capturista de datos -->
+            <div class="has-submenu active">
+                <a href="#"><i class="bi bi-clipboard-check-fill"></i> Inventarios</a>
+                <div class="submenu">
+                    <a href="{% url 'listar_inventario_climatizacion' %}">Aires Acondicionados</a>
+                    <a href="{% url 'listar_inventario_luminarias' %}">Luminarias</a>
+                    <a href="{% url 'listar_inventario_miscelaneos' %}">Misceláneos</a>
+                </div>
+            </div>
+
+        {% elif request.session.rol == "auditor" %}
+            <!-- Links de Auditor -->
+            <a href="#"><i class="bi bi-arrows-move"></i> Por definir</a>
+            <a href="#"><i class="bi bi-arrows-move"></i> Por definir</a>
+            <a href="#"><i class="bi bi-arrows-move"></i> Por definir</a>
+        {% endif %}
+        </section>
+
+    </div>
+
+
+    <!--Animación de carga-->
+    <div id="loadingSpinner">
+        <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <div id="main-content">
+        <div class="">
+        {% block messages %}
+            {% if messages %}
+            <div class=" mt-3" id="alert-container">
+            {% for message in messages %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar" style="box-shadow: none; outline: none;"></button>
+                </div>
+            {% endfor %}
+            </div>
+            {% endif %}
+        {% endblock %}
+
+        {% block content %}
+        {% endblock %}
+        </div>
+    </div>
+    
+    <script src="{% static 'libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'libs/fontawesome-free/js/all.min.js' %}"></script>
+    <script src="{% static 'js/sweetalert2.all.min.js' %}"></script> <!-- SweetAlert2 Versión 11.22.2 -->
+    <script src="{% static 'js/custom.js' %}"></script>
+    <script src="{% static 'js/darkmode.js' %}"></script>
+    <script src="{% static 'js/input.js' %}"></script>
+    <script src="{% static 'js/searchClear.js' %}"></script> 
+    <script src="{% static 'js/search.js' %}"></script>
+    <script src="{% static 'js/alertaSuccessDuracion.js' %}"></script>
+    <script src="{% static 'js/spinner.js' %}"></script>
+    <script src="{% static 'js/pagination.js' %}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentUrl = window.location.pathname;
+
+            // Selecciona todos los enlaces dentro del sidebar
+            const links = document.querySelectorAll('#sidebar a');
+
+            links.forEach(link => {
+                // Verifica si el href del link está contenido en la URL actual
+                if (link.getAttribute('href') === currentUrl) {
+                    link.classList.add('active');
+
+                    // Si el enlace está dentro de un submenu, abre su contenedor
+                    const submenu = link.closest('.submenu');
+                    if (submenu) {
+                        const parent = submenu.closest('.has-submenu');
+                        if (parent) {
+                            parent.classList.add('open');
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

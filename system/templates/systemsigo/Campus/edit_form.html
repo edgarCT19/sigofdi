@@ -1,0 +1,30 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="mt-2">
+    <div class="card p-4">
+        <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del Campus</p>
+        <hr class="text-center" style="color: var(--color-uacam-primary);">
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="material-input mt-4">
+                {{ form.nomenclatura }}
+                <label for="{{ form.nomenclatura.id_for_label }}">Nomenclatura</label>
+            </div>
+            <div class="material-input mt-4">
+                {{ form.ubicacion }}
+                <label for="{{ form.ubicacion.id_for_label }}">Ubicación</label>
+            </div>
+            <div class="material-input mt-4">
+                {{ form.metros_cuadrados }}
+                <label for="{{ form.metros_cuadrados.id_for_label }}">M<sup>2</sup> de construcción</label>
+            </div>
+            <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+                <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+                <a href="{% url 'listar_campus' %}" class="btn btn-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

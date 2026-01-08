@@ -1,0 +1,107 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div id="loadingSpinner">
+  <div class="spinner-border text-warning" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div class=" mt-2">
+  <div class="card p-4">
+    <p class="text-center mb-2" style="font-size: 18px;">Actualizar información del usuario</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="mt-3">
+      {% csrf_token %}
+
+      <!-- Primera fila: Matrícula y Nombres -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            {{ form.matricula }}
+            <label for="{{ form.matricula.id_for_label }}">Matrícula</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            {{ form.nombres }}
+            <label for="{{ form.nombres.id_for_label }}">Nombres</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segunda fila: Apellidos, Email, Teléfono -->
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            {{ form.apellidos }}
+            <label for="{{ form.apellidos.id_for_label }}">Apellidos</label>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            {{ form.email }}
+            <label for="{{ form.email.id_for_label }}">Correo Electrónico</label>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="material-input">
+            {{ form.telefono }}
+            <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tercera fila: Rol y Unidad Responsable -->
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            {{ form.rol }}
+            <label for="{{ form.rol.id_for_label }}">Rol</label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="material-input">
+            {{ form.unidad_responsable }}
+            <label for="{{ form.unidad_responsable.id_for_label }}">Unidad Responsable</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activar usuario -->
+      <div class="form-check form-switch mb-4">
+        {{ form.is_active }}
+        <label class="form-check-label ms-2" for="{{ form.is_active.id_for_label }}" style="color: var(--color-uacam-black);">Usuario activo</label>
+      </div>
+
+      <!-- Botones -->
+      <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+        <a href="{% url 'usuarios' %}" class="btn btn-danger">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const rolSelect = document.getElementById("id_rol");
+  const urSelect = document.getElementById("id_unidad_responsable");
+
+  function toggleUnidadResponsable() {
+    const rolesSinUR = ["admin", "admin_ambiental", "admin_energia", "admin_salud"];
+    if (rolesSinUR.includes(rolSelect.value)) {
+      urSelect.disabled = true;
+      urSelect.value = "";
+    } else {
+      urSelect.disabled = false;
+    }
+  }
+
+  rolSelect.addEventListener("change", toggleUnidadResponsable);
+  window.onload = toggleUnidadResponsable;
+
+</script>
+
+{% endblock %}

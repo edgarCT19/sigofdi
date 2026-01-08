@@ -1,0 +1,15 @@
+  /* Evitar que se desborde en pantallas pequeñas */
+  @media (max-width: 346px) {
+    .material-input,
+    .material-input select {
+      font-size: 0.9rem;
+    }
+  }
+
+  /* Si usas modo oscuro forzado por sistema o navegador */
+  @media (prefers-color-scheme: dark) {
+    .material-input select {
+      background-color: #f7f7f7;
+      color: #000000 ;
+    }
+  }

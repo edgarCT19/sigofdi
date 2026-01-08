@@ -1,0 +1,36 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h3 class="mb-4 text-center"><p>Cambiar foto de perfil</p></h3>
+
+          {% if usuario.foto_perfil %}
+            <div class="text-center mb-3">
+              <img src="{{ MEDIA_URL }}{{ usuario.foto_perfil }}" 
+                   class="rounded-circle" 
+                   style="width: 150px; height: 150px; object-fit: cover;">
+              <p class="mt-1">{{ usuario.foto_perfil }}</p>
+            </div>
+          {% endif %}
+
+          <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="material-input mt-4">
+                    <input type="file" name="foto" id="foto" accept="image/*" class="material-input">
+                    <label for="foto">Selecciona una nueva foto:</label>
+                </div>
+                <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="{% url 'perfil_usuario' %}" class="btn btn-danger">Cancelar</a>
+                </div>
+           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

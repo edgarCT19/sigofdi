@@ -1,0 +1,146 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div>
+
+   <div class="card">
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+        <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input
+            type="text"
+            id="input-search"
+            class=""
+            placeholder="Buscar..."
+            oninput="toggleClearButton(this)"
+        />
+        <button
+            id="clear-search"
+            type="button"
+            class="btn btn-sm btn-link text-secondary px-2 d-none"
+            onclick="clearSearch()"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="Borrar búsqueda"
+        >
+            <i class="bi bi-x-circle-fill"></i>
+        </button>
+        </div>
+
+        <a href="{% url 'registrar_inventario_miscelaneos_admin' %}"><button class="btn btn-primary">Agregar</button></a>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+        <table class="styled-table text-center">
+            <thead>
+                <tr class="text-center">
+                    <th colSpan="22" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                        Lista de de inventarios de Misceláneos
+                    </th>
+                </tr>
+                <tr class="text-center">
+                    <th>Unidad Responsable</th>
+                    <th>Edificio</th>
+                    <th>Nivel</th>
+                    <th>Área</th>
+                    <th>Misceláneo</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Voltaje</th>
+                    <th>Amperaje</th>
+                    <th>Potencia</th>
+                    <th>Potencia total</th>
+                    <th>Horas al mes</th>
+                    <th>Consumo</th>
+                    <th>Creado por</th>
+                    <th>Fecha de registro</th>
+                    <th>Actualizado por</th>
+                    <th>Ultima actualización</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                {% for miscelaneos in miscelaneos %}
+                <tr>
+                    <td>{{ miscelaneos.unidad_responsable.nombre }}</td>
+                    <td>{{ miscelaneos.edificio.nombre }}</td>
+                    <td>{{ miscelaneos.nivel }}</td>    
+                    <td>{{ miscelaneos.area.nombre }}</td>
+                    <td>{{ miscelaneos.miscelaneos }}</td>
+                    <td>{{ miscelaneos.marca }}</td>
+                    <td>{{ miscelaneos.modelo }}</td>
+                    <td>{{ miscelaneos.voltaje }}</td>
+                    <td>{{ miscelaneos.amperaje }}</td>
+                    <td>{{ miscelaneos.potencia }}</td>
+                    <td>{{ miscelaneos.potencia_total }}</td>
+                    <td>{{ miscelaneos.horas_mes }}</td>
+                    <td>{{ miscelaneos.consumo_mensual }}</td>
+                    <td>{{ miscelaneos.creado_por }}</td>
+                    <td>{{ miscelaneos.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+                    <td>{{ miscelaneos.actualizado_por }}</td>
+                    <td>{{ miscelaneos.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
+                    <td> 
+                        <div class="d-flex actions justify-content-center gap-2">
+                            <a href="{% url 'editar_inventario_miscelaneos_admin' miscelaneos.id %}" class="btn btn-light rounded rounded-circle btn-sm" title="Actualizar información">
+                                <i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-success rounded-circle btn-sm" 
+                                    onclick="darBajaMiscelaneo('{{ miscelaneos.id }}')" 
+                                    title="Dar de baja">
+                                <i class="bi bi-toggle-off"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+        <ul class="pagination" id="pagination"></ul>
+    </div>
+
+   </div>
+
+</div>
+
+<script>
+function darBajaMiscelaneo(id) {
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: "El registro será dado de baja y quedará inactivo.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#6c757d",
+        confirmButtonText: "Sí, dar de baja",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/inventario/miscelaneos/dar_baja/admin/${id}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("Dado de baja", "El registro fue dado de baja correctamente.", "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("Error", data.error || "No se pudo dar de baja.", "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Hubo un problema con la petición.", "error");
+            });
+        }
+    });
+}
+</script>
+{% endblock content %}

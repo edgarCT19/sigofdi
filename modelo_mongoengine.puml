@@ -1,0 +1,424 @@
+@startuml
+hide circle
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #EFF8FF
+  BorderColor #2B6CB0
+  FontName Arial
+}
+entity AlmacenamientoTemporal {
+  unidad_responsable : ReferenceField
+  centro_acopio : StringField
+  tipo_residuo : StringField
+  cantidad : DecimalField
+  estado_fisico : StringField
+  creti : StringField
+  tipo_envase : StringField
+  capacidad_medida : StringField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity Area {
+  nombre : StringField
+  unidad_responsable : ReferenceField
+  edificio : ReferenceField
+  fecha_registro : DateTimeField
+  responsable : StringField
+  telefono : StringField
+  cargo : StringField
+  grado_estudio : StringField
+  id : ObjectIdField
+}
+
+entity BitacoraGeneracionRPBI {
+  unidad_responsable : ReferenceField
+  area_dependencia : StringField
+  cultivos_cepas : StringField
+  punzocortantes : StringField
+  patologicos : StringField
+  no_anatomicos : StringField
+  sangre : StringField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity BitacoraMensual {
+  unidad_responsable : ReferenceField
+  laboratorio : StringField
+  tipo_residuo : StringField
+  cantidad : DecimalField
+  estado_fisico : StringField
+  creti : StringField
+  tipo_envase : StringField
+  capacidad_medida : StringField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity BitacoraRecoleccionRPBI {
+  unidad_responsable : ReferenceField
+  area_dependencia : StringField
+  cultivos_cepas : StringField
+  punzocortantes : StringField
+  patologicos : StringField
+  no_anatomicos : StringField
+  sangre : StringField
+  bolsas_rojas : IntField
+  bolsas_amarillas : IntField
+  contenedores_punzocortantes : IntField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity Campus {
+  nomenclatura : StringField
+  ubicacion : StringField
+  metros_cuadrados : DecimalField
+  fecha_registro : DateTimeField
+  id : ObjectIdField
+}
+
+entity CentroAcopioRME {
+  unidad_responsable : ReferenceField
+  centro_acopio : StringField
+  tipo_residuo : StringField
+  cantidad : DecimalField
+  estado_fisico : StringField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity CentroAcopioRRR {
+  unidad_responsable : ReferenceField
+  centro_acopio : StringField
+  dependencia : StringField
+  pet : StringField
+  papel : StringField
+  carton : StringField
+  metales : StringField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity Edificio {
+  nombre : StringField
+  responsable_alta : StringField
+  unidad_responsable : ReferenceField
+  fecha_registro : DateTimeField
+  id : ObjectIdField
+}
+
+entity FacturaEnergeticaTriple {
+  tipo_tarifa : StringField
+  subestacion : ReferenceField
+  dias_periodo : IntField
+  periodo : StringField
+  consumo : DecimalField
+  demanda_maxima : IntField
+  factor_potencia : DecimalField
+  factor_carga : IntField
+  cargo_energia : DecimalField
+  importe_demanda_maxima : DecimalField
+  importe_bt : DecimalField
+  importe_fp : DecimalField
+  dap : DecimalField
+  iva : DecimalField
+  total_a_pagar : DecimalField
+  archivo_pdf : FileField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  fecha_vencimiento : DateTimeField
+  status : StringField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  id : ObjectIdField
+}
+
+entity FacturaPdbt {
+  tipo_tarifa : StringField
+  subestacion : ReferenceField
+  dias_periodo : IntField
+  periodo : StringField
+  consumo : DecimalField
+  cargo_energia : DecimalField
+  importe_demanda_maxima : DecimalField
+  dap : DecimalField
+  iva : DecimalField
+  total_a_pagar : DecimalField
+  archivo_pdf : FileField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  status : StringField
+  fecha_vencimiento : DateTimeField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  id : ObjectIdField
+}
+
+entity HistorialInventario {
+  periodo : ReferenceField
+  inventario_id : ObjectIdField
+  tipo : StringField
+  datos : DictField
+  fecha_registro : DateTimeField
+  id : ObjectIdField
+}
+
+entity InventarioClimatizacion {
+  unidad_responsable : ReferenceField
+  edificio : ReferenceField
+  nivel : StringField
+  area : ReferenceField
+  tipo_clima : StringField
+  marca : StringField
+  modelo : StringField
+  capacidad : IntField
+  voltaje : DecimalField
+  amperaje : DecimalField
+  potencia : DecimalField
+  potencia_total : DecimalField
+  horas_mes : DecimalField
+  consumo_mensual : DecimalField
+  fecha_registro : DateTimeField
+  periodo : ReferenceField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  activo : BooleanField
+  fecha_baja : DateTimeField
+  fecha_reactivacion : DateTimeField
+  dado_baja_por : ReferenceField
+  reactivado_por : ReferenceField
+  id : ObjectIdField
+}
+
+entity InventarioLuminarias {
+  unidad_responsable : ReferenceField
+  edificio : ReferenceField
+  nivel : StringField
+  area : ReferenceField
+  tipo_lampara : StringField
+  num_luminarias : IntField
+  lamp_luminarias : IntField
+  potencia_lamp : DecimalField
+  potencia_total_lum : DecimalField
+  consumo_mensual_horas : IntField
+  consumo_mensual : DecimalField
+  fecha_registro : DateTimeField
+  periodo : ReferenceField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  activo : BooleanField
+  fecha_baja : DateTimeField
+  fecha_reactivacion : DateTimeField
+  dado_baja_por : ReferenceField
+  reactivado_por : ReferenceField
+  id : ObjectIdField
+}
+
+entity InventarioMiscelaneos {
+  unidad_responsable : ReferenceField
+  edificio : ReferenceField
+  nivel : StringField
+  area : ReferenceField
+  marca : StringField
+  miscelaneos : StringField
+  modelo : StringField
+  voltaje : DecimalField
+  amperaje : DecimalField
+  potencia : DecimalField
+  potencia_total : DecimalField
+  horas_mes : DecimalField
+  consumo_mensual : DecimalField
+  fecha_registro : DateTimeField
+  periodo : ReferenceField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  activo : BooleanField
+  fecha_baja : DateTimeField
+  fecha_reactivacion : DateTimeField
+  dado_baja_por : ReferenceField
+  reactivado_por : ReferenceField
+  id : ObjectIdField
+}
+
+entity Medidores {
+  unidad_responsable : ReferenceField
+  no_medidor : StringField
+  capacidad_transformador : DecimalField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+entity PasswordResetCode {
+  usuario : ReferenceField
+  codigo : StringField
+  creado_en : DateTimeField
+  expiracion : DateTimeField
+  usado : BooleanField
+  id : ObjectIdField
+}
+
+entity PeriodoInventario {
+  nombre : StringField
+  fecha_inicio : DateTimeField
+  fecha_fin : DateTimeField
+  status : StringField
+  observaciones : StringField
+  persona_autoriza : StringField
+  rol : StringField
+  activo : BooleanField
+  id : ObjectIdField
+}
+
+entity Subestacion {
+  unidad_responsable : ReferenceField
+  no_servicio : IntField
+  no_medidor : StringField
+  tarifa : StringField
+  multiplicador : DecimalField
+  id : ObjectIdField
+}
+
+entity Tarifas {
+  nombre : StringField
+  descripcion : StringField
+  tarifa : DecimalField
+  id : ObjectIdField
+}
+
+entity UnidadResponsable {
+  nombre : StringField
+  total_personas : IntField
+  campus : ReferenceField
+  diagrama_unifilar : FileField
+  id : ObjectIdField
+}
+
+entity Usuario {
+  matricula : StringField
+  nombres : StringField
+  apellidos : StringField
+  email : EmailField
+  telefono : StringField
+  unidad_responsable : ReferenceField
+  rol : StringField
+  is_active : BooleanField
+  fecha_alta : DateTimeField
+  fecha_baja : DateTimeField
+  password : StringField
+  creado_por : ReferenceField
+  foto_perfil : StringField
+  intentos_fallidos : IntField
+  bloqueado_hasta : DateTimeField
+  id : ObjectIdField
+}
+
+entity VertederoMunicipal {
+  unidad_responsable : ReferenceField
+  dependencia : StringField
+  tipo_desecho : StringField
+  capacidad : DecimalField
+  fecha_registro : DateTimeField
+  creado_por : ReferenceField
+  actualizado_por : ReferenceField
+  ultima_actualizacion : DateTimeField
+  status : BooleanField
+  id : ObjectIdField
+}
+
+AlmacenamientoTemporal --> UnidadResponsable : unidad_responsable
+AlmacenamientoTemporal --> Usuario : creado_por
+AlmacenamientoTemporal --> Usuario : actualizado_por
+Area --> UnidadResponsable : unidad_responsable
+Area --> Edificio : edificio
+BitacoraGeneracionRPBI --> UnidadResponsable : unidad_responsable
+BitacoraGeneracionRPBI --> Usuario : creado_por
+BitacoraGeneracionRPBI --> Usuario : actualizado_por
+BitacoraMensual --> UnidadResponsable : unidad_responsable
+BitacoraMensual --> Usuario : creado_por
+BitacoraMensual --> Usuario : actualizado_por
+BitacoraRecoleccionRPBI --> UnidadResponsable : unidad_responsable
+BitacoraRecoleccionRPBI --> Usuario : creado_por
+BitacoraRecoleccionRPBI --> Usuario : actualizado_por
+CentroAcopioRME --> UnidadResponsable : unidad_responsable
+CentroAcopioRME --> Usuario : creado_por
+CentroAcopioRME --> Usuario : actualizado_por
+CentroAcopioRRR --> UnidadResponsable : unidad_responsable
+CentroAcopioRRR --> Usuario : creado_por
+CentroAcopioRRR --> Usuario : actualizado_por
+Edificio --> UnidadResponsable : unidad_responsable
+FacturaEnergeticaTriple --> Subestacion : subestacion
+FacturaEnergeticaTriple --> Usuario : creado_por
+FacturaEnergeticaTriple --> Usuario : actualizado_por
+FacturaPdbt --> Subestacion : subestacion
+FacturaPdbt --> Usuario : creado_por
+FacturaPdbt --> Usuario : actualizado_por
+HistorialInventario --> PeriodoInventario : periodo
+InventarioClimatizacion --> UnidadResponsable : unidad_responsable
+InventarioClimatizacion --> Edificio : edificio
+InventarioClimatizacion --> Area : area
+InventarioClimatizacion --> PeriodoInventario : periodo
+InventarioClimatizacion --> Usuario : creado_por
+InventarioClimatizacion --> Usuario : actualizado_por
+InventarioClimatizacion --> Usuario : dado_baja_por
+InventarioClimatizacion --> Usuario : reactivado_por
+InventarioLuminarias --> UnidadResponsable : unidad_responsable
+InventarioLuminarias --> Edificio : edificio
+InventarioLuminarias --> Area : area
+InventarioLuminarias --> PeriodoInventario : periodo
+InventarioLuminarias --> Usuario : creado_por
+InventarioLuminarias --> Usuario : actualizado_por
+InventarioLuminarias --> Usuario : dado_baja_por
+InventarioLuminarias --> Usuario : reactivado_por
+InventarioMiscelaneos --> UnidadResponsable : unidad_responsable
+InventarioMiscelaneos --> Edificio : edificio
+InventarioMiscelaneos --> Area : area
+InventarioMiscelaneos --> PeriodoInventario : periodo
+InventarioMiscelaneos --> Usuario : creado_por
+InventarioMiscelaneos --> Usuario : actualizado_por
+InventarioMiscelaneos --> Usuario : dado_baja_por
+InventarioMiscelaneos --> Usuario : reactivado_por
+Medidores --> UnidadResponsable : unidad_responsable
+Medidores --> Usuario : creado_por
+Medidores --> Usuario : actualizado_por
+PasswordResetCode --> Usuario : usuario
+Subestacion --> UnidadResponsable : unidad_responsable
+UnidadResponsable --> Campus : campus
+Usuario --> UnidadResponsable : unidad_responsable
+Usuario --> Usuario : creado_por
+VertederoMunicipal --> UnidadResponsable : unidad_responsable
+VertederoMunicipal --> Usuario : creado_por
+VertederoMunicipal --> Usuario : actualizado_por
+@enduml

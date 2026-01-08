@@ -1,0 +1,274 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-2">
+    
+  <div class="card p-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Lista de facturas registradas con tarifa {{ tarifas_disponibles }}</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="get" class="row mt-3 g-3">
+      <div class="col-md-4">
+        <div class="material-input">
+          <select name="subestacion" onchange="this.form.submit()">
+            <option value="">-- Todas las Subestaciones --</option>
+            {% for sub in subestaciones %}
+              <option value="{{ sub.id }}" {% if filtros.subestacion_id == sub.id|stringformat:"s" %}selected{% endif %}>
+                {{ sub.no_servicio }} - {{ sub.no_medidor }} - {{ sub.tarifa }}
+              </option>
+            {% endfor %}
+          </select>
+          <label for="subestacion">Subestación</label>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="material-input">
+          <select name="tipo_tarifa" onchange="this.form.submit()">
+            <option value="">-- Todas las Tarifas --</option>
+            <option value="GDMTH" {% if filtros.tipo_tarifa == 'GDMTH' %}selected{% endif %}>GDMTH</option>
+            <option value="GDMTO" {% if filtros.tipo_tarifa == 'GDMTO' %}selected{% endif %}>GDMTO</option>
+            <option value="GDBT" {% if filtros.tipo_tarifa == 'GDBT' %}selected{% endif %}>GDBT</option>
+          </select>
+          <label for="tipo_tarifa">Tipo Tarifa</label>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="material-input">
+          <select name="anio" onchange="this.form.submit()">
+            <option value="">-- Todos los Años --</option>
+            {% for y in anios_disponibles %}
+              <option value="{{ y }}" {% if filtros.anio == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+          <label for="anio">Año</label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card p-4 mt-4">
+    <div class="d-flex justify-content-end">
+      <a href="{% url 'exportar_facturas_triple' %}" class="btn btn-success mx-2" title="Descargar reporte">Excel </a>
+      <a href="{% url 'listar_facturas_triple' %}"><button class="btn btn-secondary mx-2">Limpiar</button></a>
+      <a href="{% url 'registrar_factura_triple' %}"><button class="btn btn-primary mx-2">Agregar</button></a>
+    </div>
+    
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="table-container">
+            <table class="styled-table text-center">
+            <thead>
+                <tr class="text-center">
+                    <th colSpan="22" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                        Lista de facturas registradas
+                    </th>
+                </tr>
+                <tr class="text-center">
+                <th>Tipo</th>
+                <th>Subestación</th>
+                <th>Periodo</th>
+                <th>Días del periodo</th>
+                <th>Consumo en kwh</th>
+                <th>Demanda máxima (kw)</th>
+                <th>Factor potecnia</th>
+                <th>Factor de carga</th>
+                <th>Cargo por energía</th>
+                <th>Importe demanda máxima</th>
+                <th>Importe de medición BT</th>
+                <th>Importe FP</th>
+                <th>DAP</th>
+                <th>IVA</th>
+                <th>Total a pagar</th>
+                <th>Registrado por</th>
+                <th>Fecha de registro</th>
+                <th>Status</th>
+                <th>Actualizado por</th>
+                <th>Última actualización</th>
+                <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                {% for f in facturas %}
+                <tr>
+                <td>{{ f.tipo_tarifa }}</td>
+                <td>{{ f.subestacion.no_servicio }} - {{ f.subestacion.no_medidor }}</td>
+                <td>{{ f.periodo }}</td>
+                <td>{{ f.dias_periodo }}</td>
+                <td>{{ f.consumo }}</td>
+                <td>{{ f.demanda_maxima }}</td>
+                <td>
+                  {% if f.factor_potencia is not None %}
+                    {% with f.factor_potencia|floatformat:2 as potencia %}
+                      {% if f.factor_potencia < 0.89 %}
+                        <div class="d-flex flex-column align-items-center">
+                            <span class="danger-text">{{ potencia }}</span>
+                            <button type="button" class="btn btn-danger mt-1"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal"
+                                    title="Clic para ver más"
+                                    style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                ⚠
+                            </button>
+                        </div>
+                      {% elif f.factor_potencia >= 0.89 and f.factor_potencia < 1 %}
+                        <span class="warning-text">{{ potencia }}</span>
+                        <span class="alert-warning-custom">⚠ Advertencia</span>
+                      {% else %}
+                        {{ potencia }}
+                      {% endif %}
+                    {% endwith %}
+                  {% else %}
+                    --
+                  {% endif %}
+                </td>
+                <td>{{ f.factor_carga }}</td>
+                <td>{{ f.cargo_energia }}</td>
+                <td>{{ f.importe_demanda_maxima }}</td>
+                <td>{{ f.importe_bt }}</td>
+                <td>{{ f.importe_fp }}</td>
+                <td>{{ f.dap }}</td>
+                <td>{{ f.iva }}</td>
+                <td>$ {{ f.total_a_pagar }}</td>
+                <td>{{ f.creado_por }}</td>
+                <td>{{ f.fecha_registro|date:"d/m/Y H:i:s" }}</td>
+                <td>{{ f.actualizado_por }}</td>
+                <td>{{ f.ultima_actualizacion|date:"d/m/Y H:i:s" }}</td>
+                <td>
+                    {% if f.status == "Pagada" %}
+                      <span class="badge bg-success">Pagada</span>
+                    {% elif f.status == "Pendiente" %}
+                      <span class="badge bg-warning text-dark">Pendiente</span>
+                    {% elif f.status == "Vencida" %}
+                      <span class="badge bg-danger">Vencida</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Sin estado</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex actions justify-content-center gap-2">
+                        <a href="{% url 'descargar_pdf_factura' f.id %}" title="Ver PDF" target="_blank">
+                          <button class="btn btn-primary btn-sm rounded rounded-circle"><i class="bi bi-filetype-pdf"></i></button>  </a>
+                        <a href="{% url 'editar_factura_triple' f.id %}" title="Editar información"><button class="btn btn-light btn-sm rounded rounded-circle">
+                            <i class="bi bi-pencil"></i></button></a>
+                        <button class="btn btn-danger eliminar-factura btn-sm rounded rounded-circle" data-id="{{ f.id|stringformat:'s' }}"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="20" class="text-center">No hay facturas registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+        <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+            <ul class="pagination" id="pagination"></ul>
+        </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content card">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 text-danger" id="exampleModalLabel">¡Lineamientos del Factor Potencia!</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="color: var(--color-uacam-black);"></button>
+      </div>
+      <div class="modal-body text-dark" style="text-align: justify;">
+        <p>
+          El usuario deberá procurar mantener un <strong>Factor de Potencia (FP) cercano al 100%</strong>. 
+          Si durante cualquier periodo de facturación el FP promedio es 
+          <strong>menor al 90% (atrasado)</strong>, determinado conforme a las Normas Oficiales Mexicanas, 
+          el suministrador tendrá derecho a aplicar un recargo al monto de la facturación.
+        </p>
+
+        <p>
+          En cambio, si el FP es <strong>igual o superior al 90%</strong>, el suministrador tendrá la 
+          obligación de otorgar una bonificación al usuario, calculada mediante la fórmula correspondiente.
+        </p>
+
+        <hr>
+
+        <h5 class="fw-bold text-secondary">Fórmulas aplicables</h5>
+
+        <div class="mt-3">
+          <p class="fw-semibold">🔹 <u>Fórmula de Recargo</u> (FP menor a 90%):</p>
+          <pre class="bg-light p-2 rounded border">
+Porcentaje de Recargo = (3/5) × ( (90 / FP) - 1 ) × 100
+          </pre>
+        </div>
+
+        <div class="mt-3">
+          <p class="fw-semibold">🔹 <u>Fórmula de Bonificación</u> (FP ≥ 90%):</p>
+          <pre class="bg-light p-2 rounded border">
+Porcentaje de Bonificación = (1/4) × ( 1 - (90 / FP) ) × 100
+          </pre>
+        </div>
+
+        <p class="mt-3">
+          <small><em>Nota: FP es el Factor de Potencia expresado en porcentaje.</em></small>
+        </p>
+
+        <hr>
+
+        <h5 class="fw-bold text-secondary">Redondeo y límites</h5>
+        <ul style="color: var(--color-uacam-black);">
+          <li>Los resultados se redondearán a un decimal.</li>
+          <li>No se aplicarán recargos mayores al <strong>120%</strong>.</li>
+          <li>No se otorgarán bonificaciones mayores al <strong>2.5%</strong>.</li>
+        </ul>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.eliminar-factura').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const facturaId = this.dataset.id;
+
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Esta acción eliminará la factura permanentemente.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#d33'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/facturas/triple/eliminar/${facturaId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        body: `factura_id=${facturaId}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Eliminada', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    });
+                }
+            });
+        });
+    });
+});
+
+</script>
+{% endblock %}

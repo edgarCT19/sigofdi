@@ -1,0 +1,172 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-2">
+  <div class="card p-4 mt-4">
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información de la misceláneo</p>
+    <hr class="text-center" style="color: var(--color-uacam-primary);">
+    <form method="POST" class="mt-3">
+        {% csrf_token %}
+
+        <div class="row">
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <select name="edificio" id="edificio-select" class="" required>
+                <option value="">-- Selecciona un Edificio --</option>
+                {% for edificio in edificios %}
+                  <option value="{{ edificio.id }}" {% if edificio.id == inventario.edificio.id %}selected{% endif %}>{{ edificio.nombre }}</option>
+                {% endfor %}
+              </select>
+              <label>Edificio</label>
+            </div>
+          </div>
+
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <select name="nivel" id="nivel-select" class="" required>
+                <option value="">-- Selecciona un Nivel --</option>
+                {% for nivel in niveles %}
+                  <option value="{{ nivel }}" {% if nivel == inventario.nivel %}selected{% endif %}>{{ nivel }}</option>
+                {% endfor %}
+              </select>
+              <label>Nivel</label>
+            </div>
+          </div>
+
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <select name="area" id="area-select" class="" required>
+                <option value="">-- Selecciona un Área --</option>
+                {% for area in areas_filtradas %}
+                  <option value="{{ area.id }}" {% if area.id == inventario.area.id %}selected{% endif %}>{{ area.nombre }}</option>
+                {% endfor %}
+              </select>
+              <label>Área</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="material-input mt-4">
+          <input type="text" name="marca" value="{{ inventario.marca }}" required>
+          <label>Marca</label>
+        </div>
+
+        <div class="material-input mt-4">
+          <input type="text" name="miscelaneos" value="{{ inventario.miscelaneos }}" required>
+          <label>Nombre del Dispositivo</label>
+        </div>
+
+        <div class="material-input mt-4">
+          <input type="text" name="modelo" value="{{ inventario.modelo }}" required>
+          <label>Modelo</label>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <input type="number" name="voltaje" id="voltaje" step="0.001" value="{{ inventario.voltaje }}" required>
+              <label>Voltaje</label>
+            </div>
+          </div>
+
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <input type="number" step="0.001" name="amperaje" id="amperaje"  value="{{ inventario.amperaje }}" required>
+              <label>Amperaje</label>
+            </div>
+          </div>
+
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <input type="number" step="0.0001" name="horas_mes" id="horas_mes" value="{{ inventario.horas_mes }}" required>
+              <label>Horas al Mes</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos calculados -->
+        <div class="row">
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <input type="number" name="potencia" id="potencia" step="0.0001" value="{{ inventario.potencia }}" readonly>
+              <label>Potencia (Amperaje x Voltaje)</label>
+            </div>
+          </div>
+
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <input type="number" name="potencia_total" id="potencia_total" step="0.0001" value="{{ inventario.potencia_total }}" readonly>
+              <label>Potencia Total</label>
+            </div>
+          </div>
+
+          <div class="col-md-4 mt-4">
+            <div class="material-input">
+              <input type="number" name="consumo_mensual" id="consumo_mensual" step="0.0001" value="{{ inventario.consumo_mensual }}" readonly>
+              <label>Consumo Mensual</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+          <button type="submit" class="btn btn-primary">Actualizar</button>
+          <a href="{% url 'listar_inventario_miscelaneos' %}" class="btn btn-danger">Cancelar</a>
+        </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+ function actualizarCampos() {
+    const voltaje = parseFloat(document.getElementById('voltaje').value) || 0;
+    const amperaje = parseFloat(document.getElementById('amperaje').value) || 0;
+    const horas = parseFloat(document.getElementById('horas_mes').value) || 0;
+
+    const potencia = voltaje * amperaje;
+    const potenciaTotal = potencia / 1000;
+    const consumo = potenciaTotal * horas;
+
+    document.getElementById('potencia').value = potencia.toFixed(2);
+    document.getElementById('potencia_total').value = potenciaTotal.toFixed(4);
+    document.getElementById('consumo_mensual').value = consumo.toFixed(2);
+  }
+
+  document.getElementById('voltaje').addEventListener('input', actualizarCampos);
+  document.getElementById('amperaje').addEventListener('input', actualizarCampos);
+  document.getElementById('horas_mes').addEventListener('input', actualizarCampos);
+
+  // Áreas dinámicas según edificio
+  document.getElementById('edificio-select').addEventListener('change', function () {
+    const edificioId = this.value;
+    fetch(`/inventario/miscelaneos/obtener_areas/?edificio_id=${edificioId}`)
+      .then(res => res.json())
+      .then(data => {
+        const areaSelect = document.getElementById('area-select');
+        areaSelect.innerHTML = '<option value="">-- Selecciona un Área --</option>';
+        data.forEach(area => {
+          const option = document.createElement('option');
+          option.value = area.id;
+          option.textContent = area.nombre;
+          areaSelect.appendChild(option);
+        });
+      });
+  });
+
+  document.getElementById('edificio-select').addEventListener('change', function () {
+    const edificioId = this.value;
+    fetch(`/inventario/miscelaneos/obtener_areas/?edificio_id=${edificioId}`)
+      .then(res => res.json())
+      .then(data => {
+        const areaSelect = document.getElementById('area-select');
+        areaSelect.innerHTML = '<option value="">-- Selecciona un Área --</option>';
+        data.forEach(area => {
+          const option = document.createElement('option');
+          option.value = area.id;
+          option.textContent = area.nombre;
+          areaSelect.appendChild(option);
+        });
+      });
+  });
+</script>
+{% endblock %}

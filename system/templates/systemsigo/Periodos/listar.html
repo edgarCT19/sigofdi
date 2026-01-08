@@ -1,0 +1,112 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+  <div class="card mt-4">
+    <div class="d-flex justify-content-end">
+      <div>
+        <a href="{% url 'crear_periodo_inventario' %}" class="btn btn-primary mt-2 mx-2">Crear nuevo periodo</a>
+      </div>
+    </div>
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead class="">
+            <tr class="text-center">
+                <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    Lista de registros del de los periodos de inventarios energéticos
+                </th>
+            </tr>
+            <tr class="text-center">
+              <th>Nombre</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Status</th>
+              <th>Observaciones</th>
+              <th>Autorizado por</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for periodo in periodos %}
+              <tr>
+                <td>{{ periodo.nombre }}</td>
+                <td>{{ periodo.fecha_inicio|date:"d/m/Y" }}</td>
+                <td>{{ periodo.fecha_fin|date:"d/m/Y" }}</td>
+                <td>
+                  {% if periodo.status_actual == 'Activo' %}
+                    <span class="badge bg-success">Activo</span>
+                  {% elif periodo.status_actual == 'Pendiente' %}
+                    <span class="badge bg-warning text-dark">Pendiente</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Finalizado</span>
+                  {% endif %}
+                </td>
+                <td>{{ periodo.observaciones|default:"Sin observaciones" }}</td>
+                <td>{{ periodo.persona_autoriza }}</td>
+                <td>
+                  <div class="d-flex justify-content-center gap-2">
+                    <a href="{% url 'editar_periodo_inventario' periodo.id %}" class="btn btn-sm btn-light btn-sm rounded rounded-circle">
+                      <i class="bi bi-pencil"></i></a>
+                      <button 
+                        class="btn btn-sm btn-danger rounded rounded-circle delete-btn" 
+                        data-id="{{ periodo.id }}" 
+                        data-url="{% url 'eliminar_periodo_inventario' periodo.id %}"
+                        title="Eliminar periodo">
+                        <i class="bi bi-trash-fill"></i>
+                      </button>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="7" class="text-center">No hay periodos registrados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+      <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+          <ul class="pagination" id="pagination"></ul>
+      </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const periodoId = this.dataset.id;
+      const deleteUrl = this.dataset.url;
+      
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          fetch(deleteUrl, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',  // renderizado por Django
+              'Content-Type': 'application/json'
+            },
+          })
+          .then(response => {
+            if (response.ok) {
+              Swal.fire('Eliminado', 'El periodo ha sido eliminado.', 'success').then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire('Error', 'Ocurrió un error al eliminar.', 'error');
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

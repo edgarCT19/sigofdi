@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+{% load static %} <!-- Configuración para los elementos estáticos desde el settings -->
+<head>
+    <!-- Configuración básica de la página -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIG-Online</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/vnd.icon" href="{% static 'images/favicon.ico' %}">
+
+    <!-- Importación de estilos principales -->
+    <!-- Bootstrap 5: framework de diseño responsivo -->
+    <link rel="stylesheet" href="{% static 'libs/bootstrap/css/bootstrap.min.css' %}">
+    <!-- Bootstrap Icons: librería de íconos -->
+    <link rel="stylesheet" href="{% static 'libs/bootstrap-icons/bootstrap-icons.min.css' %}">
+    <!-- Font Awesome: otra librería de íconos -->
+    <link rel="stylesheet" href="{% static 'libs/fontawesome-free/css/all.min.css' %}">
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+</head>
+
+<body>
+    <!-- ====================================================== -->
+    <!-- NAVBAR SUPERIOR -->
+    <!-- ====================================================== -->
+    <nav class="navbar-custom d-flex justify-content-between align-items-center px-3">
+        <div class="d-flex align-items-center">
+            <!-- Botón hamburguesa (visible solo en móviles) -->
+            <button class="btn btn-light d-md-none rounded-circle me-2" id="menu-toggle" title="Menú">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <!-- Logo -->
+            <a href="#" class="navbar-brand d-flex align-items-center">
+                <img src="{% static 'images/LogoUacamWeb.png' %}" alt="Logo UACAM" class="img-fluid" width="120">
+            </a>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <!-- Menú desplegable de usuario -->
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle rounded-pill" id="userMenu" data-bs-toggle="dropdown">
+                    Mi cuenta
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person-circle me-1"></i> Perfil</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-1"></i> Configuración</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-1"></i> Cerrar sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ====================================================== -->
+    <!-- SIDEBAR LATERAL -->
+    <!-- ====================================================== -->
+    <aside id="sidebar" class="bg-light p-3">
+        <!-- Logo o encabezado del sidebar -->
+        <div class="text-center mb-3">
+            <img src="{% static 'images/LogoUacamWeb.png' %}" alt="Logo" class="img-fluid" width="100">
+        </div>
+
+        <!-- Ejemplo de enlaces principales -->
+        <a href="#" class="d-block py-2 px-3"><i class="bi bi-house-fill me-2"></i> Inicio</a>
+
+        <!-- Ejemplo de un menú con submenú -->
+        <div class="has-submenu">
+            <a href="#" class="d-block py-2 px-3"><i class="bi bi-folder-fill me-2"></i> Inventarios</a>
+            <div class="submenu ps-4">
+                <a href="#" class="d-block py-1">Aires Acondicionados</a>
+                <a href="#" class="d-block py-1">Luminarias</a>
+                <a href="#" class="d-block py-1">Misceláneos</a>
+            </div>
+        </div>
+
+        <!-- Otro enlace simple -->
+        <a href="#" class="d-block py-2 px-3"><i class="bi bi-receipt me-2"></i> Facturas</a>
+    </aside>
+
+    <!-- ====================================================== -->
+    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ====================================================== -->
+    <main id="main-content" class="p-4">
+        <h2>Bienvenido al Sistema SIG-Online</h2>
+        <p>Este es un ejemplo de la estructura base del sistema.</p>
+    </main>
+
+    <!-- ====================================================== -->
+    <!-- SCRIPTS -->
+    <!-- ====================================================== -->
+    <script src="{% static 'libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'libs/fontawesome-free/js/all.min.js' %}"></script>
+
+    <!-- Script personalizado -->
+    <script src="{% static 'js/custom.js' %}"></script>
+
+    <!-- Ejemplo de activación del enlace actual -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const links = document.querySelectorAll("#sidebar a");
+            const current = window.location.pathname;
+
+            links.forEach(link => {
+                if (link.getAttribute("href") === current) {
+                    link.classList.add("active");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

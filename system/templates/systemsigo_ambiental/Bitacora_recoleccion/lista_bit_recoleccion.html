@@ -1,0 +1,118 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div>
+  <div class="card">
+
+    <!-- Buscador + Agregar -->
+    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
+      <div class="searchBox position-relative d-flex align-items-center mx-2">
+        <i class="bi bi-search me-2 text-secondary"></i>
+        <input type="text" id="input-search" placeholder="Buscar..." oninput="toggleClearButton(this)" />
+        <button id="clear-search" type="button" class="btn btn-sm btn-link text-secondary px-2 d-none" onclick="clearSearch()" title="Borrar búsqueda">
+          <i class="bi bi-x-circle-fill"></i>
+        </button>
+      </div>
+
+      <a href="{% url 'bitacora_recoleccion_crear_admin' %}">
+        <button class="btn btn-primary">Agregar</button>
+      </a>
+    </div>
+
+    <!-- Tabla -->
+    <div class="d-flex align-items-center justify-content-center">
+      <div class="table-container">
+        <table class="styled-table text-center">
+          <thead>
+            <tr class="text-center">
+              <th colspan="11" style="background-color: var(--color-uacam-table-header); font-size: 15px;">
+                Lista de Bitácoras de Recolección RPBI
+              </th>
+            </tr>
+            <tr class="text-center">
+              <th>Unidad Responsable</th>
+              <th>Área Dependencia</th>
+              <th>Cultivos Cepas</th>
+              <th>Punzocortantes</th>
+              <th>Patológicos</th>
+              <th>No Anatómicos</th>
+              <th>Sangre</th>
+              <th>Bolsas</th>
+              <th>Contenedores</th>
+              <th>Fecha Registro</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="table-body">
+            {% for r in registros %}
+            <tr>
+              <td>{{ r.unidad_responsable.nombre }}</td>
+              <td>{{ r.area_dependencia }}</td>
+              <td>{{ r.cultivos_cepas }}</td>
+              <td>{{ r.punzocortantes }}</td>
+              <td>{{ r.patologicos }}</td>
+              <td>{{ r.no_anatomicos }}</td>
+              <td>{{ r.sangre }}</td>
+              <td>
+                🟥 {{ r.bolsas_rojas }} <br>
+                🟨 {{ r.bolsas_amarillas }}
+              </td>
+              <td>{{ r.contenedores_punzocortantes }}</td>
+              <td>{{ r.fecha_registro|date:"Y-m-d H:i" }}</td>
+              <td>
+                <div class="d-flex actions justify-content-center gap-2">
+                  <a href="{% url 'bitacora_recoleccion_editar_admin' r.id %}" class="btn btn-light rounded-circle btn-sm" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button class="btn btn-danger btn-sm rounded-circle" onclick="eliminarRegistro('{{ r.id }}')" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="18" class="text-center">No hay registros disponibles</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="table-header d-flex justify-content-end align-items-center mt-2 mb-3 p-2">
+      <ul class="pagination" id="pagination"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+function eliminarRegistro(id) {
+  Swal.fire({
+    title: '¿Estás seguro?',
+    text: "El registro será eliminado",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: '¡Eliminado!',
+        text: 'El registro fue eliminado correctamente.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = `/bitacora_recoleccion/eliminar/${id}/`;
+      });
+    }
+  });
+}
+</script>
+
+{% endblock content %}

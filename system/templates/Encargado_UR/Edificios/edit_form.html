@@ -1,0 +1,25 @@
+{% extends "systemsigo/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card p-4">
+        <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del edificio</p>
+        <hr class="text-center" style="color: var(--color-uacam-primary);">
+        <form method="POST" class="mt-3">
+            {% csrf_token %}
+            <div class="material-input">
+            <input type="text" name="nombre" id="nombre" value="{{ edificio.nombre }}" required>
+            <label for="nombre">Nombre del edificio</label>
+            <span></span>
+            </div>
+            
+            <div class="text-center mt-4">
+            <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+            </div>
+            <div class="text-center mt-2">
+            <a href="{% url 'lista_edificios' %}" class="btn btn-danger">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

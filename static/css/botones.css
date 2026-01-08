@@ -1,0 +1,54 @@
+/* Botón primario del sistema */
+.btn-uacam-primary {
+    background-color: var(--color-uacam-btn-primary);
+    color: var(--color-uacam-white);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 16px;
+}
+
+.btn-uacam-primary:hover {
+    background-color: var(--color-uacam-btn-primary-hover);
+    transform: scale(1.02);
+}
+
+/* Botón especial primario */
+.btn-uacam-primary-especial {
+    background-color: var(--color-uacam-btn-especial);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-size: 16px;
+}
+
+.btn-uacam-primary-especial:hover {
+    background-color: #0f64b9;
+    transform: scale(1.02);
+}
+
+.btn-header {
+    background-color: var(--color-uacam-background-light);
+    border: 2px solid transparent;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+}
+
+.btn-header:hover {
+    border-color: var(--color-uacam-datatext);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .btn-header:hover {
+    border-color: var(--color-uacam-secondary);
+}
+
+.btn-close:focus {
+    box-shadow: none;
+    outline: none;
+}
