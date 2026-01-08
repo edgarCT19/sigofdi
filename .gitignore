@@ -1,0 +1,46 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.env
+.env.*
+*.env
+
+# =========================
+# Virtual Environments
+# =========================
+venv/
+.venv/
+env/
+
+# =========================
+# Django
+# =========================
+db.sqlite3
+staticfiles/
+media/
+*.log
+
+# =========================
+# IDEs / Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Node / Frontend (por si usas Tailwind, npm, etc.)
+# =========================
+node_modules/
+dist/

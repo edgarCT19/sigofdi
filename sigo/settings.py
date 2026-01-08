@@ -13,28 +13,29 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from mongoengine import connect
 import os
+from dotenv import load_dotenv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Cargar variables de entorno
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-secret-key")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o_+*-hwd5wrnu!%euxm4muoe^buvh0$t)&0xe*5un2+rf_ag7i'
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "127.0.0.1,localhost"
+).split(",")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # Cambiar a False en producción o en caso de pruebas de despliegue
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    ""
+).split(",") if os.getenv("CSRF_TRUSTED_ORIGINS") else []
 
-ALLOWED_HOSTS = ['*'] # '127.0.0.1', 'localhost'-> para pruebas locales
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://5474125d4e54.ngrok-free.app", # Dominnios temporales para pruebas de despliegue Ngrok u otros
-]
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,7 +48,6 @@ INSTALLED_APPS = [
 ]
 
 # Configuración de middleware's
-# https://docs.djangoproject.com/en/5.2/ref/settings/#middleware  
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -59,11 +59,9 @@ MIDDLEWARE = [
 ]
 
 # Configuración de las URLs del proyecto
-# https://docs.djangoproject.com/en/5.2/ref/settings/#root-urlconf
 ROOT_URLCONF = 'sigo.urls'
 
 # Configuración de las plantillas del proyecto
-# https://docs.djangoproject.com/en/5.2/ref/settings/#templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -79,11 +77,11 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'sigo.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',  # Usa SQLite como base ficticia
@@ -93,28 +91,25 @@ DATABASES = {
 
 # Conexión a MongoDB usando MongoEngine
 MONGODB_SETTINGS = {
-    'db': 'SystemSIGO',
-    'host': 'mongodb+srv://edgaraimar0263:aMHr8Vi8G33MegHF@cluster0.qqwqgrn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+    'db': os.getenv("MONGO_DB_NAME"),
+    'host': os.getenv("MONGO_DB_URI"),
 }
 
+connect(
+    db=os.getenv("MONGO_DB_NAME"),
+    host=os.getenv("MONGO_DB_URI")
+)
 
 # Configuracipón del correo electrónico para notificaciones
-# https://docs.djangoproject.com/en/5.2/topics/email/
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'al066230@uacam.mx'         # Cambiar por el correo del remitente
-EMAIL_HOST_PASSWORD = 'pvkleqxdbicyqjre'
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# Configuración del captcha
-RECAPTCHA_SITE_KEY = '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI'
-RECAPTCHA_SECRET_KEY = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'
-
 # Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -132,22 +127,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Configuración internacional de zona horaria e idioma
-# Internationalization
-# https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
 # Configuración del almacenamiento de archivos estáticos y multimedia
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 
@@ -155,11 +142,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-MEDIA_URL = '/images/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
