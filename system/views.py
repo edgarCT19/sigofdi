@@ -120,7 +120,7 @@ def SolicitarCambioPassword(request):
         send_mail(
             'Código para cambio de contraseña - Sistema SIGO',
             f'Hola {usuario.nombres},\n\nTu código para cambiar la contraseña es: {codigo}\nEste código es válido por 15 minutos.',
-            'al066230@uacam.mx',
+            'sigo-50001@uacam.mx',
             [usuario.email],
             fail_silently=False
         )
@@ -162,7 +162,7 @@ def ConfirmarCambioPassword(request):
         codigo_db.save()
 
         messages.success(request, 'Contraseña actualizada con éxito.')
-        return redirect('cambiar_password')  # Redirige donde prefieras
+        return redirect('login')  # Redirige donde prefieras
 
     return render(request, 'systemsigo/Resets_passwords/Interno/confirmar_cambio.html')
 
@@ -195,7 +195,7 @@ def SolicitarRecuperacionPassword(request):
         send_mail(
             'Código para recuperar tu contraseña - SIGO',
             f'Hola {usuario.nombre_completo},\n\nTu código de recuperación es: {codigo}\nEste código expirará en 10 minutos.',
-            'al066230@uacam.mx',  # EMAIL_HOST_USER
+            'sigo-50001@uacam.mx',  # EMAIL_HOST_USER
             [usuario.email],
             fail_silently=False,
         )

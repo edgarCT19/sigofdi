@@ -112,7 +112,7 @@ def Add_Capturistas(request):
                 send_mail(
                     'Tu cuenta ha sido creada en el Sistema SIGO',
                     f'Hola {usuario.nombre_completo},\n\nUsuario: {usuario.email}\nContraseña: {raw_password}',
-                    'al066230@uacam.mx',
+                    'sigo-50001@uacam.mx',
                     [usuario.email],
                     fail_silently=False,
                 )

@@ -86,7 +86,7 @@ def crear_periodo_inventario(request):
                 send_mail(
                     subject="Nuevo Periodo de Inventario Energético",
                     message=mensaje,
-                    from_email="al066230@uacam.mx",  # Cambiar por tu EMAIL_HOST_USER real
+                    from_email="sigo-50001@uacam.mx",  # Cambiar por tu EMAIL_HOST_USER real
                     recipient_list=[u.email],
                     fail_silently=False,
                 )
