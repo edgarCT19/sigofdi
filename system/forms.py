@@ -36,7 +36,7 @@ class UsuarioForm(forms.Form):
     required=False,
     widget=forms.TextInput(attrs={
         'type': 'number', 
-        'placeholder': 'Ingrese su teléfono',
+        'placeholder': '',
         'pattern': '[0-9+ ]*',  
         'inputmode': 'numeric', 
     })
