@@ -264,8 +264,9 @@ def exportar_excel_inventario(request):
         ws.column_dimensions[col_letter].width = max_length + 2
 
     # Preparar respuesta
+    anio = periodo.fecha_inicio.year
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    nombre_archivo = f"Inventario_{tipo}_{unidad.nombre}_{periodo.nombre}.xlsx"
+    nombre_archivo = f"Inventario_{tipo}_{unidad.nombre}_{periodo.nombre}_{anio}.xlsx"
     response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
 
     wb.save(response)
