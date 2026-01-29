@@ -21,7 +21,7 @@ from .gestion_energetica.views_admin.facturas import (
     api_subestaciones_por_ur, editar_factura_triple_admin,
     eliminar_factura_triple_admin, crear_factura_pdbt,
     editar_factura_pdbt_admin, eliminar_factura_pdbt_admin, listar_facturas_pdbt_admin, listar_facturas_triple_admin)
-from .gestion_energetica.views_admin.inventarios import admin_inventarios_filtro, exportar_excel_inventario
+from .gestion_energetica.views_admin.inventarios import admin_inventarios_filtro, exportar_excel_inventario, exportar_excel_inventario_general
 
 from .gestion_energetica.views_admin.inventario_climatizacion import ( listado_inventario_climatizacion, 
     registrar_inventario_climatizacion_admin, editar_inventario_climatizacion_admin, eliminar_inventario_climatizacion_admin)
@@ -164,6 +164,7 @@ urlpatterns = [
     # Link de filttrado de datos para inventarios energeticos
     path("inventarios/filtro/triple/", admin_inventarios_filtro, name="inventarios_filtro_triple"),
     path('inventarios/exportar/', exportar_excel_inventario, name='exportar_excel_inventario'),
+    path('inventarios/exportar/general/', exportar_excel_inventario_general, name='exportar_excel_inventario_general'),
     # Links de captura de datos de inventarios energeticos (Climatizacion)
     path('listado/inventarios/climatizacion/', listado_inventario_climatizacion, name='listado_inventario_climatizacion'),
     path('inventario/climatizacion/agregar/', registrar_inventario_climatizacion_admin, name='registrar_inventario_climatizacion_admin'),

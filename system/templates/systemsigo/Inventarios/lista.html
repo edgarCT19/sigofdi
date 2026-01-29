@@ -51,12 +51,17 @@
   <!-- Tabla de Resultados -->
   {% if registros %}
    <div class="card mt-2">
-    <div class="d-flex justify-content-end align-items-center p-2 mx-1">
+    <div class="d-flex justify-content-end align-items-center flex-wrap gap-2 p-2 mx-1">
         {% if registros %}
           <a href="{% url 'exportar_excel_inventario' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}&tipo={{ tipo_seleccionado }}" 
           class="btn btn-success mx-2" title="Exportar a Excel">Exportar</a>
           <a href="{% url 'inventarios_filtro_triple' %}" class="btn btn-secondary mx-2">Limpiar</a>
         {% endif %}
+          <a href="{% url 'exportar_excel_inventario_general' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}"
+            class="btn btn-primary mx-2"
+            title="Exportar inventario general">
+            Exportar General
+          </a>
     </div>
     <div class="d-flex justify-content-center align-items-center">
       <div class="table-container">

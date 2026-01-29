@@ -271,3 +271,144 @@ def exportar_excel_inventario(request):
 
     wb.save(response)
     return response
+
+@never_cache
+@login_required_custom
+def exportar_excel_inventario_general(request):
+
+    unidad_id = request.GET.get('unidad')
+    periodo_id = request.GET.get('periodo')
+
+    try:
+        unidad = UnidadResponsable.objects.get(id=unidad_id)
+        periodo = PeriodoInventario.objects.get(id=periodo_id)
+    except DoesNotExist:
+        messages.error(request, "Unidad o periodo no encontrado.")
+        return redirect("admin_inventarios_filtro")
+
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)  # eliminar hoja por defecto
+
+    # =========================
+    # CONFIGURACIÓN COMPARTIDA
+    # =========================
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="305496", end_color="305496", fill_type="solid")
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    def aplicar_estilos(ws, headers):
+        ws.append(headers)
+        for col_num in range(1, len(headers) + 1):
+            cell = ws.cell(row=1, column=col_num)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.border = border
+            cell.alignment = Alignment(horizontal="center")
+
+    def ajustar_columnas(ws):
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                if cell.value:
+                    max_length = max(max_length, len(str(cell.value)))
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+    # =========================
+    # CLIMATIZACIÓN
+    # =========================
+    ws = wb.create_sheet("Climatización")
+    headers = [
+        "Edificio", "Nivel", "Área", "Tipo Clima", "Marca", "Modelo", "Capacidad BTU/HR",
+        "Voltaje", "Amperaje", "Potencia (W)", "Potencia total (Kw)",
+        "Horas al mes", "Consumo mensual"
+    ]
+    aplicar_estilos(ws, headers)
+
+    total_potencia = total_horas = total_consumo = 0
+    registros = InventarioClimatizacion.objects.filter(unidad_responsable=unidad, periodo=periodo)
+
+    for i in registros:
+        total_potencia += i.potencia_total or 0
+        total_horas += i.horas_mes or 0
+        total_consumo += i.consumo_mensual or 0
+        ws.append([
+            i.edificio.nombre, i.nivel, i.area.nombre, i.tipo_clima,
+            i.marca, i.modelo, i.capacidad, i.voltaje, i.amperaje,
+            i.potencia, i.potencia_total, i.horas_mes, i.consumo_mensual
+        ])
+
+    ws.append([""] * 10 + [total_potencia, total_horas, total_consumo])
+    ajustar_columnas(ws)
+
+    # =========================
+    # LUMINARIAS
+    # =========================
+    ws = wb.create_sheet("Luminarias")
+    headers = [
+        "Edificio", "Área", "Nivel", "Tipo Lámpara",
+        "N° Luminarias", "Potencia Total",
+        "Horas al mes", "Consumo mensual"
+    ]
+    aplicar_estilos(ws, headers)
+
+    total_potencia = total_horas = total_consumo = 0
+    registros = InventarioLuminarias.objects.filter(unidad_responsable=unidad, periodo=periodo)
+
+    for i in registros:
+        total_potencia += i.potencia_total_lum or 0
+        total_horas += i.consumo_mensual_horas or 0
+        total_consumo += i.consumo_mensual or 0
+        ws.append([
+            i.edificio.nombre, i.area.nombre, i.nivel, i.tipo_lampara,
+            i.num_luminarias, i.potencia_total_lum,
+            i.consumo_mensual_horas, i.consumo_mensual
+        ])
+
+    ws.append([""] * 5 + [total_potencia, total_horas, total_consumo])
+    ajustar_columnas(ws)
+
+    # =========================
+    # MISCELÁNEOS
+    # =========================
+    ws = wb.create_sheet("Misceláneos")
+    headers = [
+        "Edificio", "Nivel", "Área", "Equipo",
+        "Marca", "Modelo", "Potencia",
+        "Horas al mes", "Consumo mensual"
+    ]
+    aplicar_estilos(ws, headers)
+
+    total_potencia = total_horas = total_consumo = 0
+    registros = InventarioMiscelaneos.objects.filter(unidad_responsable=unidad, periodo=periodo)
+
+    for i in registros:
+        total_potencia += i.potencia or 0
+        total_horas += i.horas_mes or 0
+        total_consumo += i.consumo_mensual or 0
+        ws.append([
+            i.edificio.nombre, i.nivel, i.area.nombre, i.miscelaneos,
+            i.marca, i.modelo, i.potencia,
+            i.horas_mes, i.consumo_mensual
+        ])
+
+    ws.append([""] * 6 + [total_potencia, total_horas, total_consumo])
+    ajustar_columnas(ws)
+
+    # =========================
+    # RESPUESTA
+    # =========================
+    anio = periodo.fecha_inicio.year
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    nombre_archivo = f"Inventario_General_{unidad.nombre}_{periodo.nombre}_{anio}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+
+    wb.save(response)
+    return response
