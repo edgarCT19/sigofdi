@@ -1,0 +1,6 @@
+El rol "encargado_ur" solo aplica al usuario responsable del módulo de energía.
+Para próximos roles como lo son los gestores de ambiente, salud o trabajo se recomienda las siguientes nomenclaturas 
+para su desarrollo:
+responsable_ambiental
+responsable_salud
+responsable_trabajo

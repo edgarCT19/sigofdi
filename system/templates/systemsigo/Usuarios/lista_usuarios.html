@@ -57,7 +57,21 @@
                         <td>{{ usuario.nombre_completo }}</td>
                         <td>{{ usuario.email }}</td>
                         <td>{{ usuario.telefono|default:"—" }}</td>
-                        <td>{{ usuario.rol|capfirst }}</td>
+                        <td>
+                            {% if usuario.rol == "encargado_ur" %}
+                                Responsable de Energía
+                            {% elif usuario.rol == "admin" %}
+                                Administrador General
+                            {% elif usuario.rol == "admin_energia" %}
+                                Administrador Energía
+                            {% elif usuario.rol == "capturista" %}    
+                                Capturista de Datos
+                            {% elif usuario.rol == "admin_ambiental" %}
+                                Administrador Ambiental
+                            {% else %}
+                                {{ usuario.rol|capfirst }}
+                            {% endif %}
+                        </td>
                         <td>
                             {% if usuario.unidad_responsable %}
                                 {{ usuario.unidad_responsable.nombre }}

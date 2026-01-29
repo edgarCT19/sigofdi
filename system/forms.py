@@ -49,7 +49,7 @@ class UsuarioForm(forms.Form):
         #('admin_salud', 'Administrador Salud'),
         #('rector', 'Rector'),
         #('director', 'Director'),
-        ('encargado_ur', 'Responsable de Unidad'),
+        ('encargado_ur', 'Responsable de energía'), # Cambio de etiqueta aquí
         ('capturista', 'Capturista'),
         #('auditor', 'Auditor'),
     ])

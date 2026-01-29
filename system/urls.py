@@ -49,6 +49,8 @@ from .gestion_energetica.views_admin.medidores import (medidores_lista_admin,
     medidores_eliminar_admin, medidores_crear_admin, medidores_editar_admin)
 
 # ==================== Vistas de Encargado de Unidad Responsable ====================
+# El encargado de UR es el responsable de energia, para mantener compatibilidad se deja el nombre original
+# Para módulos futuros como el de trabajo, salud o ambiente la nomenclatura es responsable_(ambiental/energia/salud) segun sea el caso
 from .gestion_energetica.views_encargado_ur.index import Inicio_encargado
 from .gestion_energetica.views_encargado_ur.edificios import (
     listar_edificios, alta_edificio, editar_edificio, eliminar_edificio)
