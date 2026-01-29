@@ -57,6 +57,10 @@
                             title="Eliminar UR"><i class="bi bi-trash-fill"></i></button>
                         </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="28" class="text-center">No hay registros de unidades responsables.</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

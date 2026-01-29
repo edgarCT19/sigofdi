@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="card p-4">
-    <p class="text-center mb-2"  style="font-size: 18px;">Filtro de subestaciones por Unidad Responsable</p>
+    <p class="text-center mb-2"  style="font-size: 18px;">Filtro de servicios por Unidad Responsable</p>
     <hr class="text-center" style="color: var(--color-uacam-primary);">
     <div class="mt-4">
         <form method="get" class="mb-4">
@@ -31,7 +31,7 @@
                 <thead>
                     <tr class="text-center">
                         <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
-                            Lista de subestaciones de las Unidades Responsables
+                            Lista de servicios de las Unidades Responsables
                         </th>
                     </tr>
                     <tr class="text-center">
@@ -60,7 +60,7 @@
                         </tr>
                     {% empty %}
                         <tr class="text-center">
-                            <td colspan="8">No se encontraron subestaciones.</td>
+                            <td colspan="28">No hay servicios registrados.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -72,7 +72,7 @@
 <script>
       function eliminarSubestacion(id) {
     Swal.fire({
-      title: '¿Eliminar esta subestación?',
+      title: '¿Eliminar este servicio?',
       text: "Esta acción no se puede deshacer.",
       icon: 'warning',
       showCancelButton: true,

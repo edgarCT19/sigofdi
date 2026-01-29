@@ -4,3 +4,5 @@ para su desarrollo:
 responsable_ambiental
 responsable_salud
 responsable_trabajo
+
+Todo lo relacionado con subestaciones, será visto ahora como "servicios"
