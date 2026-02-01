@@ -83,7 +83,13 @@
                         </td>
                         <td>{{ usuario.fecha_alta|date:"d/m/Y H:i:s" }}</td>
                         <td>{{ usuario.is_active|yesno:"Sí,No" }}</td>
-                        <td>{{ usuario.creado_por }}</td>
+                        <td>
+                            {% if usuario.creado_por %}
+                                {{ usuario.creado_por.nombre_completo }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
                         <td>
                             <div class="d-flex actions justify-content-around">
                                 <a href="{% url 'editar_usuario' usuario.id %}" title="Editar información" 
