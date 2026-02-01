@@ -38,6 +38,7 @@
             </tr>
             <tr class="text-center">
                 <th>Nombre</th>
+                <th>Unidad Responsable</th>
                 <th>Responsable de alta</th>
                 <th>Acciones</th>
             </tr>
@@ -46,6 +47,7 @@
             {% for edificio in edificios %}
                 <tr>
                 <td>{{ edificio.nombre }}</td>
+                <td>{{ edificio.unidad_responsable.nombre }}</td>
                 <td>{{ edificio.responsable_alta }}</td>
                 <td>
                     <div class="d-flex actions justify-content-center">

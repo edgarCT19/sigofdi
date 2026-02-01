@@ -69,6 +69,12 @@ from .gestion_energetica.views_encargado_ur.factura_pdbt import (
 from .gestion_energetica.views_encargado_ur.inventario_listas import (
     listar_climatizacion_encargado, listar_luminarias_encargado,
     listar_miscelaneos_encargado)
+from .gestion_energetica.views_encargado_ur.inventario_aa import (
+    editar_inventario_climatizacion_responsable_energia,
+    eliminar_inventario_climatizacion_encargado,
+    historial_climatizacion_encargado,
+    registrar_inventario_climatizacion_responsable_energia, dar_baja_inventario_climatizacion_responsable_energia,
+    restaurar_registro_climatizacion_encargado)
 # ==================== Vistas del Rector ====================
 from .gestion_energetica.views_rector.index import Inicio_rector
 # ==================== Vistas del Director ====================
@@ -218,7 +224,7 @@ urlpatterns = [
     path('director/', Inicio_director, name='director'),
 
 
-    # ==================== Paths de Encargado de UR ====================
+    # ==================== Paths de Encargado de UR, ahora Responsable de Energía ====================
     path('encargado_ur/', Inicio_encargado, name='encargado_ur'),
     # Links de edificios de encargado de ur
     path('lista_edificios/', listar_edificios, name='lista_edificios'),
@@ -256,8 +262,17 @@ urlpatterns = [
     path('facturas/pdbt/descargar/<str:factura_id>/', descargar_pdf_factura_pdbt, name='descargar_factura_pdbt'),
     path('facturas/pdbt/exportar/', exportar_facturas_pdbt_excel, name='exportar_facturas_pdbt'),
     # Links para el listado de datos de el encargado de ur de los inventarios
+    # Climatización
     path("encargado/inventario/climatizacion/", listar_climatizacion_encargado, name="listar_climatizacion_encargado"),
+    path('inventario/climatizacion/agregar/responsable-energia/', registrar_inventario_climatizacion_responsable_energia, name='registrar_inventario_climatizacion_responsable_energia'),
+    path('inventario/climatizacion/editar/responsable-energia/<str:climatizacion_id>/', editar_inventario_climatizacion_responsable_energia, name='editar_climatizacion_encargado'),
+    path('inventario/climatizacion/dar_baja/responsable-energia/<str:his_id>/', dar_baja_inventario_climatizacion_responsable_energia, name='dar_baja_climatizacion_encargado'),
+    path('inventario/climatizacion/historial/responsable-energia/', historial_climatizacion_encargado, name='historial_climatizacion_encargado'),
+    path('inventario/climatizacion/restaurar/responsable-energia/<str:registro_id>/', restaurar_registro_climatizacion_encargado, name='restaurar_climatizacion_encargado'),
+    path('inventario/climatizacion/eliminar/responsable-energia/<str:climatizacion_id>/', eliminar_inventario_climatizacion_encargado, name='eliminar_climatizacion_encargado'),
+    # Luminarias
     path("encargado/inventario/luminarias/", listar_luminarias_encargado, name="listar_luminarias_encargado"),
+    # Miscelaneos
     path("encargado/inventario/miscelaneos/", listar_miscelaneos_encargado, name="listar_miscelaneos_encargado"),
 
 

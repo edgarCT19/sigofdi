@@ -21,14 +21,14 @@
       </div>
       <div class="col-md-3 material-input">
         <select name="subestacion" onchange="this.form.submit()">
-          <option value="">-- Subestación --</option>
+          <option value="">-- Servicios --</option>
           {% for sub in subestaciones %}
             <option value="{{ sub.id }}" {% if filtros.sub_id == sub.id|stringformat:"s" %}selected{% endif %}>
               {{ sub.no_medidor }} ({{ sub.tarifa }})
             </option>
           {% endfor %}
         </select>
-        <label>Subestación</label>
+        <label>Servicio</label>
       </div>
       <div class="col-md-3 material-input">
         <select name="tipo_tarifa" onchange="this.form.submit()">

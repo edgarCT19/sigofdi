@@ -13,11 +13,14 @@
             <select name="subestacion" class="" required>
             {% for sub in subestaciones %}
                 <option value="{{ sub.id }}" {% if sub.id == factura.subestacion.id %}selected{% endif %}>
-                {{ sub.no_servicio }} - {{ sub.no_medidor }} - {{ sub.tarifa }}
+                {{ sub.unidad_responsable.nombre }} —
+                {{ sub.no_servicio }} —
+                {{ sub.no_medidor }} —
+                {{ sub.tarifa }}
                 </option>
             {% endfor %}
             </select>
-            <label>Subestación</label>
+            <label>Servicio</label>
         </div>
         <div class="col-md-6 mt-4 material-input">
             <select name="tipo_tarifa" class="" required>

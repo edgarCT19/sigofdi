@@ -90,10 +90,11 @@ select#unidad_responsable {
         </div>
         <div class="col-md-6 mb-3">
           <div class="material-input">
-            <select class="" id="unidad_responsable" name="unidad_responsable">
-              <option value="">-- Ninguna --</option>
+            <select class="" id="unidad_responsable" name="unidad_responsable[]" multiple size="6" style="overflow: scroll;">
               {% for ur in unidades %}
-              <option value="{{ ur.id }}" title="{{ ur.nombre }}" style="color: black;">{{ ur.nombre|truncatechars:45 }}</option>
+              <option value="{{ ur.id }}" title="{{ ur.nombre }}" style="color: black;">
+                {{ ur.nombre|truncatechars:45 }}
+              </option>
               {% endfor %}
             </select>
             <label for="unidad_responsable">Unidad Responsable</label>
@@ -120,8 +121,11 @@ select#unidad_responsable {
 
   function toggleUnidadResponsable() {
     const rolesSinUR = ["admin", "admin_ambiental", "admin_energia", "admin_salud"];
+
     if (rolesSinUR.includes(rolSelect.value)) {
-      urSelect.value = "";  // Limpia la selección
+      for (let opt of urSelect.options) {
+        opt.selected = false;
+      }
       urSelect.disabled = true;
     } else {
       urSelect.disabled = false;

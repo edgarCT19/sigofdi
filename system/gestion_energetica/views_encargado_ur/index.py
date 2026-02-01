@@ -21,7 +21,8 @@ def Inicio_encargado(request):
         activo=True
     ).first()
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    urs = user.unidad_responsable if user.unidad_responsable else []
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     return render(request, 'systemsigo/index_encargado.html', {

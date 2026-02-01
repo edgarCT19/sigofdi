@@ -4,7 +4,7 @@
 {% block content %}
 <div class="mt-2">
   <div class="card p-4 mt-2">
-    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del aire acondicionado</p>
+    <p class="text-center mb-2"  style="font-size: 18px;">Actualizar información del aire acondicionado Responsable</p>
     <hr class="text-center" style="color: var(--color-uacam-primary);">
     <form method="POST" class="">
       {% csrf_token %}
@@ -149,7 +149,7 @@
 
       <div class="d-grid gap-2 mx-auto justify-content-center align-items-center mt-4">
         <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
-        <a href="{% url 'listado_inventario_climatizacion' %}" class="btn btn-danger">Cancelar</a>
+        <a href="{% url 'listar_climatizacion_encargado' %}" class="btn btn-danger">Cancelar</a>
       </div>
     </form>
   </div>

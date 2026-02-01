@@ -11,14 +11,14 @@
       <div class="col-md-4">
         <div class="material-input">
           <select name="subestacion" onchange="this.form.submit()">
-            <option value="">-- Todas las Subestaciones --</option>
+            <option value="">-- Todas los Servicios --</option>
             {% for sub in subestaciones %}
               <option value="{{ sub.id }}" {% if filtros.subestacion_id == sub.id|stringformat:"s" %}selected{% endif %}>
                 {{ sub.no_servicio }} - {{ sub.no_medidor }} - {{ sub.tarifa }}
               </option>
             {% endfor %}
           </select>
-          <label for="subestacion">Subestación</label>
+          <label for="subestacion">Servicios</label>
         </div>
       </div>
 
@@ -60,13 +60,15 @@
             <table class="styled-table text-center">
             <thead>
                 <tr class="text-center">
-                    <th colSpan="22" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                    <th colSpan="28" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
                         Lista de facturas registradas
                     </th>
                 </tr>
                 <tr class="text-center">
+                <th>Unidad Responsable</th>
+                <th>Campus</th>  
                 <th>Tipo</th>
-                <th>Subestación</th>
+                <th>Servicios</th>
                 <th>Periodo</th>
                 <th>Días del periodo</th>
                 <th>Consumo en kwh</th>
@@ -91,6 +93,8 @@
             <tbody id="table-body">
                 {% for f in facturas %}
                 <tr>
+                <td>{{ f.subestacion.unidad_responsable.nombre }}</td>
+                <td>{{ f.subestacion.unidad_responsable.campus.nomenclatura }}</td>
                 <td>{{ f.tipo_tarifa }}</td>
                 <td>{{ f.subestacion.no_servicio }} - {{ f.subestacion.no_medidor }}</td>
                 <td>{{ f.periodo }}</td>

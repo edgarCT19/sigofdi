@@ -26,10 +26,11 @@ def lista_areas(request):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
     
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    urs = user.unidad_responsable if user.unidad_responsable else []
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
-    areas = Area.objects(unidad_responsable=user.unidad_responsable)
+    areas = Area.objects(unidad_responsable__in=user.unidad_responsable)
     return render(request, 'Encargado_UR/Areas/areas.html', {
         'areas': areas,
         'subestaciones': subestaciones,
@@ -56,35 +57,52 @@ def agregar_areas(request):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
-    unidad = user.unidad_responsable
-    edificios = Edificio.objects(unidad_responsable=unidad)
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    urs = user.unidad_responsable if user.unidad_responsable else []
+
+    edificios = Edificio.objects(unidad_responsable__in=urs)
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     if request.method == 'POST':
+
         nombre = request.POST.get('nombre')
         edificio_id = request.POST.get('edificio')
         telefono = request.POST.get('telefono')
         cargo = request.POST.get('cargo')
         grado_estudio = request.POST.get('grado_estudio')
-        responsable = request.POST.get('responsable')  # <- Ingresado manualmente
+        responsable = request.POST.get('responsable')
 
-        if nombre and edificio_id and responsable:
-            edificio = Edificio.objects.get(id=edificio_id)
-            Area(
-                nombre=nombre,
-                unidad_responsable=unidad,
-                edificio=edificio,
-                fecha_registro=datetime.now(),
-                responsable=responsable,
-                telefono=telefono,
-                cargo=cargo,
-                grado_estudio=grado_estudio
-            ).save()
-            messages.success(request, 'Área registrada correctamente.')
-            return redirect('lista_areas')
-        else:
+        if not (nombre and edificio_id and responsable):
             messages.error(request, 'Faltan datos obligatorios.')
+            return render(request, 'Encargado_UR/Areas/add_form.html', {
+                'edificios': edificios,
+                'subestaciones': subestaciones,
+                'tarifas_disponibles': tarifas_disponibles
+            })
+
+        try:
+            edificio = Edificio.objects.get(id=edificio_id)
+        except Edificio.DoesNotExist:
+            messages.error(request, "Edificio inválido.")
+            return redirect('lista_areas')
+
+        if edificio.unidad_responsable not in urs:
+            messages.error(request, "No tienes permiso para ese edificio.")
+            return redirect('lista_areas')
+
+        Area(
+            nombre=nombre,
+            unidad_responsable=edificio.unidad_responsable,
+            edificio=edificio,
+            fecha_registro=datetime.now(),
+            responsable=responsable,
+            telefono=telefono,
+            cargo=cargo,
+            grado_estudio=grado_estudio
+        ).save()
+
+        messages.success(request, 'Área registrada correctamente.')
+        return redirect('lista_areas')
 
     return render(request, 'Encargado_UR/Areas/add_form.html', {
         'edificios': edificios,
@@ -114,33 +132,58 @@ def editar_areas(request, area_id):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
+    urs = user.unidad_responsable if user.unidad_responsable else []
+
     try:
         area = Area.objects.get(id=area_id)
     except Area.DoesNotExist:
         messages.error(request, "Área no encontrada.")
         return redirect('lista_areas')
 
-    if area.unidad_responsable != user.unidad_responsable:
+    if area.unidad_responsable not in urs:
+        messages.error(request, "No tienes permiso para editar esta área.")
         return redirect('lista_areas')
 
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=urs)
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     if request.method == 'POST':
+
         area.nombre = request.POST.get('nombre')
-        edificio_id = request.POST.get('edificio')
         area.telefono = request.POST.get('telefono')
         area.cargo = request.POST.get('cargo')
         area.grado_estudio = request.POST.get('grado_estudio')
-        area.responsable = request.POST.get('responsable')  # <- editable manual
+        area.responsable = request.POST.get('responsable')
 
-        if edificio_id:
-            area.edificio = Edificio.objects.get(id=edificio_id)
-            area.save()
-            messages.success(request, 'Área actualizada correctamente.')
+        edificio_id = request.POST.get('edificio')
+
+        if not edificio_id:
+            messages.error(request, "Debe seleccionar un edificio.")
+            return render(request, 'Encargado_UR/Areas/edit_form.html', {
+                'area': area,
+                'edificios': edificios,
+                'subestaciones': subestaciones,
+                'tarifas_disponibles': tarifas_disponibles
+            })
+
+        try:
+            edificio = Edificio.objects.get(id=edificio_id)
+        except Edificio.DoesNotExist:
+            messages.error(request, "Edificio inválido.")
             return redirect('lista_areas')
 
+        if edificio.unidad_responsable not in urs:
+            messages.error(request, "No tienes permiso para ese edificio.")
+            return redirect('lista_areas')
+
+        area.edificio = edificio
+        area.unidad_responsable = edificio.unidad_responsable
+
+        area.save()
+
+        messages.success(request, 'Área actualizada correctamente.')
+        return redirect('lista_areas')
 
     return render(request, 'Encargado_UR/Areas/edit_form.html', {
         'area': area,
@@ -168,13 +211,15 @@ def eliminar_areas(request, area_id):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
+    urs = user.unidad_responsable if user.unidad_responsable else []
+
     try:
         area = Area.objects.get(id=area_id)
     except Area.DoesNotExist:
         messages.error(request, "Área no encontrada.")
         return redirect('lista_areas')
 
-    if area.unidad_responsable != user.unidad_responsable:
+    if area.unidad_responsable not in urs:
         messages.error(request, "No tienes permiso para eliminar esta área.")
         return redirect('lista_areas')
 

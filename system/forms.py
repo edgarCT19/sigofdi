@@ -31,35 +31,42 @@ class UsuarioForm(forms.Form):
     nombres = forms.CharField(max_length=100, required=True)
     apellidos = forms.CharField(max_length=100, required=True)
     email = forms.EmailField(required=True)
-    telefono = forms.CharField( # Cambie la linea de codigo aquí para que el campo telefono acepte solo numeros
-    max_length=20,
-    required=False,
-    widget=forms.TextInput(attrs={
-        'type': 'number', 
-        'placeholder': '',
-        'pattern': '[0-9+ ]*',  
-        'inputmode': 'numeric', 
-    })
-)
-    unidad_responsable = forms.ChoiceField(choices=[], required=False)
+
+    telefono = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'type': 'number',
+            'pattern': '[0-9+ ]*',
+            'inputmode': 'numeric',
+        })
+    )
+
+    unidad_responsable = forms.MultipleChoiceField(
+        choices=[],
+        required=False,
+        widget=forms.SelectMultiple(attrs={
+            "class": "",
+            "size": "6"
+        })
+    )
+
     rol = forms.ChoiceField(choices=[
-        ('admin', 'Administrador'),
+        ('admin', 'Administrador General'),
         ('admin_energia', 'Administrador Energía'),
         ('admin_ambiental', 'Administrador Ambiental'),
-        #('admin_salud', 'Administrador Salud'),
-        #('rector', 'Rector'),
-        #('director', 'Director'),
-        ('encargado_ur', 'Responsable de energía'), # Cambio de etiqueta aquí
+        ('encargado_ur', 'Responsable de energía'),
         ('capturista', 'Capturista'),
-        #('auditor', 'Auditor'),
     ])
+
     is_active = forms.BooleanField(required=False, initial=True)
 
     def __init__(self, *args, **kwargs):
-        super(UsuarioForm, self).__init__(*args, **kwargs)
-        # Se carga el listado de unidades responsables
+        super().__init__(*args, **kwargs)
+
         self.fields['unidad_responsable'].choices = [
-            (str(ur.id), ur.nombre) for ur in UnidadResponsable.objects.all()
+            (str(ur.id), ur.nombre)
+            for ur in UnidadResponsable.objects.all()
         ]
 
 class FotoPerfilForm(forms.Form):

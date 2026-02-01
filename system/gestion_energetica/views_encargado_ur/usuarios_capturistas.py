@@ -9,7 +9,7 @@ from django.core.mail import send_mail
 from django.contrib import messages
 
 from system.decorators import login_required_custom
-from system.models import Subestacion, Usuario
+from system.models import Subestacion, Usuario, UnidadResponsable
 from system.views import get_user
 
 
@@ -41,7 +41,8 @@ def listar_capturistas(request):
         return redirect('login')
 
     # Capturistas que tienen la misma unidad responsable
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    urs = usuario_logueado.unidad_responsable if usuario_logueado.unidad_responsable else []
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
     capturistas = Usuario.objects(
     unidad_responsable=usuario_logueado.unidad_responsable,
@@ -75,59 +76,91 @@ def Add_Capturistas(request):
     """
 
     user = Usuario.objects(id=request.session['user_id']).first()
-    if user.rol != 'encargado_ur':
-        return redirect('inicio')
+
+    if not user or user.rol != 'encargado_ur':
+        return redirect('encargado_ur')
+
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     if request.method == "POST":
+
         matricula = request.POST.get('matricula')
         email = request.POST.get('email')
+        ur_id = request.POST.get('unidad_responsable')
+
+        # -------- VALIDACIONES --------
+
+        if not ur_id:
+            messages.error(request, "Debes seleccionar una Unidad Responsable.")
+            return redirect('add_capturista')
+
+        ur = UnidadResponsable.objects(id=ur_id).first()
+
+        if not ur or ur not in urs:
+            messages.error(request, "UR inválida.")
+            return redirect('add_capturista')
 
         matricula_existe = Usuario.objects(matricula=matricula).first()
         email_existe = Usuario.objects(email=email).first()
 
         if matricula_existe and email_existe:
             messages.error(request, 'La matrícula y el correo electrónico ya están registrados.')
-        elif matricula_existe:
+            return redirect('add_capturista')
+
+        if matricula_existe:
             messages.error(request, 'La matrícula ya está registrada.')
-        elif email_existe:
+            return redirect('add_capturista')
+
+        if email_existe:
             messages.error(request, 'El correo electrónico ya está registrado.')
-        else:
-            try:
-                raw_password = secrets.token_urlsafe(10)
-                hashed_password = Usuario.hash_password(raw_password)
+            return redirect('add_capturista')
 
-                usuario = Usuario(
-                    matricula=matricula,
-                    nombres=request.POST.get('nombres'),
-                    apellidos=request.POST.get('apellidos'),
-                    email=email,
-                    telefono=request.POST.get('telefono'),
-                    rol='capturista',
-                    unidad_responsable=user.unidad_responsable,
-                    password=hashed_password,
-                    creado_por=user,
-                )
-                usuario.save()
+        # -------- CREACIÓN --------
 
-                send_mail(
-                    'Tu cuenta ha sido creada en el Sistema SIGO',
-                    f'Hola {usuario.nombre_completo},\n\nUsuario: {usuario.email}\nContraseña: {raw_password}',
-                    'sigo-50001@uacam.mx',
-                    [usuario.email],
-                    fail_silently=False,
-                )
+        try:
+            raw_password = secrets.token_urlsafe(10)
+            hashed_password = Usuario.hash_password(raw_password)
 
-                messages.success(request, 'Capturista agregado exitosamente.')
-                return redirect('lista_capturistas')
+            usuario = Usuario(
+                matricula=matricula,
+                nombres=request.POST.get('nombres'),
+                apellidos=request.POST.get('apellidos'),
+                email=email,
+                telefono=request.POST.get('telefono'),
+                rol='capturista',
+                unidad_responsable=[ur],   # SOLO UNA UR
+                password=hashed_password,
+                creado_por=user,
+            )
 
-            except (NotUniqueError, ValidationError):
-                messages.error(request, 'Ocurrió un error al guardar el usuario. Verifica los datos.')
+            usuario.save()
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+            send_mail(
+                'Tu cuenta ha sido creada en el Sistema SIGO',
+                f'''Hola {usuario.nombre_completo},
+
+                    Usuario: {usuario.email}
+                    Contraseña: {raw_password}
+                    ''',
+                'sigo-50001@uacam.mx',
+                [usuario.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, 'Capturista agregado exitosamente.')
+            return redirect('lista_capturistas')
+
+        except (NotUniqueError, ValidationError):
+            messages.error(request, 'Error al guardar el usuario.')
+            return redirect('add_capturista')
+
+    # -------- DATOS PARA TEMPLATE --------
+
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     return render(request, "Encargado_UR/Usuarios/add_userCap.html", {
-        "unidad": user.unidad_responsable,
+        "urs": urs,   # Ahora mandamos lista de URs
         'subestaciones': subestaciones,
         'tarifas_disponibles': tarifas_disponibles
     })
@@ -146,7 +179,7 @@ def Edit_Capturistas(request, id):
 
     user = Usuario.objects(id=request.session['user_id']).first()
     if user.rol != 'encargado_ur':
-        return redirect('inicio')
+        return redirect('encargado_ur')
 
     usuario = Usuario.objects(id=id, creado_por=user).first()
     if not usuario:
@@ -162,7 +195,8 @@ def Edit_Capturistas(request, id):
         messages.success(request, 'Usuario actualizado correctamente.')
         return redirect('lista_capturistas')
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    urs = user.unidad_responsable if user.unidad_responsable else []
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
     return render(request, "Encargado_UR/Usuarios/edit_userCap.html", {"usuario": usuario, 'subestaciones': subestaciones, 'tarifas_disponibles':tarifas_disponibles})
 

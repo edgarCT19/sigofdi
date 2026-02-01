@@ -4,7 +4,7 @@ import bcrypt
 from mongoengine import (
     Document, StringField, EmailField, BooleanField, DateTimeField,
     ReferenceField, IntField, DecimalField, DictField,
-    FileField, ObjectIdField
+    FileField, ObjectIdField, ListField
 )
 from mongoengine import DENY, ValidationError
 from datetime import date
@@ -44,7 +44,8 @@ class Usuario(Document):
     apellidos = StringField(required=True)
     email = EmailField(required=True, unique=True)
     telefono = StringField(max_length=20, required=False, default=None)
-    unidad_responsable = ReferenceField(UnidadResponsable, required=False, default=None, reverse_delete_rule=DENY)
+    #unidad_responsable = ReferenceField(UnidadResponsable, required=False, default=None, reverse_delete_rule=DENY)
+    unidad_responsable = ListField(ReferenceField(UnidadResponsable, reverse_delete_rule=DENY), default=list)
     rol = StringField(required=True, choices=('admin', 'admin_energia', 'admin_ambiental', 'admin_salud',
                                               'rector', 'director', 'encargado_ur', 'capturista', 'auditor'))
     is_active = BooleanField(default=True)
@@ -89,6 +90,10 @@ class Usuario(Document):
     @property
     def nombre_completo(self):
         return f"{self.nombres} {self.apellidos}"
+    
+    @property
+    def ur_ids(self):
+        return [str(ur.id) for ur in self.unidad_responsable] if self.unidad_responsable else []
     
     intentos_fallidos = IntField(default=0)
     bloqueado_hasta = DateTimeField(required=False, default=None)

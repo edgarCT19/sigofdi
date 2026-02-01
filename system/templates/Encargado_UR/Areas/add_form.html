@@ -19,9 +19,15 @@
               <div class="material-input">
                 <select name="edificio" class="" required>
                   <option value="">-- Selecciona un Edificio --</option>
+
                   {% for edificio in edificios %}
-                    <option value="{{ edificio.id }}" {% if area.edificio.id == edificio.id %}selected{% endif %}>
-                      {{ edificio.nombre }}
+                    <option value="{{ edificio.id }}"
+                      {% if area.edificio.id == edificio.id %}selected{% endif %}>
+
+                      {{ edificio.nombre }} —
+                      {{ edificio.unidad_responsable.nombre }} —
+                      {{ edificio.unidad_responsable.campus.nomenclatura }}
+
                     </option>
                   {% endfor %}
                 </select>
@@ -46,17 +52,19 @@
             </div>
           </div>
 
-          <div class="mb-3">
-            <div class="material-input">
-              <input type="text" class="" id="responsable" name="responsable" required>
-              <label for="responsable" class="form-label">Responsable</label>
-            </div> 
-          </div>
+          <div class="row">
+            <div class="mb-3">
+              <div class="material-input">
+                <input type="text" class="" id="responsable" name="responsable" required>
+                <label for="responsable" class="form-label">Responsable</label>
+              </div> 
+            </div>
 
-          <div class="mb-3">
-            <div class="material-input"> 
-              <input type="text" name="grado_estudio" class="" value="{{ area.grado_estudio|default:'' }}">
-              <label for="grado_estudio">Grado de Estudio</label>
+            <div class="mb-3">
+              <div class="material-input"> 
+                <input type="text" name="grado_estudio" class="" value="{{ area.grado_estudio|default:'' }}">
+                <label for="grado_estudio">Grado de Estudio</label>
+              </div>
             </div>
           </div>
           

@@ -14,7 +14,6 @@ from django.core.files.base import ContentFile
 from django.views.decorators.http import require_POST
 
 # ================================================ VISTAS DE FUNCIONES LOGIN =====================================================
-# Vista principal de inicio de sesión
 def Login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -23,21 +22,38 @@ def Login(request):
         usuario = Usuario.objects(email=email).first()
 
         if usuario and usuario.is_active and usuario.check_password(password):
-            # Crear sesión
+
             request.session['user_id'] = str(usuario.id)
             request.session['rol'] = usuario.rol
             request.session['email'] = usuario.email
             request.session['nombres'] = usuario.nombres
             request.session['apellidos'] = usuario.apellidos
 
-            if usuario.unidad_responsable:
-                request.session['unidad_responsable_id'] = str(usuario.unidad_responsable.id)
-                request.session['unidad_responsable_nombre'] = usuario.unidad_responsable.nombre
-            else:
-                request.session['unidad_responsable_id'] = None
-                request.session['unidad_responsable_nombre'] = None
+            urs = usuario.unidad_responsable
 
-            # Redirección según rol
+            if urs:
+                # si es lista (nuevo modelo)
+                if isinstance(urs, (list, tuple)) or hasattr(urs, '__iter__'):
+                    request.session['unidad_responsable_ids'] = [str(u.id) for u in urs]
+                    request.session['unidad_responsable_nombres'] = [u.nombre for u in urs]
+
+                    # UR activa por defecto = primera
+                    request.session['ur_activa_id'] = str(urs[0].id)
+                    request.session['ur_activa_nombre'] = urs[0].nombre
+
+                else:
+                    # compatibilidad con modelo viejo (1 sola UR)
+                    request.session['unidad_responsable_ids'] = [str(urs.id)]
+                    request.session['unidad_responsable_nombres'] = [urs.nombre]
+                    request.session['ur_activa_id'] = str(urs.id)
+                    request.session['ur_activa_nombre'] = urs.nombre
+
+            else:
+                request.session['unidad_responsable_ids'] = []
+                request.session['unidad_responsable_nombres'] = []
+                request.session['ur_activa_id'] = None
+                request.session['ur_activa_nombre'] = None
+
             destino = {
                 'admin': 'inicio',
                 'admin_energia': 'admin_energia_inicio',
@@ -54,12 +70,10 @@ def Login(request):
                 'redirect_url': destino
             })
 
-        # Si no coincide correo o contraseña
         return render(request, 'systemsigo/login.html', {
             'error': 'Correo o contraseña incorrectos.'
         })
 
-    # Si es GET, solo muestra el formulario
     return render(request, 'systemsigo/login.html')
 
 def enviar_correo_bloqueo(usuario):
@@ -290,7 +304,8 @@ def get_user(request):
 @login_required_custom
 def perfil_usuario(request):
     usuario = get_user(request)  # O donde tengas almacenado el usuario logueado
-    subestaciones = Subestacion.objects(unidad_responsable=usuario.unidad_responsable)
+    urs = usuario.unidad_responsable if usuario.unidad_responsable else []
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
     return render(request, 'systemsigo/Perfil/perfil.html', 
                   {'usuario': usuario,'MEDIA_URL': settings.MEDIA_URL, 'subestaciones': subestaciones,

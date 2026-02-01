@@ -15,7 +15,7 @@
             <select class="" name="unidad" id="unidad" required>
               <option value="">-- Selecciona --</option>
               {% for unidad in unidades %}
-                <option value="{{ unidad.id }}" {% if unidad_seleccionada == unidad.id|stringformat:"s" %}selected{% endif %}>{{ unidad.nombre }}</option>
+                <option value="{{ unidad.id }}" {% if unidad_seleccionada == unidad.id|stringformat:"s" %}selected{% endif %}>{{ unidad.nombre }} - {{ unidad.campus.nomenclatura }}</option>
               {% endfor %}
             </select>
             <label for="unidad" class="">Unidad Responsable</label>
@@ -238,7 +238,7 @@
     </div>
    </div>
   {% elif unidad_seleccionada and periodo_seleccionado and tipo_seleccionado %}
-    <div class="custom-alert-warning">No se encontraron registros para los filtros seleccionados.</div>
+    <div class="custom-alert-warning mt-2">No se encontraron registros para los filtros seleccionados.</div>
   {% endif %}
 </div>
 

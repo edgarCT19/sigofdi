@@ -74,9 +74,11 @@
                         </td>
                         <td>
                             {% if usuario.unidad_responsable %}
-                                {{ usuario.unidad_responsable.nombre }}
+                                {% for ur in usuario.unidad_responsable %}
+                                    {{ ur.nombre }} - {{ ur.campus.nomenclatura }} {% if not forloop.last %}, {% endif %}
+                                {% endfor %}
                             {% else %}
-                                —
+                                No asignada
                             {% endif %}
                         </td>
                         <td>{{ usuario.fecha_alta|date:"d/m/Y H:i:s" }}</td>

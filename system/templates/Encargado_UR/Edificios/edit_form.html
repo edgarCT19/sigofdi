@@ -8,16 +8,30 @@
         <form method="POST" class="mt-3">
             {% csrf_token %}
             <div class="material-input">
-            <input type="text" name="nombre" id="nombre" value="{{ edificio.nombre }}" required>
-            <label for="nombre">Nombre del edificio</label>
-            <span></span>
+                <input type="text" name="nombre" id="nombre" value="{{ edificio.nombre }}" required>
+                <label for="nombre">Nombre del edificio</label>
+                <span></span>
             </div>
-            
-            <div class="text-center mt-4">
-            <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
-            </div>
-            <div class="text-center mt-2">
-            <a href="{% url 'lista_edificios' %}" class="btn btn-danger">Cancelar</a>
+           
+            <div class="material-input">
+                <select name="unidad_responsable" required>
+                    {% for ur in urs %}
+                    <option value="{{ ur.id }}"
+                        {% if ur.id == edificio.unidad_responsable.id %}selected{% endif %}>
+                        {{ ur.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <label>Unidad Responsable</label>
+            </div> 
+
+            <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+                <div class="text-center mt-4">
+                <button type="submit" class="btn-uacam-primary-especial">Actualizar</button>
+                </div>
+                <div class="text-center mt-2">
+                <a href="{% url 'lista_edificios' %}" class="btn btn-danger">Cancelar</a>
+                </div>
             </div>
         </form>
     </div>

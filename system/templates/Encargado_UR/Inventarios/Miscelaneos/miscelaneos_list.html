@@ -31,6 +31,8 @@
               </th>
           </tr>
           <tr class="text-center">
+            <th>Campus</th>
+            <th>Unidad Responsable</th>
             <th>Edificio</th>
             <th>Nivel</th>
             <th>Área</th>
@@ -49,6 +51,8 @@
         <tbody>
           {% for r in registros %}
           <tr>
+            <td>{{ r.edificio.unidad_responsable.campus.nomenclatura }}</td>  
+            <td>{{ r.edificio.unidad_responsable.nombre }}</td>
             <td>{{ r.edificio.nombre }}</td>
             <td>{{ r.nivel }}</td>
             <td>{{ r.area.nombre }}</td>
@@ -66,7 +70,7 @@
           {% empty %}
           <tr><td colspan="28">No hay registros disponibles.</td></tr>
           {% endfor %}
-          <tr colspan="20" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
+          <tr colspan="28" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
             <th>Total:</th>
             <th></th>
             <th></th>
@@ -79,6 +83,8 @@
             <th>{{ total_potencia }}</th>
             <th>{{ total_horas }}</th>
             <th>{{ total_consumo }}</th>
+            <th></th>
+            <th></th>
             <th></th>
           </tr>
         </tbody>

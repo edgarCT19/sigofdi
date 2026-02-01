@@ -17,7 +17,7 @@
               <option value="">-- Selecciona --</option>
               {% for ur in urs %}
                 <option value="{{ ur.id }}" {% if luminarias.unidad_responsable.id == ur.id %}selected{% endif %}>
-                  {{ ur.nombre }}
+                  {{ ur.nombre }} - {{ ur.campus.nomenclatura }}
                 </option>
               {% endfor %}
             </select>

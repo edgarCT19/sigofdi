@@ -33,8 +33,10 @@ def registrar_factura_pdbt(request):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable, tarifa="PDBT")
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs, tarifa__in=["PDBT", "GDMTH", "GDMTO", "GDBT"])
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     if request.method == 'POST':
@@ -79,8 +81,10 @@ def listar_facturas_pdbt(request):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable, tarifa="PDBT")
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs, tarifa__in=["PDBT", "GDMTH", "GDMTO", "GDBT"])
     facturas = FacturaPdbt.objects(subestacion__in=subestaciones)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
@@ -121,6 +125,8 @@ def editar_factura_pdbt(request, factura_id):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     from mongoengine.errors import DoesNotExist
     try:
@@ -133,7 +139,7 @@ def editar_factura_pdbt(request, factura_id):
         messages.error(request, "No tienes permiso para editar esta factura.")
         return redirect('listar_facturas_pdbt')
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable, tarifa="PDBT")
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs, tarifa__in=["PDBT", "GDMTH", "GDMTO", "GDBT"])
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     if request.method == 'POST':
@@ -183,6 +189,8 @@ def eliminar_factura_pdbt(request, factura_id):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     try:
         factura = FacturaPdbt.objects.get(id=factura_id)
@@ -236,11 +244,13 @@ def exportar_facturas_pdbt_excel(request):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     if user.rol == 'admin':
         facturas = FacturaPdbt.objects()
     else:
-        subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+        subestaciones = Subestacion.objects(unidad_responsable__in=urs, tarifa__in=["PDBT", "GDMTH", "GDMTO", "GDBT"])
         facturas = FacturaPdbt.objects(subestacion__in=subestaciones)
 
     wb = openpyxl.Workbook()

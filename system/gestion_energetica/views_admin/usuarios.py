@@ -61,9 +61,10 @@ def Add_User(request):
 
                 rol = request.POST.get('rol')
 
-                unidad_responsable = None
-                if rol not in ['admin', 'admin_ambiental', 'admin_energia', 'admin_salud'] and request.POST.get('unidad_responsable'):
-                    unidad_responsable = UnidadResponsable.objects.get(id=request.POST.get('unidad_responsable'))
+                ur_ids = request.POST.getlist('unidad_responsable')
+                unidad_responsable = []
+                if rol not in ['admin', 'admin_ambiental', 'admin_energia', 'admin_salud'] and ur_ids:
+                    unidad_responsable = list(UnidadResponsable.objects(id__in=ur_ids))[:4]
 
                 creado_por = Usuario.objects(id=request.session['user_id']).first() if 'user_id' in request.session else None
 
@@ -126,19 +127,17 @@ def Edit_User(request, usuario_id):
             usuario.rol = form.cleaned_data['rol']
             usuario.is_active = form.cleaned_data['is_active']
 
-            # Asociar unidad responsable
-            unidad_id = form.cleaned_data['unidad_responsable']
-            if unidad_id:
-                usuario.unidad_responsable = UnidadResponsable.objects.get(id=ObjectId(unidad_id))
-            else:
-                usuario.unidad_responsable = None
-
+            unidad_ids = form.cleaned_data['unidad_responsable']
             if usuario.rol in ["admin", "admin_ambiental", "admin_energia", "admin_salud"]:
-               usuario.unidad_responsable = None # Lineas agregadas
+                usuario.unidad_responsable = []
+            else:
+                if unidad_ids:
+                    usuario.unidad_responsable = list(UnidadResponsable.objects(id__in=unidad_ids))[:4]
+                else:
+                    usuario.unidad_responsable = []
 
             usuario.save()
 
-            # ✅ Mostrar mensaje de éxito
             messages.success(request, 'Usuario actualizado correctamente.')
             return redirect('usuarios')
     else:
@@ -150,7 +149,7 @@ def Edit_User(request, usuario_id):
             'telefono': usuario.telefono,
             'rol': usuario.rol,
             'is_active': usuario.is_active,
-            'unidad_responsable': str(usuario.unidad_responsable.id) if usuario.unidad_responsable else '',
+            'unidad_responsable': [str(ur.id) for ur in usuario.unidad_responsable],
         })
 
     return render(request, 'systemsigo/Usuarios/edit_form.html', {

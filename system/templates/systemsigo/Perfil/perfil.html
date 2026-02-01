@@ -52,7 +52,7 @@
                 <p>Información de usuario</p>
                 <div class="row">
                 <div class="col-md-6 mt-4 material-input">
-                    <input type="text" class="" id="unidad_responsable" value="{{ usuario.unidad_responsable.nombre|default:"No asignada" }}" disabled>
+                    <input type="text" class="" id="unidad_responsable" value="{% if usuario.unidad_responsable %}{% for ur in usuario.unidad_responsable %}{{ ur.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}No asignada{% endif %}" disabled>
                     <label for="name" class="">Unidad Responsable</label>
                 </div>
                 <div class="col-md-6 mt-4 material-input">
@@ -67,7 +67,7 @@
                     <label for="phone" class="">Teléfono</label>
                 </div>
                 <div class="col-md-6 mt-4 material-input">
-                    <input type="text" class="" id="rol" value="{{ usuario.rol|title  }}" disabled>
+                    <input type="text" class="" id="rol" value="{% if usuario.rol == 'encargado_ur' %}Responsable de energía{% elif usuario.rol == 'capturista' %}Capturista de datos{% else %}{{ usuario.rol|title }}{% endif %}" disabled>
                     <label for="dob" class="">Rol</label>
                 </div>
                 </div>
@@ -78,7 +78,7 @@
                     <label for="address" class="">Matrícula</label>
                 </div>
                 <div class="col-md-6 mt-4 material-input">
-                    <input type="text" class="" id="fecha_alta" value="{{ usuario.fecha_alta|date:"d M Y H:i" }}" disabled>
+                    <input type="text" class="" id="fecha_alta" value="{{ usuario.fecha_alta|date:"d M Y H:i:s" }}" disabled>
                     <label for="zip" class="">Fecha de alta</label>
                 </div>
                 </div>

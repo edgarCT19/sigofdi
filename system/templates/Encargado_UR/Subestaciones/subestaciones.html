@@ -12,10 +12,12 @@
           <thead>
             <tr class="text-center">
                 <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
-                    Tus subestaciones
+                    Tus servicios
                 </th>
             </tr>
             <tr class="text-center">
+              <th>Unidad Responsable</th>
+              <th>Campus</th>
               <th>Número de Servicio</th>
               <th>Medidor</th>
               <th>Tarifa</th>
@@ -26,6 +28,8 @@
           <tbody>
             {% for sub in subestaciones %}
               <tr>
+                <td>{{ sub.unidad_responsable.nombre }}</td>
+                <td>{{ sub.unidad_responsable.campus.nomenclatura }}</td>
                 <td>{{ sub.no_servicio }}</td>
                 <td>{{ sub.no_medidor }}</td>
                 <td>{{ sub.tarifa }}</td>

@@ -4,8 +4,6 @@
 {% block content %}
 
 <div class="container mt-4">
-  <h3>Facturas PDBT</h3>
-
   <div class="card p-4">
     <p class="text-center mb-2"  style="font-size: 18px;">Lista de facturas registradas con tarifa PDBT</p>
     <hr class="text-center" style="color: var(--color-uacam-primary);">
@@ -13,14 +11,14 @@
       <div class="col-md-6">
         <div class="material-input">
           <select name="subestacion" onchange="this.form.submit()">
-            <option value="">-- Todas las Subestaciones --</option>
+            <option value="">-- Todas los servicios --</option>
             {% for sub in subestaciones %}
               <option value="{{ sub.id }}" {% if filtros.subestacion_id == sub.id|stringformat:"s" %}selected{% endif %}>
                 {{ sub.no_servicio }} - {{ sub.no_medidor }} - {{ sub.tarifa }}
               </option>
             {% endfor %}
           </select>
-          <label for="subestacion">Filtrar por Subestación</label>
+          <label for="subestacion">Filtrar por servicios</label>
         </div>
       </div>
 
@@ -49,15 +47,17 @@
       <table class="styled-table text-center">
           <thead>
             <tr class="text-center">
-                <th colSpan="22" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
+                <th colSpan="28" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
                     Lista de facturas registradas
                 </th>
             </tr>
             <tr class="text-center">
               <th>#</th>
+              <th>Unidad Responsable</th>
+              <th>Campus</th>
               <th>Periodo</th>
               <th>Consumo (kWh)</th>
-              <th>Subestación</th>
+              <th>Servicio</th>
               <th>Días</th>
               <th>Cargo Energía</th>
               <th>Importe DM</th>
@@ -75,6 +75,8 @@
             {% for factura in facturas %}
               <tr>
                 <td>{{ forloop.counter }}</td>
+                <td>{{ factura.subestacion.unidad_responsable.nombre }}</td>
+                <td>{{ factura.subestacion.unidad_responsable.campus.nomenclatura }}</td>
                 <td>{{ factura.periodo }}</td>
                 <td>{{ factura.consumo }}</td>
                 <td>{{ factura.subestacion.no_medidor }}</td>
@@ -110,7 +112,7 @@
                 </td>
               </tr>
             {% empty %}
-              <tr><td colspan="13" class="text-center">No hay facturas registradas.</td></tr>
+              <tr><td colspan="28" class="text-center">No hay facturas registradas.</td></tr>
             {% endfor %}
           </tbody>
       </table>

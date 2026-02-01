@@ -33,14 +33,19 @@
           <thead>
             <tr class="text-center">
                 <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
-                    Lista de áreas de mi unidad
+                    Lista de áreas registradas según la unidad responsable
                 </th>
             </tr>
             <tr class="text-center">
               <th>#</th>
               <th>Nombre</th>
+              <th>Campus</th>
+              <th>Unidad Responsable</th>
               <th>Edificio</th>
               <th>Responsable</th>
+              <th>Teléfono</th>
+              <th>Cargo</th>
+              <th>Grado de Estudio</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -49,8 +54,13 @@
               <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ area.nombre }}</td>
+                <td>{{ area.unidad_responsable.campus.nomenclatura }}</td>
+                <td>{{ area.unidad_responsable.nombre }}</td>
                 <td>{{ area.edificio.nombre }}</td>
                 <td>{{ area.responsable }}</td>
+                <td>{{ area.telefono }}</td>
+                <td>{{ area.cargo }}</td>
+                <td>{{ area.grado_estudio }}</td>
                 <td>
                   <div class="d-flex actions justify-content-center">
                     <a href="{% url 'editar_areas' area.id %}" class="btn btn-sm btn-light rounded rounded-circle" 

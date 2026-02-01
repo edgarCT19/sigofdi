@@ -34,12 +34,14 @@ def listar_climatizacion_encargado(request):
     user = get_user(request)
     if not user or user.rol != "encargado_ur":
         messages.error(request, "Acceso denegado.")
-        return redirect("inicio")
+        return redirect("encargado_ur")
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     # Obtener todos los periodos (para el filtro)
     periodos = PeriodoInventario.objects.order_by('-fecha_inicio')
 
-    registros = InventarioClimatizacion.objects(unidad_responsable=user.unidad_responsable)
+    registros = InventarioClimatizacion.objects(unidad_responsable__in=urs, activo=True)
 
     registros, periodo_id = filtrar_por_periodo(registros, request)
 
@@ -47,7 +49,7 @@ def listar_climatizacion_encargado(request):
     total_horas = sum([i.horas_mes for i in registros])
     total_consumo = sum([i.consumo_mensual for i in registros])
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     context = {
@@ -78,11 +80,13 @@ def listar_luminarias_encargado(request):
     user = get_user(request)
     if not user or user.rol != "encargado_ur":
         messages.error(request, "Acceso denegado.")
-        return redirect("inicio")
+        return redirect("encargado_ur")
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     periodos = PeriodoInventario.objects.order_by('-fecha_inicio')
 
-    registros = InventarioLuminarias.objects(unidad_responsable=user.unidad_responsable)
+    registros = InventarioLuminarias.objects(unidad_responsable__in=urs)
 
     registros, periodo_id = filtrar_por_periodo(registros, request)
 
@@ -90,7 +94,7 @@ def listar_luminarias_encargado(request):
     total_horas = sum([i.consumo_mensual_horas for i in registros])
     total_consumo = sum([i.consumo_mensual for i in registros])
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     context = {
@@ -121,11 +125,13 @@ def listar_miscelaneos_encargado(request):
     user = get_user(request)
     if not user or user.rol != "encargado_ur":
         messages.error(request, "Acceso denegado.")
-        return redirect("inicio")
+        return redirect("encargado_ur")
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     periodos = PeriodoInventario.objects.order_by('-fecha_inicio')
 
-    registros = InventarioMiscelaneos.objects(unidad_responsable=user.unidad_responsable)
+    registros = InventarioMiscelaneos.objects(unidad_responsable__in=urs)
 
     registros, periodo_id = filtrar_por_periodo(registros, request)
 
@@ -133,7 +139,7 @@ def listar_miscelaneos_encargado(request):
     total_horas = sum([i.horas_mes for i in registros])
     total_consumo = sum([i.consumo_mensual for i in registros])
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
     context = {

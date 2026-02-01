@@ -40,9 +40,11 @@ def listar_facturas_triple(request):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
   
     # Subestaciones de la UR del usuario
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
 
     # Extraer tarifas disponibles según sus subestaciones
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
@@ -98,18 +100,30 @@ def registrar_factura_triple(request):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable, tarifa__in=['GDMTH', 'GDMTO', 'GDBT'])
-    tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
+    urs = user.unidad_responsable or []
+
+    subestaciones = Subestacion.objects(
+        unidad_responsable__in=urs,
+        tarifa__in=['GDMTH', 'GDMTO', 'GDBT']
+    )
 
     if not subestaciones:
-        messages.error(request, "No tienes subestaciones con tarifa GDMTH, GDMTO o GDBT.")
+        messages.error(request, "No tienes subestaciones de tarifa triple.")
         return redirect('listar_facturas_triple')
+
+    tarifas_disponibles = set(
+        s.tarifa for s in Subestacion.objects(unidad_responsable__in=urs)
+    )
 
     if request.method == 'POST':
         try:
+            sub_id = request.POST.get('subestacion')
+
+            sub = subestaciones.get(id=sub_id)
+
             factura = FacturaEnergeticaTriple(
                 tipo_tarifa=request.POST.get('tipo_tarifa'),
-                subestacion=Subestacion.objects.get(id=request.POST.get('subestacion')),
+                subestacion=sub,
                 dias_periodo=int(request.POST.get('dias_periodo')),
                 periodo=request.POST.get('periodo'),
                 consumo=Decimal(request.POST.get('consumo')),
@@ -123,20 +137,26 @@ def registrar_factura_triple(request):
                 dap=Decimal(request.POST.get('dap')),
                 iva=Decimal(request.POST.get('iva')),
                 total_a_pagar=Decimal(request.POST.get('total_a_pagar')),
-                archivo_pdf=request.FILES['archivo_pdf'],
+                archivo_pdf=request.FILES.get('archivo_pdf'),
                 fecha_vencimiento=request.POST.get('fecha_vencimiento'),
                 status=request.POST.get('status'),
                 creado_por=user
             )
+
             factura.save()
+
             messages.success(request, "Factura registrada correctamente.")
             return redirect('listar_facturas_triple')
+
+        except Subestacion.DoesNotExist:
+            messages.error(request, "Subestación inválida.")
         except Exception as e:
-            messages.error(request, f"Ocurrió un error: {e}")
+            messages.error(request, f"Error: {e}")
 
     return render(request, 'Encargado_UR/Facturas/add_form.html', {
         'subestaciones': subestaciones,
-        'tarifas_disponibles': tarifas_disponibles
+        'tarifas_disponibles': tarifas_disponibles,
+        'urs': urs
     })
     
 @never_cache
@@ -155,25 +175,34 @@ def editar_factura_triple(request, factura_id):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
-    from mongoengine.errors import DoesNotExist
+    urs = user.unidad_responsable or []
 
     try:
         factura = FacturaEnergeticaTriple.objects.get(id=factura_id)
-    except DoesNotExist:
+    except FacturaEnergeticaTriple.DoesNotExist:
         messages.error(request, "Factura no encontrada.")
         return redirect('listar_facturas_triple')
 
-    if factura.subestacion.unidad_responsable != user.unidad_responsable:
+    if factura.subestacion.unidad_responsable not in urs:
         messages.error(request, "No tienes permiso para editar esta factura.")
         return redirect('listar_facturas_triple')
 
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable, tarifa__in=['GDMTH', 'GDMTO', 'GDBT'])
-    tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
+    subestaciones = Subestacion.objects(
+        unidad_responsable__in=urs,
+        tarifa__in=['GDMTH', 'GDMTO', 'GDBT', 'PDBT']
+    )
+
+    tarifas_disponibles = set(
+        s.tarifa for s in Subestacion.objects(unidad_responsable__in=urs)
+    )
 
     if request.method == 'POST':
         try:
+            sub_id = request.POST.get('subestacion')
+
+            factura.subestacion = subestaciones.get(id=sub_id)
+
             factura.tipo_tarifa = request.POST.get('tipo_tarifa')
-            factura.subestacion = Subestacion.objects.get(id=request.POST.get('subestacion'))
             factura.dias_periodo = int(request.POST.get('dias_periodo'))
             factura.periodo = request.POST.get('periodo')
             factura.consumo = Decimal(request.POST.get('consumo'))
@@ -196,18 +225,23 @@ def editar_factura_triple(request, factura_id):
             factura.actualizado_por = user
             factura.ultima_actualizacion = datetime.now()
             factura.save()
+
             messages.success(request, "Factura actualizada correctamente.")
             return redirect('listar_facturas_triple')
-        except Exception as e:
-            messages.error(request, f"Ocurrió un error: {e}")
 
-    tipos_tarifa = ['GDMTH', 'GDMTO', 'GDBT']
+        except Subestacion.DoesNotExist:
+            messages.error(request, "Subestación inválida.")
+        except Exception as e:
+            messages.error(request, f"Error: {e}")
+
+    tipos_tarifa = ['GDMTH', 'GDMTO', 'GDBT', 'PDBT']
 
     return render(request, 'Encargado_UR/Facturas/edit_form.html', {
         'factura': factura,
         'subestaciones': subestaciones,
         'tipos_tarifa': tipos_tarifa,
-        'tarifas_disponibles': tarifas_disponibles
+        'tarifas_disponibles': tarifas_disponibles,
+        'urs': urs
     })
 
 @require_POST
@@ -223,30 +257,52 @@ def eliminar_factura_triple(request, factura_id):
 
     user = get_user(request)
 
+    if not user:
+        return JsonResponse({"success": False, "message": "Sesión expirada."}, status=401)
+
     if not factura_id or not ObjectId.is_valid(factura_id):
         return JsonResponse({"success": False, "message": "ID de factura inválido."}, status=400)
+
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     try:
         factura = FacturaEnergeticaTriple.objects.get(id=factura_id)
 
-        # Validar permisos
         if factura.creado_por and factura.creado_por != user:
-            return JsonResponse({"success": False, "message": "No tienes permiso para eliminar esta factura."}, status=403)
+            return JsonResponse({
+                "success": False,
+                "message": "No tienes permiso para eliminar esta factura."
+            }, status=403)
 
-        if factura.subestacion.unidad_responsable != user.unidad_responsable:
-            return JsonResponse({"success": False, "message": "No tienes acceso a esta subestación."}, status=403)
+        if not factura.subestacion.unidad_responsable or \
+           factura.subestacion.unidad_responsable not in urs:
+            return JsonResponse({
+                "success": False,
+                "message": "No tienes acceso a esta subestación."
+            }, status=403)
 
-        # Eliminar archivo si existe
+
         if factura.archivo_pdf:
             factura.archivo_pdf.delete()
 
         factura.delete()
-        return JsonResponse({"success": True, "message": "Factura eliminada correctamente."})
 
-    except DoesNotExist:
-        return JsonResponse({"success": False, "message": "La factura no existe."}, status=404)
+        return JsonResponse({
+            "success": True,
+            "message": "Factura eliminada correctamente."
+        })
+
+    except FacturaEnergeticaTriple.DoesNotExist:
+        return JsonResponse({
+            "success": False,
+            "message": "La factura no existe."
+        }, status=404)
+
     except ValidationError:
-        return JsonResponse({"success": False, "message": "Error al procesar la solicitud."}, status=400)
+        return JsonResponse({
+            "success": False,
+            "message": "Error al procesar la solicitud."
+        }, status=400)
 
 # Descarga de PDF facturas triple (GDBT, GDMTH, GDMTO)
 def tiene_tarifa(user, tarifa_objetivo):
@@ -255,8 +311,8 @@ def tiene_tarifa(user, tarifa_objetivo):
     - Permite determinar si el usuario puede acceder a facturas de una tarifa específica.
     - Revisa las subestaciones asociadas al usuario y verifica si alguna tiene la tarifa objetivo.
     """
-
-    subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
+    urs = user.unidad_responsable if user.unidad_responsable else []
+    subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     return any(sub.tarifa == tarifa_objetivo for sub in subestaciones)
 
 def descargar_pdf_factura(request, factura_id):
@@ -291,6 +347,8 @@ def exportar_facturas_triple_excel(request):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
+    
+    urs = user.unidad_responsable if user.unidad_responsable else []
 
     if user.rol == 'admin':
         ur_id = request.GET.get('ur')
@@ -299,8 +357,7 @@ def exportar_facturas_triple_excel(request):
         else:
             subestaciones = Subestacion.objects()
     else:
-        subestaciones = Subestacion.objects(unidad_responsable=user.unidad_responsable)
-
+        subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     facturas = FacturaEnergeticaTriple.objects(subestacion__in=subestaciones)
 
     wb = Workbook()

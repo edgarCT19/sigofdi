@@ -12,12 +12,12 @@
         <div class="col-md-6 mt-4">
           <div class="material-input">
             <select name="subestacion" required>
-              <option value="">-- Selecciona una Subestación --</option>
+              <option value="">-- Selecciona un Servicio --</option>
               {% for s in subestaciones %}
                 <option value="{{ s.id }}">{{ s.no_servicio }} - {{ s.no_medidor }} - {{ s.tarifa }}</option>
               {% endfor %}
             </select>
-            <label for="subestacion">Subestación</label>
+            <label for="subestacion">Servicio</label>
           </div>
         </div>
         <div class="col-md-6 mt-4">

@@ -59,7 +59,12 @@
       <div class="row">
         <div class="col-md-6 mb-3">
           <div class="material-input">
-            <input type="text" value="{{ unidad.nombre }}" disabled>
+            <select name="unidad_responsable" required>
+              <option value="">-- Selecciona la UR --</option>
+              {% for ur in urs %}
+                <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+              {% endfor %}
+            </select>
             <label>Unidad Responsable</label>
           </div>
         </div>
