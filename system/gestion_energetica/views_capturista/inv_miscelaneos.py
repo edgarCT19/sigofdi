@@ -41,7 +41,7 @@ def registrar_inventario_miscelaneos(request):
         return redirect("listar_inventario_miscelaneos")
 
     # 2) Datos iniciales
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
     niveles   = NIVELES
     eid       = request.GET.get("edificio") or request.session.get("edificio_misc")
     nsel      = request.GET.get("nivel")   or request.session.get("nivel_misc")
@@ -59,16 +59,17 @@ def registrar_inventario_miscelaneos(request):
             miscelaneos = request.POST["miscelaneos"]
             modelo      = request.POST["modelo"]
 
-            voltaje       = Decimal(request.POST["voltaje"])
-            amperaje      = Decimal(request.POST["amperaje"])
+            voltaje       = Decimal(request.POST["voltaje"] or 0)
+            amperaje      = Decimal(request.POST["amperaje"] or 0)
             potencia      = voltaje * amperaje
             potencia_total= potencia / 1000
             horas_mes     = Decimal(request.POST["horas_mes"])
             consumo_mensual = (potencia_total * horas_mes).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
+            ur = user.unidad_responsable[0] 
             InventarioMiscelaneos(
-                unidad_responsable = user.unidad_responsable,
-                periodo            = periodo_activo,           # <-- aquí
+                unidad_responsable = ur,
+                periodo            = periodo_activo,          
                 edificio           = edificio,
                 nivel              = nivel,
                 area               = area,
@@ -136,7 +137,7 @@ def listar_inventario_miscelaneos(request):
         })
 
     registros = InventarioMiscelaneos.objects(
-        unidad_responsable=user.unidad_responsable,
+        unidad_responsable__in=user.unidad_responsable,
         creado_por=user,
         periodo=periodo_activo 
     ).order_by('-fecha_registro')
@@ -185,7 +186,7 @@ def editar_inventario_miscelaneos(request, id):
     """
 
     user = get_user(request)
-    if not user:
+    if not user or user.rol != "capturista":
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
@@ -195,11 +196,11 @@ def editar_inventario_miscelaneos(request, id):
         messages.error(request, "Registro no encontrado.")
         return redirect('listar_inventario_miscelaneos')
 
-    if inventario.unidad_responsable != user.unidad_responsable:
+    if inventario.unidad_responsable not in user.unidad_responsable:
         messages.error(request, "No tienes permiso para editar este registro.")
         return redirect('listar_inventario_miscelaneos')
 
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
     niveles = NIVELES
     areas_filtradas = Area.objects(edificio=inventario.edificio)
 
@@ -235,7 +236,7 @@ def editar_inventario_miscelaneos(request, id):
 
 @never_cache
 @login_required_custom
-def eliminar_inventario_miscelaneos(request, id):
+def eliminar_inventario_miscelaneos(request, miscelaneo_id):
     """
     Eliminar un registro de inventario de misceláneos. 
      
@@ -244,20 +245,36 @@ def eliminar_inventario_miscelaneos(request, id):
     - Obtiene el registro de inventario a eliminar.
     - Elimina el registro y redirige a la lista de inventarios con un mensaje de éxito.
     """
-
     user = get_user(request)
-    if not user:
-        messages.error(request, "Sesión expirada.")
-        return redirect('login')
+
+    if not user or user.rol != "capturista":
+        return JsonResponse({
+            "success": False,
+            "error": "Acceso denegado"
+        })
+
+    miscelaneo = InventarioMiscelaneos.objects(
+        id=miscelaneo_id
+    ).first()
+
+    if not miscelaneo:
+        return JsonResponse({
+            "success": False,
+            "error": "Registro no encontrado"
+        })
+
+    if miscelaneo.unidad_responsable not in user.unidad_responsable:
+        return JsonResponse({
+            "success": False,
+            "error": "No tienes permiso para eliminar este registro"
+        })
 
     try:
-        inventario = InventarioMiscelaneos.objects.get(id=id)
-        if inventario.unidad_responsable != user.unidad_responsable:
-            messages.error(request, "No tienes permiso para eliminar este registro.")
-        else:
-            inventario.delete()
-            messages.success(request, "Registro eliminado correctamente.")
-    except DoesNotExist:
-        messages.error(request, "Registro no encontrado.")
-
-    return redirect('listar_inventario_miscelaneos')
+        miscelaneo.delete()
+        messages.success(request, "Registro eliminado correctamente.")
+        return JsonResponse({"success": True, "message": "Registro eliminado correctamente."})
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        })

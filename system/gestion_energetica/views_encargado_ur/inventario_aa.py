@@ -321,7 +321,8 @@ def eliminar_inventario_climatizacion_encargado(request, climatizacion_id):
 
     try:
         climatizacion.delete()
-        return JsonResponse({"success": True})
+        messages.success(request, "Registro eliminado correctamente.")
+        return JsonResponse({"success": True, "message": "Registro eliminado correctamente."})
     except Exception as e:
         return JsonResponse({
             "success": False,

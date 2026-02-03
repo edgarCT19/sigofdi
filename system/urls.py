@@ -75,6 +75,13 @@ from .gestion_energetica.views_encargado_ur.inventario_aa import (
     historial_climatizacion_encargado,
     registrar_inventario_climatizacion_responsable_energia, dar_baja_inventario_climatizacion_responsable_energia,
     restaurar_registro_climatizacion_encargado)
+from .gestion_energetica.views_encargado_ur.inventario_lum import ( 
+    registrar_inventario_luminarias_responsable_energia, editar_inventario_luminarias_responsable_energia, 
+    dar_baja_inventario_luminarias_responsable_energia, historial_luminarias_encargado,
+    restaurar_registro_luminarias_encargado, eliminar_inventario_luminarias_encargado)
+from .gestion_energetica.views_encargado_ur.inventario_misc import (registrar_inventario_miscelaneos_responsable_energia,
+    editar_inventario_miscelaneos_responsable_energia, dar_baja_inventario_miscelaneos_responsable_energia,
+    historial_miscelaneos_encargado, restaurar_registro_miscelaneos_encargado, eliminar_inventario_miscelaneos_encargado)
 # ==================== Vistas del Rector ====================
 from .gestion_energetica.views_rector.index import Inicio_rector
 # ==================== Vistas del Director ====================
@@ -272,8 +279,20 @@ urlpatterns = [
     path('inventario/climatizacion/eliminar/responsable-energia/<str:climatizacion_id>/', eliminar_inventario_climatizacion_encargado, name='eliminar_climatizacion_encargado'),
     # Luminarias
     path("encargado/inventario/luminarias/", listar_luminarias_encargado, name="listar_luminarias_encargado"),
+    path('inventario/luminarias/agregar/responsable-energia/', registrar_inventario_luminarias_responsable_energia, name='registrar_inventario_luminarias_responsable_energia'),
+    path('inventario/luminarias/editar/responsable-energia/<str:luminarias_id>/', editar_inventario_luminarias_responsable_energia, name='editar_luminarias_encargado'),
+    path('inventario/luminarias/dar_baja/responsable-energia/<str:his_id>/', dar_baja_inventario_luminarias_responsable_energia, name='dar_baja_luminarias_encargado'),
+    path('inventario/luminarias/historial/responsable-energia/', historial_luminarias_encargado, name='historial_luminarias_encargado'),
+    path('inventario/luminarias/restaurar/responsable-energia/<str:registro_id>/', restaurar_registro_luminarias_encargado, name='restaurar_luminarias_encargado'),
+    path('inventario/luminarias/eliminar/responsable-energia/<str:luminaria_id>/', eliminar_inventario_luminarias_encargado, name='eliminar_luminarias_encargado'),
     # Miscelaneos
     path("encargado/inventario/miscelaneos/", listar_miscelaneos_encargado, name="listar_miscelaneos_encargado"),
+    path('inventario/miscelaneos/agregar/responsable-energia/', registrar_inventario_miscelaneos_responsable_energia, name='registrar_inventario_miscelaneos_responsable_energia'),
+    path('inventario/miscelaneos/editar/responsable-energia/<str:miscelaneos_id>/', editar_inventario_miscelaneos_responsable_energia, name='editar_miscelaneos_encargado'),
+    path('inventario/miscelaneos/dar_baja/responsable-energia/<str:his_id>/', dar_baja_inventario_miscelaneos_responsable_energia, name='dar_baja_miscelaneos_encargado'),
+    path('inventario/miscelaneos/historial/responsable-energia/', historial_miscelaneos_encargado, name='historial_miscelaneos_encargado'),
+    path('inventario/miscelaneos/restaurar/responsable-energia/<str:registro_id>/', restaurar_registro_miscelaneos_encargado, name='restaurar_miscelaneos_encargado'),
+    path('inventario/miscelaneos/eliminar/responsable-energia/<str:miscelaneo_id>/', eliminar_inventario_miscelaneos_encargado, name='eliminar_miscelaneos_encargado'),
 
 
     # ==================== Paths de Capturista de datos ====================
@@ -283,18 +302,18 @@ urlpatterns = [
     path('inventario/climatizacion/obtener_areas/', obtener_areas_por_edificio, name='obtener_areas_clima'),
     path('inventario/climatizacion/', listar_inventario_climatizacion, name='listar_inventario_climatizacion'),
     path('inventario/clima/editar/<str:id>/', editar_inventario_climatizacion, name='editar_inventario_climatizacion'),
-    path('inventario/clima/eliminar/<str:id>/', eliminar_inventario_climatizacion, name='eliminar_inventario_climatizacion'),
+    path('inventario/clima/eliminar/<str:climatizacion_id>/', eliminar_inventario_climatizacion, name='eliminar_inventario_climatizacion'),
     # Links de Inventario energético de Luminarias
     path('inventario/luminarias/', listar_inventario_luminarias, name='listar_inventario_luminarias'),
     path('inventario/luminarias/agregar/cap/', registrar_inventario_luminarias, name='registrar_inventario_luminarias'),
     path('inventario/luminarias/editar/<str:id>/', editar_inventario_luminarias, name='editar_inventario_luminarias'),
-    path('inventario/luminarias/eliminar/<str:id>/', eliminar_inventario_luminarias, name='eliminar_inventario_luminarias'),
+    path('inventario/luminarias/eliminar/<str:luminaria_id>/', eliminar_inventario_luminarias, name='eliminar_inventario_luminarias'),
     path('inventario/luminarias/obtener_areas/', obtener_areas_luminarias, name='obtener_areas_luminarias'),
     # Links de Inventario energetico de Misceláneos
     path('inventario/miscelaneos/', listar_inventario_miscelaneos, name='listar_inventario_miscelaneos'),
     path('inventario/miscelaneos/agregar/cap/', registrar_inventario_miscelaneos, name='registrar_inventario_miscelaneos'),
     path('inventario/miscelaneos/editar/<str:id>/', editar_inventario_miscelaneos, name='editar_inventario_miscelaneos'),
-    path('inventario/miscelaneos/eliminar/<str:id>/', eliminar_inventario_miscelaneos, name='eliminar_inventario_miscelaneos'),
+    path('inventario/miscelaneos/eliminar/<str:miscelaneo_id>/', eliminar_inventario_miscelaneos, name='eliminar_inventario_miscelaneos'),
     path('inventario/miscelaneos/obtener_areas/', obtener_areas_por_edificio_miscelaneos, name='obtener_areas_por_edificio_miscelaneos'),
 
     # ==================== Paths de Auditor ====================

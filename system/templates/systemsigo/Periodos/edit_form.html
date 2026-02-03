@@ -37,6 +37,21 @@
         </select>
         <label>Status (automático)</label>
       </div>
+  
+      
+        <div class="form-check mb-3">
+            <input
+                class="form-check-input"
+                type="checkbox"
+                name="activo"
+                id="activo"
+                {% if periodo.activo %}checked{% endif %}
+            >
+            <label class="form-check-label" for="activo">
+                Marca la casilla si deseas que este periodo esté activo.
+            </label>
+        </div>
+
 
       <div class="d-grid mx-auto gap-2 align-items-center justify-content-center">
         <button type="submit" class="btn btn-primary">Actualizar</button>

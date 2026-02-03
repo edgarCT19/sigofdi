@@ -70,13 +70,9 @@
                 <div class="d-flex justify-content-center gap-2">
                     <a href="{% if periodo_activo %}{% url 'editar_inventario_luminarias' reg.id %}{% else %}#{% endif %}" 
                     class="btn btn-sm btn-light rounded-circle {% if not periodo_activo %}disabled{% endif %}" title="Editar"><i class="bi bi-pencil"></i></a>
-                    <button type="button"
-                            class="btn btn-sm btn-danger rounded-circle btn-delete-luminaria"
-                            data-id="{{ reg.id }}"
-                            {% if not periodo_activo %}disabled{% endif %}
-                            title="Eliminar">
-                      <i class="bi bi-trash-fill"></i>
-                    </button>
+                    <button class="btn btn-danger btn-sm rounded rounded-circle"
+                            onclick="eliminar('{{ reg.id }}')" title="Eliminar definitivamente">
+                    <i class="bi bi-trash"></i>
                 </div>
                 </td>
             </tr>
@@ -91,37 +87,55 @@
 </div>
 
 <script>
-  document.querySelectorAll('.btn-delete-luminaria').forEach(button => {
-    button.addEventListener('click', function () {
-      const id = this.dataset.id;
-      if (this.disabled) return;
+function eliminar(luminariasId) {
+    const url = "{% url 'eliminar_inventario_luminarias' 'ID' %}"
+        .replace('ID', luminariasId);
 
-      Swal.fire({
-        title: '¿Estás seguro?',
+    Swal.fire({
+        title: '¿Eliminar definitivamente?',
         text: 'Esta acción no se puede deshacer',
-        icon: 'warning',
+        icon: 'error',
         showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#d33'
-      }).then((result) => {
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
         if (result.isConfirmed) {
-          fetch(`/inventario/luminarias/eliminar/${id}/`, {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}', // Este token debes pasarlo correctamente
-              'Content-Type': 'application/json',
-            },
-          }).then(response => {
-            if (response.ok) {
-              location.reload();
-            } else {
-              Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
-            }
-          });
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Eliminado',
+                        text: 'El registro fue eliminado definitivamente.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error',
+                        data.error || 'No se pudo eliminar el registro',
+                        'error'
+                    );
+                }
+            })
+            .catch(() => {
+                Swal.fire(
+                    'Error',
+                    'Error de comunicación con el servidor',
+                    'error'
+                );
+            });
         }
-      });
     });
-  });
+}
 </script>
 {% endblock %}

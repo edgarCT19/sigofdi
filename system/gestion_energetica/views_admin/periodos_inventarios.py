@@ -186,6 +186,7 @@ def editar_periodo_inventario(request, id):
             periodo.fecha_fin = datetime.strptime(request.POST.get("fecha_fin"), "%Y-%m-%d")
             periodo.observaciones = request.POST.get("observaciones", "")
             periodo.status = request.POST.get("status")
+            periodo.activo = (periodo.status == "Activo")
             periodo.save()
             messages.success(request, "Periodo actualizado correctamente.")
             return redirect("listar_periodos")

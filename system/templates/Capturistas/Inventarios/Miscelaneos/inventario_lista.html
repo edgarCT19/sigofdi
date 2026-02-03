@@ -76,12 +76,9 @@
                             class="btn btn-sm btn-light rounded-circle {% if not periodo_activo %}disabled{% endif %}" 
                              title="Editar"><i class="bi bi-pencil"></i></a>
                             
-                            <button type="button"
-                                class="btn btn-sm btn-danger rounded-circle delete-btn"
-                                data-url="{% url 'eliminar_inventario_miscelaneos' reg.id %}"
-                                {% if not periodo_activo %}disabled{% endif %}
-                                title="Eliminar">
-                                <i class="bi bi-trash-fill"></i>
+                            <button class="btn btn-danger btn-sm rounded rounded-circle"
+                                    onclick="eliminar('{{ reg.id }}')" title="Eliminar definitivamente">
+                            <i class="bi bi-trash"></i>
                             </button>
                         </div>
                     </td>
@@ -97,37 +94,55 @@
 </div>
 
 <script>
-  document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function () {
-      const url = this.dataset.url;
+function eliminar(miscelaneosId) {
+    const url = "{% url 'eliminar_inventario_miscelaneos' 'ID' %}"
+        .replace('ID', miscelaneosId);
 
-      Swal.fire({
-        title: '¿Estás seguro?',
-        text: "Esta acción no se puede deshacer.",
-        icon: 'warning',
+    Swal.fire({
+        title: '¿Eliminar definitivamente?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'error',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar'
-      }).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
-          fetch(url, {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}'
-            }
-          })
-          .then(response => {
-            if (response.ok) {
-              Swal.fire('Eliminado', 'El registro ha sido eliminado.', 'success')
-                .then(() => location.reload());
-            } else {
-              Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
-            }
-          });
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Eliminado',
+                        text: 'El registro fue eliminado definitivamente.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error',
+                        data.error || 'No se pudo eliminar el registro',
+                        'error'
+                    );
+                }
+            })
+            .catch(() => {
+                Swal.fire(
+                    'Error',
+                    'Error de comunicación con el servidor',
+                    'error'
+                );
+            });
         }
-      });
     });
-  });
+}
 </script>
 {% endblock %}

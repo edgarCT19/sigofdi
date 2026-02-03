@@ -86,7 +86,7 @@ def listar_luminarias_encargado(request):
 
     periodos = PeriodoInventario.objects.order_by('-fecha_inicio')
 
-    registros = InventarioLuminarias.objects(unidad_responsable__in=urs)
+    registros = InventarioLuminarias.objects(unidad_responsable__in=urs, activo=True)
 
     registros, periodo_id = filtrar_por_periodo(registros, request)
 
@@ -131,7 +131,7 @@ def listar_miscelaneos_encargado(request):
 
     periodos = PeriodoInventario.objects.order_by('-fecha_inicio')
 
-    registros = InventarioMiscelaneos.objects(unidad_responsable__in=urs)
+    registros = InventarioMiscelaneos.objects(unidad_responsable__in=urs, activo=True)
 
     registros, periodo_id = filtrar_por_periodo(registros, request)
 

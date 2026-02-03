@@ -1,6 +1,6 @@
 {% extends "systemsigo/base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="mt-4">
   <div class="card">
     <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
         <div class="searchBox position-relative d-flex align-items-center mx-2">
@@ -81,14 +81,9 @@
                               <i class="bi bi-pencil"></i>
                           </a>
 
-                          <button type="button"
-                                  class="btn btn-sm btn-danger rounded rounded-circle delete-btn"
-                                  data-id="{{ reg.id }}"
-                                  data-url="{% url 'eliminar_inventario_climatizacion' reg.id %}"
-                                  data-csrf="{{ csrf_token }}"
-                                  title="Eliminar registro"
-                                  {% if not periodo_activo %}disabled{% endif %}>
-                            <i class="bi bi-trash-fill"></i>
+                          <button class="btn btn-danger btn-sm rounded rounded-circle"
+                            onclick="eliminar('{{ reg.id }}')" title="Eliminar registro">
+                          <i class="bi bi-trash"></i>
                           </button>
                       </div>
                     </td>
@@ -105,41 +100,56 @@
 </div>
 
 <script>
-  document.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function () {
-      const url = this.getAttribute('data-url');
-      const csrfToken = this.getAttribute('data-csrf');
-      const row = this.closest('tr');
+function eliminar(climatizacionId) {
+    const url = "{% url 'eliminar_inventario_climatizacion' 'ID' %}"
+        .replace('ID', climatizacionId);
 
-      Swal.fire({
-        title: '¿Estás seguro?',
+    Swal.fire({
+        title: '¿Eliminar definitivamente?',
         text: 'Esta acción no se puede deshacer',
-        icon: 'warning',
+        icon: 'error',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar'
-      }).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
-          fetch(url, {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': csrfToken,
-              'Content-Type': 'application/json'
-            },
-          })
-          .then(response => {
-            if (response.ok) {
-              Swal.fire('¡Eliminado!', 'El registro ha sido eliminado.', 'success');
-              row.remove();
-            } else {
-              Swal.fire('Error', 'No se pudo eliminar el registro.', 'error');
-            }
-          });
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Eliminado',
+                        text: 'El registro fue eliminado definitivamente.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error',
+                        data.error || 'No se pudo eliminar el registro',
+                        'error'
+                    );
+                }
+            })
+            .catch(() => {
+                Swal.fire(
+                    'Error',
+                    'Error de comunicación con el servidor',
+                    'error'
+                );
+            });
         }
-      });
     });
-  });
+}
 </script>
 
 

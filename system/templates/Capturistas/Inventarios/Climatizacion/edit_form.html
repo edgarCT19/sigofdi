@@ -1,6 +1,6 @@
 {% extends "systemsigo/base.html" %}
 {% block content %}
-<div class="container mt-4">
+<div class="mt-4">
   <div class="card p-4 mt-4">
     <p class="text-center mb-2"  style="font-size: 18px;">Agregar información del aire acondicionado</p>
     <hr class="text-center" style="color: var(--color-uacam-primary);">
@@ -77,7 +77,7 @@
       <div class="row">
         <div class="col-md-4 mt-4">
           <div class="material-input">
-            <input type="number" name="voltaje" id="voltaje" value="{{ inventario.voltaje }}" required>
+            <input type="number"  name="voltaje" id="voltaje" value="{{ inventario.voltaje }}" required>
             <label>Voltaje</label>
           </div>
         </div>

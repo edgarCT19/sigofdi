@@ -1,19 +1,18 @@
 {% extends "systemsigo/base.html" %}
 {% load static %}
 {% block content %}
-<div class="mt-4">
-
-  <div class="mt-4 card">
+<div class=" mt-4">
+  <div class="card mt-4">
     <div class="d-flex justify-content-end mt-2">
-      <a href="{% url 'listar_climatizacion_encargado' %}"><button class="btn btn-primary mx-2">Inventario</button></a>
+      <a href="{% url 'listar_luminarias_encargado' %}"><button class="btn btn-primary mx-2">Inventario</button></a>
     </div>
-    <div class="d-flex align-items-center justify-content-center">
+    <div class="d-flex justify-content-center align-items-center">
       <div class="table-container">
         <table class="styled-table text-center">
           <thead class="">
             <tr class="text-center">
                 <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
-                    Lista de registros dados de baja de Aires Acondicionados
+                    Lista de registros dados de baja de Iluminación
                 </th>
             </tr>
             <tr class="text-center">
@@ -22,15 +21,12 @@
               <th>Edificio</th>
               <th>Nivel</th>
               <th>Área</th>
-              <th>Tipo Clima</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th>Capacidad BTU</th>
-              <th>Voltaje</th>  
-              <th>Amperaje</th>
-              <th>Potencia</th>
+              <th>Tipo Lámpara</th>
+              <th># Luminarias</th>
+              <th>Lámparas/Luminaria</th>
+              <th>Potencia Lámpara (W)</th>
               <th>Potencia Total</th>
-              <th>Horas mes</th>
+              <th>Horas al mes</th>
               <th>Consumo Mensual</th>
               <th>Fecha</th>
               <th>Acciones</th>
@@ -44,15 +40,12 @@
               <td>{{ r.edificio.nombre }}</td>
               <td>{{ r.nivel }}</td>
               <td>{{ r.area.nombre }}</td>
-              <td>{{ r.tipo_clima }}</td>
-              <td>{{ r.marca }}</td>
-              <td>{{ r.modelo }}</td>
-              <td>{{ r.capacidad }}</td>
-              <td>{{ r.voltaje }}</td>
-              <td>{{ r.amperaje }}</td>
-              <td>{{ r.potencia }}</td>
-              <td>{{ r.potencia_total }}</td>
-              <td>{{ r.horas_mes }}</td>
+              <td>{{ r.tipo_lampara }}</td>
+              <td>{{ r.num_luminarias }}</td>
+              <td>{{ r.lamp_luminarias }}</td>
+              <td>{{ r.potencia_lamp }}</td>
+              <td>{{ r.potencia_total_lum }}</td>
+              <td>{{ r.consumo_mensual_horas }}</td>
               <td>{{ r.consumo_mensual }}</td>
               <td>{{ r.fecha_registro|date:"d/m/Y" }}</td>
               <td>
@@ -72,6 +65,22 @@
             {% empty %}
             <tr><td colspan="28">No hay registros disponibles.</td></tr>
             {% endfor %}
+            <tr colspan="28" class="" style='background-color: var(--color-uacam-table-header); font-size: 10px; color: var(--color-uacam-white);'>
+              <th>Total:</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th>{{ total_potencia }}</th>
+              <th>{{ total_horas }}</th>
+              <th>{{ total_consumo }}</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -80,9 +89,9 @@
 </div>
 
 <script>
-    function restaurar(climatizacionId) {
-    const url = "{% url 'restaurar_climatizacion_encargado' 'ID' %}"
-        .replace('ID', climatizacionId);
+   function restaurar(luminariaId) {
+    const url = "{% url 'restaurar_luminarias_encargado' 'ID' %}"
+        .replace('ID', luminariaId);
 
     Swal.fire({
         title: '¿Restaurar registro?',
@@ -107,9 +116,9 @@
     });
 }
 
-function eliminar(climatizacionId) {
-    const url = "{% url 'eliminar_climatizacion_encargado' 'ID' %}"
-        .replace('ID', climatizacionId);
+function eliminar(luminariasId) {
+    const url = "{% url 'eliminar_luminarias_encargado' 'ID' %}"
+        .replace('ID', luminariasId);
 
     Swal.fire({
         title: '¿Eliminar definitivamente?',

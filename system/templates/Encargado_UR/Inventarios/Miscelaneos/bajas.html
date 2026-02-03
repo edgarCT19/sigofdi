@@ -2,28 +2,9 @@
 {% load static %}
 {% block content %}
 <div class="mt-4">
-  <div class="card p-4">
-    <p class="text-center mb-2"  style="font-size: 18px;">Inventario de objetos Misceláneos</p>
-    <hr class="text-center" style="color: var(--color-uacam-primary);">
-    <form method="GET" class="mt-3">
-      <div class="material-input">
-      <select name="periodo" id="periodo" onchange="this.form.submit()" class="">
-          <option value="">-- Todos los periodos --</option>
-          {% for p in periodos %}
-              <option value="{{ p.id }}" {% if periodo_seleccionado == p.id|stringformat:"s" %}selected{% endif %}>
-                  {{ p.nombre }} ({{ p.fecha_inicio|date:"d/m/Y" }} - {{ p.fecha_fin|date:"d/m/Y" }})
-              </option>
-          {% endfor %}
-      </select>
-      <label for="periodo"><strong>Filtrar por periodo:</strong></label>
-      </div>
-    </form>
-  </div>
-
   <div class="card mt-4">
     <div class="d-flex justify-content-end mt-2">
-      <a href="{% url 'historial_miscelaneos_encargado' %}" class="btn btn-secondary mx-2">Bajas</a>
-      <a href="{% url 'registrar_inventario_miscelaneos_responsable_energia' %}" class="btn btn-primary mx-2">Agregar</a>
+      <a href="{% url 'listar_miscelaneos_encargado' %}" class="btn btn-primary mx-2">Inventario</a>
     </div>
     <div class=" d-flex align-items-center justify-content-center">
       <div class="table-container">
@@ -31,7 +12,7 @@
         <thead class="">
           <tr class="text-center">
               <th colSpan="20" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
-                  Lista de registros de inventario de Misceláneos
+                  Lista de registros dados de baja de Misceláneos
               </th>
           </tr>
           <tr class="text-center">
@@ -73,10 +54,15 @@
             <td>{{ r.fecha_registro|date:"d/m/Y" }}</td>
             <td>
                <div class="d-flex actions justify-content-center gap-2">
-                 <a href="{% url 'editar_miscelaneos_encargado' r.id %}" class="btn btn-sm btn-light rounded rounded-circle"
-                 title="Actualizar información"><i class="bi bi-pencil"></i></a>
-                 <button onclick="darBaja('{{ r.id }}')" class="btn btn-success btn-sm rounded rounded-circle"
-                  title="Dar de baja"><i class="bi bi-toggle-on"></i></button>
+                    <button class="btn btn-secondary btn-sm rounded rounded-circle"
+                            onclick="restaurar('{{ r.id }}')" title="Restaurar registro">
+                    <i class="bi bi-toggle-off"></i></button>
+                    </button>
+
+                    <button class="btn btn-danger btn-sm rounded rounded-circle"
+                            onclick="eliminar('{{ r.id }}')" title="Eliminar definitivamente">
+                    <i class="bi bi-trash"></i>
+                    </button>
                </div>
             </td>
           </tr>
@@ -110,26 +96,79 @@
 </div>
 
 <script>
-function darBaja(miscelaneoId) {
+ function restaurar(miscelaneosId) {
+    const url = "{% url 'restaurar_miscelaneos_encargado' 'ID' %}"
+        .replace('ID', miscelaneosId);
+
     Swal.fire({
-        title: '¿Estás seguro?',
-        text: "El registro será dado de baja",
-        icon: 'warning',
+        title: '¿Restaurar registro?',
+        text: 'El inventario será reactivado',
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#198754',
         cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Sí, dar de baja',
+        confirmButtonText: 'Sí, restaurar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire({
-                title: '¡Dado de baja!',
-                text: 'El registro ha sido dado de baja correctamente.',
+                title: '¡Restaurado!',
+                text: 'El registro fue reactivado correctamente.',
                 icon: 'success',
                 confirmButtonText: 'OK'
             }).then(() => {
-                // Redirigir después del OK
-                window.location.href = `/inventario/miscelaneos/dar_baja/responsable-energia/${miscelaneoId}/`;
+                window.location.href = url;
+            });
+        }
+    });
+}
+
+function eliminar(miscelaneosId) {
+    const url = "{% url 'eliminar_miscelaneos_encargado' 'ID' %}"
+        .replace('ID', miscelaneosId);
+
+    Swal.fire({
+        title: '¿Eliminar definitivamente?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Eliminado',
+                        text: 'El registro fue eliminado definitivamente.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire(
+                        'Error',
+                        data.error || 'No se pudo eliminar el registro',
+                        'error'
+                    );
+                }
+            })
+            .catch(() => {
+                Swal.fire(
+                    'Error',
+                    'Error de comunicación con el servidor',
+                    'error'
+                );
             });
         }
     });

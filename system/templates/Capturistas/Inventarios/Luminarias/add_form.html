@@ -101,11 +101,34 @@
 <script>
   // Persistencia
   window.addEventListener('DOMContentLoaded', function () {
-    const e = sessionStorage.getItem('edificioSeleccionado');
-    const n = sessionStorage.getItem('nivelSeleccionado');
-    if (e) document.getElementById('edificioSelect').value = e;
-    if (n) document.getElementById('nivelSelect').value = n;
+    const edif  = sessionStorage.getItem('edificioSeleccionado');
+    const nivel = sessionStorage.getItem('nivelSeleccionado');
+    const area  = sessionStorage.getItem('areaSeleccionada');
+
+    if (edif) document.getElementById('edificioSelect').value = edif;
+    if (nivel) document.getElementById('nivelSelect').value = nivel;
+
+    if (edif) {
+      fetch(`/inventario/luminarias/obtener_areas/?edificio_id=${edif}`)
+        .then(res => res.json())
+        .then(data => {
+          const sel = document.getElementById('areaSelect');
+          sel.innerHTML = '<option value="">-- Área --</option>';
+          data.forEach(o => {
+            const opt = document.createElement('option');
+            opt.value = o.id;
+            opt.textContent = o.nombre;
+            if (area && o.id === area) opt.selected = true;
+            sel.appendChild(opt);
+          });
+        });
+    }
   });
+
+  document.getElementById('areaSelect').addEventListener('change', function () {
+  sessionStorage.setItem('areaSeleccionada', this.value);
+  });
+
 
   document.getElementById('edificioSelect').addEventListener('change', function () {
     const edificioId = this.value;

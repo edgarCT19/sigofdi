@@ -31,8 +31,8 @@ def registrar_inventario_climatizacion(request):
         messages.error(request, "Acceso denegado.")
         return redirect('inicio')
 
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
-    areas = Area.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
+    areas = Area.objects(unidad_responsable__in=user.unidad_responsable)
 
     # Obtener periodo activo
     periodo_activo = PeriodoInventario.objects(status="Activo").first()
@@ -50,16 +50,16 @@ def registrar_inventario_climatizacion(request):
             marca = request.POST.get('marca')
             modelo = request.POST.get('modelo')
             capacidad = int(request.POST.get('capacidad'))
-            voltaje = int(request.POST.get('voltaje'))
-            amperaje = Decimal(request.POST.get('amperaje'))
-            potencia = Decimal(request.POST.get('potencia'))
-            potencia_total = Decimal(request.POST.get('potencia_total'))
-            horas_mes = Decimal(request.POST.get('horas_mes'))
+            voltaje = Decimal(request.POST.get('voltaje') or 0)
+            amperaje = Decimal(request.POST.get('amperaje') or 0)
+            potencia = Decimal(request.POST.get('potencia') or 0)
+            potencia_total = Decimal(request.POST.get('potencia_total') or 0)
+            horas_mes = Decimal(request.POST.get('horas_mes') or 0)
 
             consumo_mensual = (potencia_total * horas_mes).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
             InventarioClimatizacion(
-                unidad_responsable=user.unidad_responsable,
+                unidad_responsable=edificio.unidad_responsable,
                 edificio=edificio,
                 nivel=nivel,
                 area=area,
@@ -74,7 +74,7 @@ def registrar_inventario_climatizacion(request):
                 horas_mes=horas_mes,
                 consumo_mensual=consumo_mensual,
                 creado_por=user,
-                periodo=periodo_activo  # Se guarda aquí
+                periodo=periodo_activo
             ).save()
 
             messages.success(request, "Registro de inventario guardado correctamente.")
@@ -122,7 +122,7 @@ def listar_inventario_climatizacion(request):
         })
 
     registros = InventarioClimatizacion.objects(
-        unidad_responsable=user.unidad_responsable,
+        unidad_responsable__in=user.unidad_responsable,
         creado_por=user,
         periodo=periodo_activo 
     ).order_by('-fecha_registro')
@@ -149,7 +149,7 @@ def editar_inventario_climatizacion(request, id):
 
     inventario = InventarioClimatizacion.objects.get(id=id)
 
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
     niveles = NIVELES
     areas_filtradas = Area.objects(edificio=inventario.edificio)
 
@@ -161,11 +161,11 @@ def editar_inventario_climatizacion(request, id):
         inventario.marca = request.POST.get('marca')
         inventario.modelo = request.POST.get('modelo')
         inventario.capacidad = int(request.POST.get('capacidad'))
-        inventario.voltaje = int(request.POST.get('voltaje'))
-        inventario.amperaje = Decimal(request.POST.get('amperaje'))
-        inventario.potencia = Decimal(request.POST.get('potencia'))
-        inventario.potencia_total = Decimal(request.POST.get('potencia_total'))
-        inventario.horas_mes = Decimal(request.POST.get('horas_mes'))
+        inventario.voltaje = Decimal(request.POST.get('voltaje') or 0)
+        inventario.amperaje = Decimal(request.POST.get('amperaje') or 0)
+        inventario.potencia = Decimal(request.POST.get('potencia') or 0)
+        inventario.potencia_total = Decimal(request.POST.get('potencia_total') or 0)
+        inventario.horas_mes = Decimal(request.POST.get('horas_mes') or 0)
         inventario.consumo_mensual = inventario.potencia_total * inventario.horas_mes
         inventario.actualizado_por = user
         inventario.ultima_actualizacion = datetime.now()
@@ -183,7 +183,7 @@ def editar_inventario_climatizacion(request, id):
 
 @never_cache
 @login_required_custom
-def eliminar_inventario_climatizacion(request, id):
+def eliminar_inventario_climatizacion(request, climatizacion_id):
     """
     Eliminar un registro de inventario de climatización.
 
@@ -193,21 +193,38 @@ def eliminar_inventario_climatizacion(request, id):
     """
 
     user = get_user(request)
-    if not user:
-        messages.error(request, "Sesión expirada.")
-        return redirect('login')
+
+    if not user or user.rol != "capturista":
+        return JsonResponse({
+            "success": False,
+            "error": "Acceso denegado"
+        })
+
+    climatizacion = InventarioClimatizacion.objects(
+        id=climatizacion_id
+    ).first()
+
+    if not climatizacion:
+        return JsonResponse({
+            "success": False,
+            "error": "Registro no encontrado"
+        })
+
+    if climatizacion.unidad_responsable not in user.unidad_responsable:
+        return JsonResponse({
+            "success": False,
+            "error": "No tienes permiso para eliminar este registro"
+        })
 
     try:
-        registro = InventarioClimatizacion.objects.get(id=id)
-        if registro.creado_por != user:
-            messages.error(request, "No tienes permiso para eliminar este registro.")
-            return redirect('listar_inventario_climatizacion')
-        registro.delete()
+        climatizacion.delete()
         messages.success(request, "Registro eliminado correctamente.")
-    except InventarioClimatizacion.DoesNotExist:
-        messages.error(request, "Registro no encontrado.")
-
-    return redirect('listar_inventario_climatizacion')
+        return JsonResponse({"success": True, "message": "Registro eliminado correctamente."})
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        })
 
 @never_cache
 @login_required_custom

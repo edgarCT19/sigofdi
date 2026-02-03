@@ -21,6 +21,10 @@
   </div>
 
   <div class="card mt-4">
+    <div class="d-flex justify-content-end mt-2">
+      <a href="{% url 'historial_luminarias_encargado' %}" class="btn btn-secondary mx-2">Bajas</a>
+      <a href="{% url 'registrar_inventario_luminarias_responsable_energia' %}"><button class="btn btn-primary mx-2">Agregar</button></a>
+    </div>
     <div class="d-flex justify-content-center align-items-center">
       <div class="table-container">
         <table class="styled-table text-center">
@@ -44,6 +48,7 @@
               <th>Horas al mes</th>
               <th>Consumo Mensual</th>
               <th>Fecha</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -62,6 +67,15 @@
               <td>{{ r.consumo_mensual_horas }}</td>
               <td>{{ r.consumo_mensual }}</td>
               <td>{{ r.fecha_registro|date:"d/m/Y" }}</td>
+              <td>
+                <div class="d-flex actions justify-content-center gap-2">
+                  <a href="{% url 'editar_luminarias_encargado' r.id %}" class="btn btn-light btn-sm rounded rounded-circle" 
+                  title="Actualizar información"><i class="bi bi-pencil"></i>
+                  </a>
+                  <button onclick="darBaja('{{ r.id }}')" class="btn btn-success btn-sm rounded rounded-circle"
+                  title="Dar de baja"><i class="bi bi-toggle-on"></i></button>
+                </div>
+              </td>
             </tr>
             {% empty %}
             <tr><td colspan="28">No hay registros disponibles.</td></tr>
@@ -74,10 +88,11 @@
               <th></th>
               <th></th>
               <th></th>
+              <th></th>
+              <th></th>
               <th>{{ total_potencia }}</th>
               <th>{{ total_horas }}</th>
               <th>{{ total_consumo }}</th>
-              <th></th>
               <th></th>
               <th></th>
             </tr>
@@ -87,4 +102,31 @@
     </div>
   </div>
 </div>
+
+<script>
+function darBaja(luminariaId) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "El registro será dado de baja",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, dar de baja',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: '¡Dado de baja!',
+                text: 'El registro ha sido dado de baja correctamente.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                // Redirigir después del OK
+                window.location.href = `/inventario/luminarias/dar_baja/responsable-energia/${luminariaId}/`;
+            });
+        }
+    });
+}
+</script>
 {% endblock %}

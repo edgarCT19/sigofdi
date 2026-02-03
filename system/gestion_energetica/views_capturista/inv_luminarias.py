@@ -38,7 +38,7 @@ def registrar_inventario_luminarias(request):
         messages.error(request, "No hay un periodo de inventario activo.")
         return redirect('listar_inventario_luminarias')
 
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
     niveles = NIVELES
     
     # Persistencia de selecciones
@@ -62,20 +62,21 @@ def registrar_inventario_luminarias(request):
             potencia_total = num_luminarias * lamp_luminarias * potencia_lamp / 1000
             consumo_mensual = potencia_total * horas_mes
 
+            ur = user.unidad_responsable[0] 
             inv = InventarioLuminarias(
-                unidad_responsable    = user.unidad_responsable,
-                periodo               = periodo_activo,               # aquí
-                edificio              = edificio,
-                nivel                 = request.POST['nivel'],
-                area                  = area,
-                tipo_lampara          = request.POST['tipo_lampara'].upper(),
-                num_luminarias        = num_luminarias,
-                lamp_luminarias       = lamp_luminarias,
-                potencia_lamp         = potencia_lamp,
-                potencia_total_lum    = potencia_total,
+                unidad_responsable = ur,
+                periodo            = periodo_activo,
+                edificio           = edificio,
+                nivel              = request.POST['nivel'],
+                area               = area,
+                tipo_lampara       = request.POST['tipo_lampara'].upper(),
+                num_luminarias     = num_luminarias,
+                lamp_luminarias    = lamp_luminarias,
+                potencia_lamp      = potencia_lamp,
+                potencia_total_lum = potencia_total,
                 consumo_mensual_horas = horas_mes,
-                consumo_mensual       = consumo_mensual,
-                creado_por            = user
+                consumo_mensual    = consumo_mensual,
+                creado_por         = user
             )
             inv.save()
             messages.success(request, "Registro guardado exitosamente.")
@@ -126,7 +127,7 @@ def listar_inventario_luminarias(request):
         })
 
     registros = InventarioLuminarias.objects(
-        unidad_responsable=user.unidad_responsable,
+        unidad_responsable__in=user.unidad_responsable,
         creado_por=user,
         periodo=periodo_activo 
     ).order_by('-fecha_registro')
@@ -155,12 +156,12 @@ def editar_inventario_luminarias(request, id):
         return redirect('login')
 
     try:
-        inventario = InventarioLuminarias.objects.get(id=id, unidad_responsable=user.unidad_responsable)
+        inventario = InventarioLuminarias.objects.get(id=id, unidad_responsable__in=user.unidad_responsable)
     except InventarioLuminarias.DoesNotExist:
         messages.error(request, "Registro no encontrado.")
         return redirect('listar_inventario_luminarias')
 
-    edificios = Edificio.objects(unidad_responsable=user.unidad_responsable)
+    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
     niveles = NIVELES
     areas_filtradas = Area.objects(edificio=inventario.edificio)
 
@@ -176,7 +177,7 @@ def editar_inventario_luminarias(request, id):
             inventario.tipo_lampara = request.POST.get('tipo_lampara')
             inventario.num_luminarias = int(request.POST.get('num_luminarias'))
             inventario.lamp_luminarias = int(request.POST.get('lamp_luminarias'))
-            inventario.potencia_lamp = Decimal(request.POST.get('potencia_lamp'))
+            inventario.potencia_lamp = Decimal(request.POST.get('potencia_lamp') or 0)
             inventario.potencia_total_lum = inventario.num_luminarias * inventario.lamp_luminarias * inventario.potencia_lamp / 1000
             inventario.consumo_mensual_horas = int(request.POST.get('consumo_mensual_horas'))
             inventario.consumo_mensual = inventario.potencia_total_lum * inventario.consumo_mensual_horas
@@ -197,7 +198,7 @@ def editar_inventario_luminarias(request, id):
 
 @never_cache
 @login_required_custom
-def eliminar_inventario_luminarias(request, id):
+def eliminar_inventario_luminarias(request, luminaria_id):
     """
     Eliminar un registro de inventario de luminarias.
 
@@ -206,19 +207,39 @@ def eliminar_inventario_luminarias(request, id):
     - Obtiene el registro de inventario a eliminar.
     - Elimina el registro y redirige a la lista de inventarios con un mensaje de éxito.
     """
-
     user = get_user(request)
-    if not user:
-        return redirect('login')
+    
+    if not user or user.rol != "capturista":
+        return JsonResponse({
+            "success": False,
+            "error": "Acceso denegado"
+        })
+
+    luminaria = InventarioLuminarias.objects(
+        id=luminaria_id
+    ).first()
+
+    if not luminaria:
+        return JsonResponse({
+            "success": False,
+            "error": "Registro no encontrado"
+        })
+
+    if luminaria.unidad_responsable not in user.unidad_responsable:
+        return JsonResponse({
+            "success": False,
+            "error": "No tienes permiso para eliminar este registro"
+        })
 
     try:
-        registro = InventarioLuminarias.objects.get(id=id, unidad_responsable=user.unidad_responsable)
-        registro.delete()
+        luminaria.delete()
         messages.success(request, "Registro eliminado correctamente.")
-    except InventarioLuminarias.DoesNotExist:
-        messages.error(request, "No se encontró el registro.")
-
-    return redirect('listar_inventario_luminarias')
+        return JsonResponse({"success": True, "message": "Registro eliminado correctamente."})
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        })
 
 @never_cache
 @login_required_custom
