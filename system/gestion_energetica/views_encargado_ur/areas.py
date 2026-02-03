@@ -1,5 +1,7 @@
 from datetime import datetime
+from urllib import request
 
+from bson import ObjectId
 from django.shortcuts import redirect, render
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
@@ -7,6 +9,9 @@ from django.views.decorators.cache import never_cache
 from system.decorators import login_required_custom
 from system.models import Area, Edificio, Subestacion
 from system.views import get_user
+
+def get_user_urs(user):
+    return user.unidades_responsables if user.unidades_responsables else []
 
 @never_cache
 @login_required_custom
@@ -25,17 +30,33 @@ def lista_areas(request):
     if not user:
         messages.error(request, "Sesión expirada.")
         return redirect('login')
-    
+
     urs = user.unidad_responsable if user.unidad_responsable else []
+
+    # UR seleccionada desde el frontend
+    ur_id = request.GET.get('ur')
+
     subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
 
-    areas = Area.objects(unidad_responsable__in=user.unidad_responsable)
-    return render(request, 'Encargado_UR/Areas/areas.html', {
-        'areas': areas,
-        'subestaciones': subestaciones,
-        'tarifas_disponibles': tarifas_disponibles
-    })
+    # Filtro base (seguridad)
+    areas = Area.objects(unidad_responsable__in=urs)
+
+    # Filtro adicional por UR seleccionada
+    if ur_id:
+        areas = areas.filter(unidad_responsable=ur_id)
+
+    return render(
+        request,
+        'Encargado_UR/Areas/areas.html',
+        {
+            'areas': areas,
+            'urs': urs,
+            'ur_seleccionada': ur_id,
+            'subestaciones': subestaciones,
+            'tarifas_disponibles': tarifas_disponibles
+        }
+    )
 
 @never_cache
 @login_required_custom

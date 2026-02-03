@@ -3,6 +3,21 @@
 {% block content %}
 
 <div class="card">
+    <div class="material-input mt-3">
+      <form method="get" class="mx-2">
+        <select name="ur"
+                class=""
+                onchange="this.form.submit()">
+          <option value="">Todas las Unidades Responsables</option>
+          {% for ur in urs %}
+            <option value="{{ ur.id }}"
+              {% if ur.id|stringformat:"s" == ur_seleccionada %}selected{% endif %}>
+              {{ ur.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
    <div class="d-flex justify-content-end align-items-center mt-2 mb-3 p-2 mx-1">
             <div class="searchBox position-relative d-flex align-items-center mx-2">
             <i class="bi bi-search me-2 text-secondary"></i>

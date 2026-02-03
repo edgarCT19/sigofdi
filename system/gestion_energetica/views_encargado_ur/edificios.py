@@ -30,15 +30,29 @@ def listar_edificios(request):
         messages.error(request, "Sesión expirada.")
         return redirect('login')
 
-    edificios = Edificio.objects(unidad_responsable__in=user.unidad_responsable)
     urs = user.unidad_responsable if user.unidad_responsable else []
+
+    ur_id = request.GET.get('ur')
+
+    edificios = Edificio.objects(unidad_responsable__in=urs)
+
+    if ur_id:
+        edificios = edificios.filter(unidad_responsable=ur_id)
+
     subestaciones = Subestacion.objects(unidad_responsable__in=urs)
     tarifas_disponibles = set(sub.tarifa for sub in subestaciones)
-    return render(request, 'Encargado_UR/Edificios/edificios.html', {
-        'edificios': edificios,
-        'subestaciones': subestaciones,
-        'tarifas_disponibles': tarifas_disponibles
-    })
+
+    return render(
+        request,
+        'Encargado_UR/Edificios/edificios.html',
+        {
+            'edificios': edificios,
+            'urs': urs,
+            'ur_seleccionada': ur_id,
+            'subestaciones': subestaciones,
+            'tarifas_disponibles': tarifas_disponibles,
+        }
+    )
 
 @never_cache
 @login_required_custom

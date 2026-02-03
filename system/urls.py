@@ -54,7 +54,8 @@ from .gestion_energetica.views_admin.medidores import (medidores_lista_admin,
 from .gestion_energetica.views_encargado_ur.index import Inicio_encargado
 from .gestion_energetica.views_encargado_ur.edificios import (
     listar_edificios, alta_edificio, editar_edificio, eliminar_edificio)
-from .gestion_energetica.views_encargado_ur.areas import lista_areas, agregar_areas, editar_areas, eliminar_areas
+from .gestion_energetica.views_encargado_ur.areas import (lista_areas, agregar_areas, 
+                        editar_areas, eliminar_areas)
 from .gestion_energetica.views_encargado_ur.usuarios_capturistas import (
     listar_capturistas, Add_Capturistas, Edit_Capturistas, Delete_Capturista)
 from .gestion_energetica.views_encargado_ur.subestaciones import (
