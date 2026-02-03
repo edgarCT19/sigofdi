@@ -147,7 +147,7 @@ def exportar_excel_inventario(request):
     if tipo == "Climatización":
         headers = [
             "Edificio", "Nivel", "Área", "Tipo Clima", "Marca", "Modelo", "Capacidad BTU/HR",
-            "Voltaje", "Amperaje", "Potencia (W)", "Potencia total (Kw)", "Horas al mes", "Consumo mensual",
+            "Voltaje", "Amperaje", "Potencia (Watts)", "Potencia total (kW)", "Horas al mes", "Consumo mensual (kWh/mes)",
             "Fecha de registro", "Creado por", "Actualizado por", "Última modificación"
         ]
         registros = InventarioClimatizacion.objects.filter(unidad_responsable=unidad, periodo=periodo)
@@ -168,7 +168,7 @@ def exportar_excel_inventario(request):
     elif tipo == "Luminarias":
         headers = [
             "Edificio", "Área", "Nivel", "Tipo Lámpara", "N° Luminarias", "Lámparas/Luminaria",
-            "Potencia por lámpara", "Potencia Total", "Horas al mes", "Consumo mensual", "Fecha de registro",
+            "Potencia por lámpara (Watts)", "Potencia Total (kW)", "Horas al mes", "Consumo mensual (kWh/mes)", "Fecha de registro",
             "Creado por", "Actualizado por", "Última modificación"
         ]
         registros = InventarioLuminarias.objects.filter(unidad_responsable=unidad, periodo=periodo)
@@ -189,7 +189,7 @@ def exportar_excel_inventario(request):
     elif tipo == "Misceláneos":
         headers = [
             "Edificio", "Nivel", "Área", "Misceláneo", "Marca", "Modelo", "Voltaje", "Amperaje",
-            "Potencia", "Horas al mes", "Consumo mensual", "Fecha de registro", "Creado por", "Actualizado por", "Última modificación"
+            "Potencia (Watts)", "Potencia Total (kW)", "Horas al mes", "Consumo mensual (kWh/mes)", "Fecha de registro", "Creado por", "Actualizado por", "Última modificación"
         ]
         registros = InventarioMiscelaneos.objects.filter(unidad_responsable=unidad, periodo=periodo)
         data = []
@@ -199,7 +199,7 @@ def exportar_excel_inventario(request):
             total_consumo += i.consumo_mensual or 0
             data.append([
                 i.edificio.nombre, i.nivel, i.area.nombre, i.miscelaneos, i.marca, i.modelo,
-                i.voltaje, i.amperaje, i.potencia, i.horas_mes, i.consumo_mensual,
+                i.voltaje, i.amperaje, i.potencia, i.potencia_total, i.horas_mes, i.consumo_mensual,
                 i.fecha_registro.strftime('%Y-%m-%d %H:%M') if i.fecha_registro else '',
                 f"{i.creado_por.nombre_completo} ({i.creado_por.email})" if i.creado_por else "N/A",
                 f"{i.actualizado_por.nombre_completo} ({i.actualizado_por.email})" if i.actualizado_por else "N/A",

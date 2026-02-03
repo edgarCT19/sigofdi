@@ -37,7 +37,7 @@
             <table class="styled-table text-center">
                 <thead>
                     <tr class="text-center">
-                        <th colSpan="9" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;'>
+                        <th colSpan="28" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;'>
                             Historial de Inventarios de Luminarias (Dado de Baja)
                         </th>
                     </tr>
@@ -48,7 +48,16 @@
                         <th>Área</th>
                         <th>Tipo Lámpara</th>
                         <th>Número de Luminarias</th>
-                        <th>Fecha de Baja</th>
+                        <th>Lámparas/Luminaria</th>
+                        <th>Potencia por lámpara (Watts)</th>
+                        <th>Potencia Total (kW)</th>
+                        <th>Horas al mes</th>
+                        <th>Consumo Mensual (kWh/mes)</th>
+                        <th>Creado por</th>
+                        <th>Fecha de registro</th>
+                        <th>Actualizado por</th>
+                        <th>Ultima actualización</th>
+                        <th>Fecha de baja</th>
                         <th>Dado de baja por</th>
                         <th>Acciones</th>
                     </tr>
@@ -62,8 +71,17 @@
                         <td>{{ lum.area.nombre }}</td>
                         <td>{{ lum.tipo_lampara }}</td>
                         <td>{{ lum.num_luminarias }}</td>
+                        <td>{{ lum.lamp_luminarias }}</td>
+                        <td>{{ lum.potencia_lamp }}</td>
+                        <td>{{ lum.potencia_total_lum }}</td>
+                        <td>{{ lum.consumo_mensual_horas }}</td>
+                        <td>{{ lum.consumo_mensual }}</td>
+                        <td>{{ lum.creado_por }}</td>
+                        <td>{{ lum.fecha_registro|date:"Y-m-d H:i:s" }}</td>
+                        <td>{{ lum.actualizado_por }}</td>
+                        <td>{{ lum.ultima_actualizacion|date:"Y-m-d H:i:s" }}</td>
                         <td>{{ lum.fecha_baja|date:"Y-m-d H:i:s" }}</td>
-                        <td>{{ lum.dado_baja_por.username }}</td>
+                        <td>{{ lum.dado_baja_por }}</td>
                         <td>
                             <div class="d-flex actions justify-content-center gap-2">
                                 <button class="btn btn-secondary btn-sm rounded rounded-circle" 
@@ -82,7 +100,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center">No hay luminarias dadas de baja.</td>
+                        <td colspan="28" class="text-center">No hay luminarias dadas de baja.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

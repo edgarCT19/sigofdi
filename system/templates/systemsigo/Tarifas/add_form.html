@@ -8,19 +8,23 @@
     <form method="POST" class="mt-3">
       {% csrf_token %}
 
-      <div class="material-input">
-        {{ form.nombre }}
-        <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+      <div class="row">
+        <div class="material-input mt-2">
+          {{ form.nombre }}
+          <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+        </div>
       </div>
-
-      <div class="material-input">
-        {{ form.descripcion }}
-        <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+      <div class="row">
+        <div class="material-input mt-4">
+          {{ form.descripcion }}
+          <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+        </div>
       </div>
-
-      <div class="material-input">
-        {{ form.tarifa }}
-        <label for="{{ form.tarifa.id_for_label }}">Tarifa</label>
+      <div class="row">
+        <div class="material-input mt-4">
+          {{ form.tarifa }}
+          <label for="{{ form.tarifa.id_for_label }}">Tarifa</label>
+        </div>
       </div>
 
       <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">

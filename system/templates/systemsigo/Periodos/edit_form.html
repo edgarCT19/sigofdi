@@ -24,9 +24,11 @@
         </div>
       </div>
 
-      <div class="mt-4 material-input">
-        <textarea name="observaciones" class="">{{ periodo.observaciones }}</textarea>
-        <label>Observaciones</label>
+      <div class="row">
+        <div class="mt-4 material-input">
+          <textarea name="observaciones" class="">{{ periodo.observaciones }}</textarea>
+          <label>Observaciones</label>
+        </div>
       </div>
 
       <div class="mt-4 material-input">
@@ -47,7 +49,7 @@
                 id="activo"
                 {% if periodo.activo %}checked{% endif %}
             >
-            <label class="form-check-label" for="activo">
+            <label class="form-check-label" for="activo" style="color: var(--color-uacam-black);">
                 Marca la casilla si deseas que este periodo esté activo.
             </label>
         </div>
