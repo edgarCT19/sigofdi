@@ -21,7 +21,7 @@
               <select name="unidad_responsable" required>
                 <option value="">-- Selecciona UR --</option>
                 {% for ur in urs %}
-                  <option value="{{ ur.id }}">{{ ur.nombre }}</option>
+                  <option value="{{ ur.id }}">{{ ur.nombre }} - {{ ur.campus.nomenclatura }}</option>
                 {% endfor %}
               </select>
               <label>Unidad Responsable</label>

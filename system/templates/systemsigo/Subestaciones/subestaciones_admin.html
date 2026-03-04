@@ -11,7 +11,7 @@
                 <select name="ur" id="ur" onchange="this.form.submit()">
                     <option value="">-- Todas las UR --</option>
                     {% for ur in unidades_responsables %}
-                        <option value="{{ ur.id }}" {% if ur.id|stringformat:"s" == ur_filtrada %}selected{% endif %}>{{ ur.nombre }}</option>
+                        <option value="{{ ur.id }}" {% if ur.id|stringformat:"s" == ur_filtrada %}selected{% endif %}>{{ ur.nombre }} - ({{ ur.campus.nomenclatura }})</option>
                     {% endfor %}
                 </select>
                 <label for="ur">Filtrar por Unidad Responsable:</label>

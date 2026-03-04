@@ -2,28 +2,68 @@
 {% load static %}
 {% block content %}
 
-<div class="container mt-2">
+<div class="mt-2">
   <div class="card p-4">
     <p class="text-center mb-2"  style="font-size: 18px;">Filtro de Edificios por Unidad Responsable</p>
     <hr class="text-center" style="color: var(--color-uacam-primary);">
-    <form method="get" class="mt-3">
-      <div class="material-input">
-        <select name="unidad_id" id="unidad_id" onchange="this.form.submit()">
-          <option value="">-- Todas las Unidades Responsables --</option>
-          {% for unidad in unidades %}
-            <option value="{{ unidad.id }}" {% if unidad.id == unidad_id %}selected{% endif %}>
-              {{ unidad.nombre }}
-            </option>
-          {% endfor %}
-        </select>
-        <label for="unidad_id">Unidad Responsable</label>
-        <span></span>
+    <form method="get" class="mt-3 row">
+      <div class="col-md-4">
+        <div class="material-input">
+          <select name="unidad_id" id="unidad_id" onchange="this.form.submit()">
+            <option value="">-- Todas las Unidades Responsables --</option>
+            {% for unidad in unidades %}
+              <option value="{{ unidad.id }}"
+                {% if unidad.id|stringformat:"s" == unidad_id %}selected{% endif %}>
+                {{ unidad.nombre }} - ({{ unidad.campus.nomenclatura }})
+              </option>
+            {% endfor %}
+          </select>
+          <label for="unidad_id">Unidad Responsable</label>
+          <span></span>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="material-input">
+            <select name="subestacion_id" id="subestacion_id" onchange="this.form.submit()">
+              <option value="">-- Selecciona --</option>
+              {% for s in subestaciones %}
+                <option value="{{ s.id }}"
+                  {% if subestacion_id == s.id|stringformat:"s" %}selected{% endif %}>
+                  {{ s.no_servicio }}
+                </option>
+              {% endfor %}
+            </select>
+            <label for="subestacion_id">Número de Servicio</label>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="material-input">
+          <select name="periodo" id="periodo" onchange="this.form.submit()">
+            <option value="">-- Selecciona Periodo --</option>
+            {% for periodo in periodos %}
+              <option value="{{ periodo.id }}"
+                {% if periodo_id == periodo.id|stringformat:"s" %}selected{% endif %}>
+                {{ periodo.nombre }}
+              </option>
+            {% endfor %}
+          </select>
+          <label for="periodo">Periodo</label>
+        </div>
       </div>
     </form>
   </div>
+</div>
 
   <div class="card mt-3">
     <div class="d-flex justify-content-end mt-2">
+          {% if subestacion_id %}
+            <div class="mx-2">
+              <a href="{% url 'exportar_excel_por_numero_servicio' %}?periodo={{ request.GET.periodo }}&subestacion_id={{ subestacion_id }}"
+                class="btn btn-success">
+                Exportar por Número de Servicio
+              </a>
+            </div>
+         {% endif %}
          <a href="{% url 'todos_edificios' %}"><button class="btn btn-secondary mx-2">Limpiar</button></a>
     </div>
     <div class="d-flex align-items-center justify-content-center">
@@ -38,7 +78,10 @@
             <tr class="text-center">
               <th>#</th>
               <th>Nombre del Edificio</th>
+              <th>Asignar servicio</th>
+              <th>No. de servicio asociado</th>
               <th>Unidad Responsable</th>
+              <th>Campus</th>
               <th>Responsable de Alta</th>
               <th>Fecha de Registro</th>
             </tr>
@@ -48,7 +91,16 @@
               <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ edificio.nombre }}</td>
+                <td>
+                  <button class="btn btn-success btn-sm rounded-circle"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modal{{ edificio.id }}" title="Asignar número de servicio al edificio">
+                    <i class="bi bi-box2-fill"></i>
+                  </button>
+                </td>
+                <td>{{ edificio.subestacion.no_servicio|default:"No asignado" }}</td>
                 <td>{{ edificio.unidad_responsable.nombre }}</td>
+                <td>{{ edificio.unidad_responsable.campus.nomenclatura }}</td>
                 <td>{{ edificio.responsable_alta|default:"-" }}</td>
                 <td>{{ edificio.fecha_registro|date:"d/m/Y H:i:s" }}</td>
               </tr>
@@ -62,7 +114,81 @@
       </div>
     </div>
   </div>
+  {% for edificio in edificios %}
+  <div class="modal fade" id="modal{{ edificio.id }}" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content card">
+        <form method="POST" action="{% url 'asignar_subestacion_edificio' %}" class="form-asignar">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" style="color:var(--color-uacam-black)">
+              Asignar número de servicio a {{ edificio.nombre }} - {{ edificio.unidad_responsable.nombre }} ({{ edificio.unidad_responsable.campus.nomenclatura }})
+            </h5>
+          </div>
 
+          <div class="modal-body">
+            <input type="hidden" name="edificio_id" value="{{ edificio.id }}">
+            <div class="material-input mt-3">
+              <select name="subestacion_id" class="" required>
+                <option value="">-- Selecciona subestación --</option>
+
+                {% for sub in subestaciones %}
+                  {% if sub.unidad_responsable.id == edificio.unidad_responsable.id %}
+                    <option value="{{ sub.id }}">
+                      {{ sub.no_servicio }} - {{ sub.tarifa }}
+                    </option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+              <label for="servicios">Servicio (s)</label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
+              <button type="submit" class="btn btn-primary btn-guardar">
+                  <span class="texto-btn">Guardar</span>
+                  <span class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+              </button>
+              <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const formularios = document.querySelectorAll(".form-asignar");
+
+    formularios.forEach(function(form) {
+
+        form.addEventListener("submit", function() {
+
+            const boton = form.querySelector(".btn-guardar");
+            const texto = boton.querySelector(".texto-btn");
+            const spinner = boton.querySelector(".spinner-border");
+
+            boton.disabled = true;
+            texto.textContent = "Guardando...";
+            spinner.classList.remove("d-none");
+
+        });
+
+    });
+
+});
+
+document.getElementById("unidad_id").addEventListener("change", function() {
+    const unidad = this.value;
+    const url = new URL(window.location.href);
+    url.searchParams.set("unidad_id", unidad);
+    url.searchParams.delete("subestacion_id");
+    window.location.href = url.toString();
+});
+</script>
 {% endblock content %}

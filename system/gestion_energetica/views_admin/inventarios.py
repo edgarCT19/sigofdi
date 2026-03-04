@@ -4,10 +4,11 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.decorators.cache import never_cache
+from django.db.models import Sum
 
 from mongoengine.errors import DoesNotExist
 
-from system.models import InventarioClimatizacion, InventarioLuminarias, InventarioMiscelaneos, PeriodoInventario, UnidadResponsable
+from system.models import InventarioClimatizacion, InventarioLuminarias, InventarioMiscelaneos, PeriodoInventario, UnidadResponsable, Subestacion, Edificio
 from system.views import get_user
 from system.decorators import login_required_custom
 
@@ -107,6 +108,7 @@ def admin_inventarios_filtro(request):
         "total_consumo_misc": total_consumo_misc
     })
 
+# Inventarios - Exportar a Excel (Por tipo de inventario)
 @never_cache
 @login_required_custom
 def exportar_excel_inventario(request):
@@ -272,6 +274,7 @@ def exportar_excel_inventario(request):
     wb.save(response)
     return response
 
+# Inventarios - Exportar a Excel (De manera general, con todos los tipos en hojas separadas)
 @never_cache
 @login_required_custom
 def exportar_excel_inventario_general(request):
@@ -326,7 +329,7 @@ def exportar_excel_inventario_general(request):
     headers = [
         "Edificio", "Nivel", "Área", "Tipo Clima", "Marca", "Modelo", "Capacidad BTU/HR",
         "Voltaje", "Amperaje", "Potencia (W)", "Potencia total (Kw)",
-        "Horas al mes", "Consumo mensual"
+        "Horas al mes", "Consumo mensual (kWh/mes)"
     ]
     aplicar_estilos(ws, headers)
 
@@ -352,8 +355,8 @@ def exportar_excel_inventario_general(request):
     ws = wb.create_sheet("Luminarias")
     headers = [
         "Edificio", "Área", "Nivel", "Tipo Lámpara",
-        "N° Luminarias", "Potencia Total",
-        "Horas al mes", "Consumo mensual"
+        "N° Luminarias", "Lámparas/Luminaria", "Potencia (W)","Potencia Total (kW)",
+        "Horas al mes", "Consumo mensual (kWh/mes)"
     ]
     aplicar_estilos(ws, headers)
 
@@ -366,11 +369,11 @@ def exportar_excel_inventario_general(request):
         total_consumo += i.consumo_mensual or 0
         ws.append([
             i.edificio.nombre, i.area.nombre, i.nivel, i.tipo_lampara,
-            i.num_luminarias, i.potencia_total_lum,
+            i.num_luminarias, i.lamp_luminarias, i.potencia_lamp, i.potencia_total_lum,
             i.consumo_mensual_horas, i.consumo_mensual
         ])
 
-    ws.append([""] * 5 + [total_potencia, total_horas, total_consumo])
+    ws.append([""] * 7 + [total_potencia, total_horas, total_consumo])
     ajustar_columnas(ws)
 
     # =========================
@@ -378,8 +381,8 @@ def exportar_excel_inventario_general(request):
     # =========================
     ws = wb.create_sheet("Misceláneos")
     headers = [
-        "Edificio", "Nivel", "Área", "Equipo",
-        "Marca", "Modelo", "Potencia",
+        "Edificio", "Nivel", "Área", "Tipo de misceláneo",
+        "Marca", "Modelo", "Voltaje", "Amperaje", "Potencia (W)", "Potencia Total (kW)",
         "Horas al mes", "Consumo mensual"
     ]
     aplicar_estilos(ws, headers)
@@ -393,11 +396,11 @@ def exportar_excel_inventario_general(request):
         total_consumo += i.consumo_mensual or 0
         ws.append([
             i.edificio.nombre, i.nivel, i.area.nombre, i.miscelaneos,
-            i.marca, i.modelo, i.potencia,
+            i.marca, i.modelo, i.voltaje, i.amperaje, i.potencia, i.potencia_total,
             i.horas_mes, i.consumo_mensual
         ])
 
-    ws.append([""] * 6 + [total_potencia, total_horas, total_consumo])
+    ws.append([""] * 9 + [total_potencia, total_horas, total_consumo])
     ajustar_columnas(ws)
 
     # =========================
@@ -409,6 +412,335 @@ def exportar_excel_inventario_general(request):
     )
     nombre_archivo = f"Inventario_General_{unidad.nombre}_{periodo.nombre}_{anio}.xlsx"
     response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+
+    wb.save(response)
+    return response
+
+# Inventarios - Exportar a Excel (Agrupado por número de servicio, con todos los tipos en hojas separadas)
+@never_cache
+@login_required_custom
+def exportar_excel_inventario_por_no_servicio(request):
+
+    periodo_id = request.GET.get('periodo')
+
+    try:
+        periodo = PeriodoInventario.objects.get(id=periodo_id)
+    except DoesNotExist:
+        messages.error(request, "Periodo no encontrado.")
+        return redirect("admin_inventarios_filtro")
+
+    subestaciones = Subestacion.objects.all()
+
+    mapa_servicios = {}
+
+    for s in subestaciones:
+        ur_id = str(s.unidad_responsable.id)
+
+        if ur_id not in mapa_servicios:
+            mapa_servicios[ur_id] = []
+
+        mapa_servicios[ur_id].append(str(s.no_servicio))
+
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="305496", end_color="305496", fill_type="solid")
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    def aplicar_estilos(ws, headers):
+        ws.append(headers)
+        for col_num in range(1, len(headers) + 1):
+            cell = ws.cell(row=ws.max_row, column=col_num)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.border = border
+            cell.alignment = Alignment(horizontal="center")
+
+    def ajustar_columnas(ws):
+        for col in ws.columns:
+            max_length = 0
+            col_letter = get_column_letter(col[0].column)
+            for cell in col:
+                if cell.value:
+                    max_length = max(max_length, len(str(cell.value)))
+            ws.column_dimensions[col_letter].width = max_length + 2
+
+
+    unidades = UnidadResponsable.objects.all()
+
+    for unidad in unidades:
+
+        nombre_hoja = unidad.nombre[:30]
+        ws = wb.create_sheet(nombre_hoja)
+
+        campus = unidad.campus.nomenclatura
+        servicios = mapa_servicios.get(str(unidad.id), ["Sin servicio"])
+        servicio = ", ".join(servicios)
+
+        ws.append([f"Campus: {campus}"])
+        ws.append([f"Número de servicio: {servicio}"])
+        ws.append([""])
+
+        # ======= CLIMATIZACIÓN =======
+
+        ws.append(["CLIMATIZACIÓN"])
+        aplicar_estilos(ws, [
+            "Edificio", "No. Servicio", "Nivel", "Área", "Tipo Clima",
+            "Marca", "Modelo", "Capacidad BTU/HR", "Voltaje", "Amperaje", "Potencia (W)", "Potencia Total (kW)",
+            "Horas al mes", "Consumo mensual (kWh/mes)"
+        ])
+
+        climas = InventarioClimatizacion.objects.filter(
+            periodo=periodo,
+            unidad_responsable=unidad
+        ).select_related()
+
+        for i in climas:
+
+            numero_servicio = (
+                str(i.edificio.subestacion.no_servicio)
+                if i.edificio and i.edificio.subestacion
+                else "Sin servicio"
+            )
+
+            ws.append([
+                i.edificio.nombre,
+                numero_servicio,
+                i.nivel,
+                i.area.nombre,
+                i.tipo_clima,
+                i.marca,
+                i.modelo,
+                i.capacidad,
+                i.voltaje,
+                i.amperaje,
+                i.potencia,
+                i.potencia_total,
+                i.horas_mes,
+                i.consumo_mensual
+            ])
+
+        ws.append([""])
+
+        # ======= LUMINARIAS =======
+
+        ws.append(["LUMINARIAS"])
+        aplicar_estilos(ws, [
+            "Edificio", "No. Servicio", "Área", "Nivel",
+            "Tipo Lámpara", "N° Luminarias", "Lámparas/Luminaria", "Potencia por lámpara (W)",
+            "Potencia Total (kW)", "Horas al mes",
+            "Consumo mensual (kWh/mes)"
+        ])
+
+        luminarias = InventarioLuminarias.objects.filter(
+            periodo=periodo,
+            unidad_responsable=unidad
+        ).select_related()
+
+
+        for i in luminarias:
+
+            numero_servicio = (
+                str(i.edificio.subestacion.no_servicio)
+                if i.edificio and i.edificio.subestacion
+                else "Sin servicio"
+            )
+
+            ws.append([
+                i.edificio.nombre,
+                numero_servicio,
+                i.area.nombre,
+                i.nivel,
+                i.tipo_lampara,
+                i.num_luminarias,
+                i.lamp_luminarias,
+                i.potencia_lamp,
+                i.potencia_total_lum,
+                i.consumo_mensual_horas,
+                i.consumo_mensual
+            ])
+
+        ws.append([""])
+
+        # ======= MISCELÁNEOS =======
+
+        ws.append(["MISCELÁNEOS"])
+        aplicar_estilos(ws, [
+            "Edificio", "No. Servicio", "Nivel", "Área",
+            "Tipo de misceláneo", "Marca", "Modelo", "Voltaje", "Amperaje", "Potencia (W)", "Potencia Total (kW)",
+            "Horas al mes", "Consumo mensual (kWh/mes)"
+        ])
+
+        miscelaneos = InventarioMiscelaneos.objects.filter(
+            periodo=periodo,
+            unidad_responsable=unidad
+        ).select_related()
+
+        for i in miscelaneos:
+
+            numero_servicio = (
+                str(i.edificio.subestacion.no_servicio)
+                if i.edificio and i.edificio.subestacion
+                else "Sin servicio"
+            )
+
+            ws.append([
+                i.edificio.nombre,
+                numero_servicio,
+                i.nivel,
+                i.area.nombre,
+                i.miscelaneos,
+                i.marca,
+                i.modelo,
+                i.voltaje,
+                i.amperaje,
+                i.potencia,
+                i.potencia_total,
+                i.horas_mes,
+                i.consumo_mensual
+            ])
+
+        ajustar_columnas(ws)
+
+
+    anio = periodo.fecha_inicio.year
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+    nombre_archivo = f"Inventario_Por_Servicio{periodo.nombre}_{anio}.xlsx"
+    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+
+    wb.save(response)
+    return response
+
+# Inventarios - Exportar a Excel (Análisis por edificio, con consumo total por tipo y mayor consumo denominado desempeño energético)
+@never_cache
+@login_required_custom
+def exportar_analisis_consumo_edificios(request):
+
+    unidad_id = request.GET.get('unidad')
+    periodo_id = request.GET.get('periodo')
+
+    if not unidad_id or not periodo_id:
+        messages.error(request, "Debe seleccionar Unidad y Periodo.")
+        return redirect("inventarios_filtro_triple")
+
+    try:
+        unidad = UnidadResponsable.objects.get(id=unidad_id)
+        periodo = PeriodoInventario.objects.get(id=periodo_id)
+    except DoesNotExist:
+        messages.error(request, "Unidad o periodo no encontrado.")
+        return redirect("inventarios_filtro_triple")
+
+    # ===== OBTENER DATOS DE CAMPUS Y SERVICIOS =====
+    subestaciones = Subestacion.objects.filter(unidad_responsable=unidad)
+
+    numeros_servicio = ", ".join(
+        str(s.no_servicio) for s in subestaciones
+    ) or "Sin servicio"
+
+    campus = unidad.campus.nomenclatura if unidad.campus else "Sin campus"
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Análisis por Edificio"
+
+    headers = [
+        "Campus",
+        "Número de Servicio",
+        "Unidad Responsable",
+        "Edificio",
+        "Consumo Climatización",
+        "Consumo Luminarias",
+        "Consumo Misceláneos",
+        "Mayor Consumo",
+        "Consumo Mayor (kWh)"
+    ]
+
+    ws.append(headers)
+
+    edificios = Edificio.objects.filter(unidad_responsable=unidad)
+
+    for edificio in edificios:
+
+        if edificio.subestacion and edificio.subestacion.no_servicio:
+            numeros_servicio = str(edificio.subestacion.no_servicio)
+        else:
+            numeros_servicio = "Sin servicio"
+
+        total_clima = sum(
+            float(i.consumo_mensual or 0)
+            for i in InventarioClimatizacion.objects.filter(
+                unidad_responsable=unidad,
+                periodo=periodo,
+                edificio=edificio
+            )
+        )
+
+        total_lum = sum(
+            float(i.consumo_mensual or 0)
+            for i in InventarioLuminarias.objects.filter(
+                unidad_responsable=unidad,
+                periodo=periodo,
+                edificio=edificio
+            )
+        )
+
+        total_misc = sum(
+            float(i.consumo_mensual or 0)
+            for i in InventarioMiscelaneos.objects.filter(
+                unidad_responsable=unidad,
+                periodo=periodo,
+                edificio=edificio
+            )
+        )
+
+        consumos = {
+            "Climatización": total_clima,
+            "Luminarias": total_lum,
+            "Misceláneos": total_misc
+        }
+
+        mayor_tipo = max(consumos, key=consumos.get)
+        mayor_valor = consumos[mayor_tipo]
+
+        ws.append([
+            campus,
+            numeros_servicio,
+            unidad.nombre,
+            edificio.nombre,
+            total_clima,
+            total_lum,
+            total_misc,
+            mayor_tipo,
+            mayor_valor
+        ])
+
+    # Ajustar columnas
+    for col in ws.columns:
+        max_length = 0
+        col_letter = get_column_letter(col[0].column)
+
+        for cell in col:
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+
+        ws.column_dimensions[col_letter].width = max_length + 2
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="Desempeño_Energético_{unidad.nombre}_{periodo.nombre}.xlsx"'
+    )
 
     wb.save(response)
     return response

@@ -15,7 +15,7 @@
             <select class="" name="unidad" id="unidad" required>
               <option value="">-- Selecciona --</option>
               {% for unidad in unidades %}
-                <option value="{{ unidad.id }}" {% if unidad_seleccionada == unidad.id|stringformat:"s" %}selected{% endif %}>{{ unidad.nombre }} - {{ unidad.campus.nomenclatura }}</option>
+                <option value="{{ unidad.id }}" {% if unidad_seleccionada == unidad.id|stringformat:"s" %}selected{% endif %}>{{ unidad.nombre }} - ({{ unidad.campus.nomenclatura }})</option>
               {% endfor %}
             </select>
             <label for="unidad" class="">Unidad Responsable</label>
@@ -46,6 +46,25 @@
           </div>
         </div>
       </form>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+
+        <!-- BOTÓN EXPORTAR POR UR -->
+        <a id="btnExportarUR"
+          class="btn btn-success mx-2 disabled"
+          href="#"
+          title="Debe seleccionar una Unidad Responsable y un Periodo para habilitar este botón">
+          Exportar por UR
+        </a>
+
+        <!-- BOTÓN EXPORTAR POR No. SERVICIO -->
+        <a id="btnExportarServicio"
+          class="btn btn-success mx-2 disabled"
+          href="#"
+          title="Debe seleccionar un Periodo para habilitar este botón">
+          Exportar por No. Servicio General
+        </a>
+
+      </div>
    </div>
 
   <!-- Tabla de Resultados -->
@@ -54,14 +73,24 @@
     <div class="d-flex justify-content-end align-items-center flex-wrap gap-2 p-2 mx-1">
         {% if registros %}
           <a href="{% url 'exportar_excel_inventario' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}&tipo={{ tipo_seleccionado }}" 
-          class="btn btn-success mx-2" title="Exportar a Excel">Exportar</a>
-          <a href="{% url 'inventarios_filtro_triple' %}" class="btn btn-secondary mx-2">Limpiar</a>
-        {% endif %}
-          <a href="{% url 'exportar_excel_inventario_general' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}"
-            class="btn btn-primary mx-2"
-            title="Exportar inventario general">
-            Exportar General
+          class="btn btn-success mx-2" title="Exportar a Excel">Exportar por inventario</a>
+          <a href="{% url 'exportar_analisis_consumo_edificios' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}"
+            class="btn btn-success mx-2"
+            title="Análisis de mayor consumo por edificio">
+            Desempeño energético
           </a>
+        {% endif %}
+         <!--<a href="{% url 'exportar_excel_inventario_general' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}"
+            class="btn btn-success mx-2"
+            title="Exportar inventario general">
+            Exportar por UR
+          </a>-->
+          <!--<a href="{% url 'exportar_excel_inventario_por_no_servicio' %}?unidad={{ unidad_seleccionada }}&periodo={{ periodo_seleccionado }}"
+            class="btn btn-success mx-2"
+            title="Exportar por Campus">
+            Exportar por No. Servicio
+          </a>-->
+          <a href="{% url 'inventarios_filtro_triple' %}" class="btn btn-secondary mx-2">Limpiar</a>
     </div>
     <div class="d-flex justify-content-center align-items-center">
       <div class="table-container">
@@ -253,6 +282,52 @@
       });
     });
   });
+
+  document.addEventListener("DOMContentLoaded", function() {
+
+    const unidad = document.getElementById("unidad");
+    const periodo = document.getElementById("periodo");
+
+    const btnUR = document.getElementById("btnExportarUR");
+    const btnServicio = document.getElementById("btnExportarServicio");
+
+    function actualizarBotones() {
+
+        const unidadVal = unidad.value;
+        const periodoVal = periodo.value;
+
+        // ---- BOTÓN EXPORTAR POR UR ----
+        if (unidadVal && periodoVal) {
+            btnUR.classList.remove("disabled");
+            btnUR.href = "{% url 'exportar_excel_inventario_general' %}?unidad=" 
+                         + unidadVal + "&periodo=" + periodoVal;
+            btnUR.title = "Exportar inventario por Unidad Responsable";
+        } else {
+            btnUR.classList.add("disabled");
+            btnUR.href = "#";
+            btnUR.title = "Debe seleccionar una Unidad Responsable y un Periodo";
+        }
+
+        // ---- BOTÓN EXPORTAR POR No. SERVICIO ----
+        if (periodoVal) {
+            btnServicio.classList.remove("disabled");
+            btnServicio.href = "{% url 'exportar_excel_inventario_por_no_servicio' %}?periodo=" 
+                               + periodoVal;
+            btnServicio.title = "Exportar por Número de Servicio";
+        } else {
+            btnServicio.classList.add("disabled");
+            btnServicio.href = "#";
+            btnServicio.title = "Debe seleccionar un Periodo";
+        }
+    }
+
+    // Ejecutar al cargar (por si ya vienen filtros seleccionados)
+    actualizarBotones();
+
+    // Detectar cambios
+    unidad.addEventListener("change", actualizarBotones);
+    periodo.addEventListener("change", actualizarBotones);
+ });
 </script>
 
 {% endblock %}

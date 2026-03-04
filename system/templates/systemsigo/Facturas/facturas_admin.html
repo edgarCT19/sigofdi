@@ -13,7 +13,7 @@
           <option value="">-- Unidad Responsable --</option>
           {% for unidad in unidades %}
             <option value="{{ unidad.id }}" {% if filtros.ur_id == unidad.id|stringformat:"s" %}selected{% endif %}>
-              {{ unidad.nombre }}
+              {{ unidad.nombre }} - ({{ unidad.campus.nomenclatura }})
             </option>
           {% endfor %}
         </select>

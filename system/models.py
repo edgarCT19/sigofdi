@@ -6,7 +6,7 @@ from mongoengine import (
     ReferenceField, IntField, DecimalField, DictField,
     FileField, ObjectIdField, ListField
 )
-from mongoengine import DENY, ValidationError
+from mongoengine import DENY, NULLIFY, ValidationError
 from datetime import date
 
 ######################################################################################
@@ -127,29 +127,6 @@ class PasswordResetCode(Document):
 
     meta = {'collection': 'password_reset_codes'}
 
-class Edificio(Document):
-    nombre = StringField(required=True)
-    responsable_alta = StringField()
-    unidad_responsable = ReferenceField(UnidadResponsable, reverse_delete_rule=DENY)
-    fecha_registro = DateTimeField(default=datetime.now)
-
-    meta = {
-        'indexes': ['nombre', 'unidad_responsable']
-    }
-
-class Area(Document):
-    nombre = StringField(required=True)
-    unidad_responsable = ReferenceField(UnidadResponsable, reverse_delete_rule=DENY)
-    edificio = ReferenceField(Edificio)
-    fecha_registro = DateTimeField(default=datetime.now)
-    responsable = StringField()
-    telefono = StringField()
-    cargo = StringField()
-    grado_estudio = StringField()
-
-    meta = {
-        'indexes': ['nombre', 'unidad_responsable']
-    }
 
 class Subestacion(Document):
     unidad_responsable = ReferenceField(UnidadResponsable, reverse_delete_rule=DENY)
@@ -166,6 +143,36 @@ NIVELES = (
     "1", "2", "3", "4",
     "Planta baja", "Planta alta", "Sin planta"
 )
+
+class Edificio(Document):
+    nombre = StringField(required=True)
+    responsable_alta = StringField()
+    unidad_responsable = ReferenceField(UnidadResponsable, reverse_delete_rule=DENY)
+    subestacion = ReferenceField(Subestacion, reverse_delete_rule=NULLIFY)
+    fecha_registro = DateTimeField(default=datetime.now)
+
+    meta = {
+        'indexes': ['nombre', 'unidad_responsable']
+    }
+
+    def clean(self):
+        if self.subestacion and self.unidad_responsable:
+            if self.subestacion.unidad_responsable != self.unidad_responsable:
+                raise ValidationError("La subestación asignada no pertenece a la unidad responsable del edificio.")
+
+class Area(Document):
+    nombre = StringField(required=True)
+    unidad_responsable = ReferenceField(UnidadResponsable, reverse_delete_rule=DENY)
+    edificio = ReferenceField(Edificio)
+    fecha_registro = DateTimeField(default=datetime.now)
+    responsable = StringField()
+    telefono = StringField()
+    cargo = StringField()
+    grado_estudio = StringField()
+
+    meta = {
+        'indexes': ['nombre', 'unidad_responsable']
+    }
 
 class PeriodoInventario(Document):
     nombre = StringField(required=True, unique=True)  # Asegura que no se repita el nombre

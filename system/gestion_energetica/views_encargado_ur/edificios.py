@@ -90,7 +90,8 @@ def alta_edificio(request):
         Edificio(
             nombre=nombre,
             responsable_alta=user.nombres,
-            unidad_responsable=ur
+            unidad_responsable=ur,
+            subestacion=None
         ).save()
 
         messages.success(request, "Edificio registrado exitosamente.")

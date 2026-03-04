@@ -6,7 +6,8 @@ from django.conf.urls.static import static
 from .gestion_energetica.views_admin.index import Inicio
 from .gestion_energetica.views_admin.campus import listar_campus, crear_campus, editar_campus, eliminar_campus
 from .gestion_energetica.views_admin.unidades_responsables import listar_unidades, crear_unidad, editar_unidad, eliminar_unidad
-from .gestion_energetica.views_admin.edificios import listar_edificios_admin
+from .gestion_energetica.views_admin.edificios import (listar_edificios_admin, asignar_subestacion_edificio
+                                                       , exportar_excel_por_numero_servicio)
 from .gestion_energetica.views_admin.usuarios import (
     User_List, Add_User, Edit_User, Delete_User, usuarios_inactivos,
     reactivar_usuario, eliminar_permanente)
@@ -21,7 +22,9 @@ from .gestion_energetica.views_admin.facturas import (
     api_subestaciones_por_ur, editar_factura_triple_admin,
     eliminar_factura_triple_admin, crear_factura_pdbt,
     editar_factura_pdbt_admin, eliminar_factura_pdbt_admin, listar_facturas_pdbt_admin, listar_facturas_triple_admin)
-from .gestion_energetica.views_admin.inventarios import admin_inventarios_filtro, exportar_excel_inventario, exportar_excel_inventario_general
+from .gestion_energetica.views_admin.inventarios import (admin_inventarios_filtro, exportar_excel_inventario, 
+                                                         exportar_excel_inventario_general, historiales_registros_inventarios_admin,
+                                                         exportar_excel_inventario_por_no_servicio, exportar_analisis_consumo_edificios)
 
 from .gestion_energetica.views_admin.inventario_climatizacion import ( listado_inventario_climatizacion, 
     registrar_inventario_climatizacion_admin, editar_inventario_climatizacion_admin, eliminar_inventario_climatizacion_admin)
@@ -29,8 +32,6 @@ from .gestion_energetica.views_admin.inventario_luminarias import ( listado_inve
     registrar_inventario_luminarias_admin, editar_inventario_luminarias_admin, eliminar_inventario_luminarias_admin)
 from .gestion_energetica.views_admin.inventario_miscelaneos import ( listado_inventario_miscelaneos, 
     registrar_inventario_miscelaneos_admin, editar_inventario_miscelaneos_admin, eliminar_inventario_miscelaneos_admin)
-
-from .gestion_energetica.views_admin.inventarios import historiales_registros_inventarios_admin
 
 from .gestion_energetica.views_admin.historial_climas import (historial_climatizacion_admin, dar_baja_inventario_climatizacion,
     registro_climatizacion_bajas_admin, restaurar_registro_climatizacion)  
@@ -155,6 +156,8 @@ urlpatterns = [
     path('campus/eliminar/<str:campus_id>/', eliminar_campus, name='eliminar_campus'),
     # Link de lista de edificios de ur del sistema
     path('todos_los_edificios/', listar_edificios_admin, name='todos_edificios'),
+    path('edificios/editar/admin/', asignar_subestacion_edificio, name='asignar_subestacion_edificio'),
+    path('edificios/exportar/por_numero_servicio/', exportar_excel_por_numero_servicio, name='exportar_excel_por_numero_servicio'),
     # Link de lista de todas las areas del sistema
     path('todas_las_areas/', listar_areas_admin, name='todas_las_areas'),
     # Subestaciones de urs
@@ -179,6 +182,8 @@ urlpatterns = [
     path("inventarios/filtro/triple/", admin_inventarios_filtro, name="inventarios_filtro_triple"),
     path('inventarios/exportar/', exportar_excel_inventario, name='exportar_excel_inventario'),
     path('inventarios/exportar/general/', exportar_excel_inventario_general, name='exportar_excel_inventario_general'),
+    path('inventarios/exportar/por_no_servicio/', exportar_excel_inventario_por_no_servicio, name='exportar_excel_inventario_por_no_servicio'),
+    path('inventarios/exportar/analisis_consumo_edificios/', exportar_analisis_consumo_edificios, name='exportar_analisis_consumo_edificios'),
     # Links de captura de datos de inventarios energeticos (Climatizacion)
     path('listado/inventarios/climatizacion/', listado_inventario_climatizacion, name='listado_inventario_climatizacion'),
     path('inventario/climatizacion/agregar/', registrar_inventario_climatizacion_admin, name='registrar_inventario_climatizacion_admin'),
