@@ -45,3 +45,6 @@ Thumbs.db
 # =========================
 node_modules/
 dist/
+
+# Archivo de diagrama de clases para MongoEngine
+modelo_mongoengine.puml

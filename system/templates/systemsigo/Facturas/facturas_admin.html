@@ -23,15 +23,17 @@
         <select name="subestacion" onchange="this.form.submit()">
           <option value="">-- Servicios --</option>
           {% for sub in subestaciones %}
-            <option value="{{ sub.id }}" {% if filtros.sub_id == sub.id|stringformat:"s" %}selected{% endif %}>
-              {{ sub.no_medidor }} ({{ sub.tarifa }})
+            <option value="{{ sub.id }}" 
+                    data-tarifa="{{ sub.tarifa }}"
+                    {% if filtros.sub_id == sub.id|stringformat:"s" %}selected{% endif %}>
+              {{ sub.no_servicio }}
             </option>
           {% endfor %}
         </select>
         <label>Servicio</label>
       </div>
       <div class="col-md-3 material-input">
-        <select name="tipo_tarifa" onchange="this.form.submit()">
+        <select name="tipo_tarifa" id="tipo_tarifa" onchange="this.form.submit()" disabled>
           <option value="">-- Tipo Tarifa --</option>
           <option value="GDMTH" {% if filtros.tipo_tarifa == 'GDMTH' %}selected{% endif %}>GDMTH</option>
           <option value="GDMTO" {% if filtros.tipo_tarifa == 'GDMTO' %}selected{% endif %}>GDMTO</option>
@@ -39,6 +41,8 @@
           <option value="PDBT" {% if filtros.tipo_tarifa == 'PDBT' %}selected{% endif %}>PDBT</option>
         </select>
         <label>Tipo de Tarifa</label>
+        <input type="hidden" name="tipo_tarifa" id="tipo_tarifa_hidden"
+          value="{{ filtros.tipo_tarifa }}">
       </div>
       <div class="col-md-3 material-input">
         <select name="anio" onchange="this.form.submit()">
@@ -356,6 +360,31 @@ function confirmarEliminacion(facturaId) {
       }
     });
   }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const subSelect = document.querySelector('select[name="subestacion"]');
+  const tarifaSelect = document.getElementById("tipo_tarifa");
+  const tarifaHidden = document.getElementById("tipo_tarifa_hidden");
+
+  function actualizarTarifa() {
+    const selectedOption = subSelect.options[subSelect.selectedIndex];
+    const tarifa = selectedOption.dataset.tarifa;
+
+    if (tarifa) {
+      tarifaSelect.value = tarifa;     // visual
+      tarifaHidden.value = tarifa;     // lo que se envía
+    }
+  }
+
+  subSelect.addEventListener("change", function () {
+    actualizarTarifa();
+    this.form.submit(); // mantiene tu comportamiento actual
+  });
+
+  // Importante: al cargar la página
+  actualizarTarifa();
+});
 
  </script>
 {% endblock %}

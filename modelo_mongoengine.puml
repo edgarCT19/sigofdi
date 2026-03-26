@@ -129,6 +129,7 @@ entity Edificio {
   nombre : StringField
   responsable_alta : StringField
   unidad_responsable : ReferenceField
+  subestacion : ReferenceField
   fecha_registro : DateTimeField
   id : ObjectIdField
 }
@@ -332,7 +333,7 @@ entity Usuario {
   apellidos : StringField
   email : EmailField
   telefono : StringField
-  unidad_responsable : ReferenceField
+  unidad_responsable : ListField
   rol : StringField
   is_active : BooleanField
   fecha_alta : DateTimeField
@@ -379,6 +380,7 @@ CentroAcopioRRR --> UnidadResponsable : unidad_responsable
 CentroAcopioRRR --> Usuario : creado_por
 CentroAcopioRRR --> Usuario : actualizado_por
 Edificio --> UnidadResponsable : unidad_responsable
+Edificio --> Subestacion : subestacion
 FacturaEnergeticaTriple --> Subestacion : subestacion
 FacturaEnergeticaTriple --> Usuario : creado_por
 FacturaEnergeticaTriple --> Usuario : actualizado_por
@@ -416,7 +418,6 @@ Medidores --> Usuario : actualizado_por
 PasswordResetCode --> Usuario : usuario
 Subestacion --> UnidadResponsable : unidad_responsable
 UnidadResponsable --> Campus : campus
-Usuario --> UnidadResponsable : unidad_responsable
 Usuario --> Usuario : creado_por
 VertederoMunicipal --> UnidadResponsable : unidad_responsable
 VertederoMunicipal --> Usuario : creado_por

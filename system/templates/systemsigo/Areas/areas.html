@@ -44,7 +44,6 @@
         </div>
         <div class="d-flex justify-content-center align-items-center">
             <div class="table-container">
-                {% if areas %}
                 <table class="styled-table text-center">
                     <thead class="">
                         <tr class="text-center">
@@ -73,30 +72,13 @@
                             <td>{{ area.grado_estudio }}</td>
                             <td>{{ area.fecha_registro|date:"d/m/Y H:i" }}</td>
                         </tr>
+                        {% empty %}
+                        <tr>
+                        <td colspan="18" class="text-center">No has seleccionado los filtros o no hay registros disponibles.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                {% else %}
-                    <table class="styled-table text-center">
-                        <thead class="">
-                            <tr class="text-center">
-                                <th colSpan="12" className="table-title" style='background-color: var(--color-uacam-table-header); font-size: 15px;' >
-                                    Lista de áreas de los edificios de Unidades Responsables
-                                </th>
-                            </tr>
-                            <tr class="text-center">
-                                <th>Nombre del Área</th>
-                                <th>Edificio</th>
-                                <th>Responsable</th>
-                                <th>Teléfono</th>
-                                <th>Cargo</th>
-                                <th>Grado de Estudio</th>
-                                <th>Fecha de Registro</th>
-                            </tr>
-                        </thead>
-                    </table>
-                    <p class="text-center">No hay áreas para mostrar.</p>
-                {% endif %}
             </div>
         </div>
     </div>
