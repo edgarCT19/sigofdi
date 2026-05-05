@@ -322,7 +322,7 @@ class FacturaEnergeticaTriple(Document):
     tipo_tarifa = StringField(choices=["GDMTH", "GDMTO", "GDBT"])
     subestacion = ReferenceField(Subestacion, reverse_delete_rule=DENY)
     dias_periodo = IntField() 
-    periodo = DateTimeField(required=True)
+    periodo = DateTimeField(required=True) #Cambio
     consumo = DecimalField(precision=2, force_string=True)
     demanda_maxima = IntField()
     factor_potencia = DecimalField(precision=2, force_string=True)
