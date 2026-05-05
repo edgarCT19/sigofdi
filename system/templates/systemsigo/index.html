@@ -2,137 +2,371 @@
 {% load static %}
 
 {% block content %}
-<style>
-.illustration-dark {
-  display: none;
-}
 
-body.dark-mode .illustration-light {
-  display: none;
-}
+  <div class="row">
 
-body.dark-mode .illustration-dark {
-  display: inline;
-}
-
-/* Íconos de la segunda sección */
-.icon-feature {
-  font-size: 2.5rem;
-  color: var(--color-uacam-black);
-  margin-bottom: 0.5rem;
-}
-
-body.dark-mode .icon-feature {
-  color: #f8f9fa;
-}
-</style>
-
-<div class="card border-0 shadow-sm rounded-4 my-2">
-  <div class="card-body py-5 px-4">
-    <div class="row align-items-center">
-      <div class="col-md-6 text-start">
-        <h1 class="fw-bold display-5 mb-3 text-secondary">
-          Bienvenido al <span style="color: var(--color-uacam-black);">
-            Sistema Integrado de Gestión Online
-          </span>
-        </h1>
-        <p class="lead text-secondary mb-4">
-          Ha llegado el momento de optimizar el consumo energético de tu organización a través del software.
-        </p>
-      </div>
-
-      <div class="col-md-6 text-center position-relative">
-        <!-- Imagen modo claro -->
-        <img src="{% static 'images/ilustraciones_svg/data-storage-light.svg' %}"
-             alt="Ilustración eficiencia energética modo claro"
-             class="img-fluid illustration-light" style="max-height: 350px;">
-
-        <!-- Imagen modo oscuro -->
-        <img src="{% static 'images/ilustraciones_svg/data-storage.svg' %}"
-             alt="Ilustración eficiencia energética modo oscuro"
-             class="img-fluid illustration-dark" style="max-height: 350px;">
-      </div>
-    </div>
-  </div>
-</div>
-
-<section class="container py-5">
-  <div class="text-center mb-5">
-    <h2 class="fw-semibold text-secondary">Gestión de la información</h2>
-    <p>
-      Gestiona, analiza y controla la información de tu organización desde aquí.
-    </p>
-  </div>
-  
-  <div class="row text-center g-4">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100 p-4">
-        <i class="bi bi-clipboard-data icon-feature"></i>
-        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Inventarios periódicos</h5>
-        <p class="text-secondary">
-          Realiza el inventario energético que se requiera desde Aires Acondicionados hasta los 
-          cargadores de dispositivos electrónicos.
-        </p>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100 p-4">
-        <i class="bi bi-file-earmark-excel icon-feature"></i>
-        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Reportes automáticos</h5>
-        <p class="text-secondary">
-          Genera reportes y compara periodos para decisiones basadas en datos (en hojas de cálculo).
-        </p>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100 p-4">
-        <i class="bi bi-bell icon-feature"></i>
-        <h5 class="fw-bold mb-2" style="color: var(--color-uacam-black);">Alertas inteligentes</h5>
-        <p class="text-secondary">
-          Recibe notificaciones cuando el consumo supere los límites establecidos.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="container py-2">
-  <div class="text-center mb-5">
-    <h2 class="fw-semibold text-secondary">Sistema Integrado de Gestión</h2>
-    <p>
-      Herramientas integradas para gestión energética y gestión ambiental.
-    </p>
-  </div>
-
-  <div class="row g-4 justify-content-center">
-    <!-- Tarjeta 1 -->
-    <div class="col-md-5">
-      <div class="card border-0 shadow-lg rounded-4 d-flex flex-row align-items-center p-3 h-100">
-        <img src="{% static 'images/gest-energia.jpg' %}" class="img-fluid rounded-3 me-3" alt="Dashboard energético" style="width: 40%;">
-        <div>
-          <h5 class="fw-bold" style="color: var(--color-uacam-black);">Gestión energética</h5>
-          <p class="text-secondary mb-0">
-            Visualiza indicadores clave de consumo, compara áreas y detecta oportunidades de mejora.
-          </p>
+    <div class="col-md-3 mb-3">
+      <div class="card card-widget h-100 rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <span class="widget-title">Edificios</span>
+            <i class="bi bi-building widget-icon"></i>
+          </div>
+          <div class="widget-value">{{ total_edificios }}</div>
+          <div class="widget-footer">Infraestructura registrada</div>
         </div>
       </div>
     </div>
 
-    <!-- Tarjeta 2 -->
-    <div class="col-md-5">
-      <div class="card border-0 shadow-lg rounded-4 d-flex flex-row align-items-center p-3 h-100">
-        <img src="{% static 'images/gest-ambiental.jpg' %}" class="img-fluid rounded-3 me-3" alt="Aplicación móvil" style="width: 40%;">
-        <div>
-          <h5 class="fw-bold" style="color: var(--color-uacam-black);">Gestión Ambiental</h5>
-          <p class="text-secondary mb-0">
-            Accede a tu información registrada para su análisis detallado y mejorar la toma de decisiones.
-          </p>
+    <div class="col-md-3 mb-3">
+      <div class="card card-widget h-100 rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <span class="widget-title">Áreas</span>
+            <i class="bi bi-diagram-3 widget-icon"></i>
+          </div>
+          <div class="widget-value">{{ total_areas }}</div>
+          <div class="widget-footer">Distribución operativa</div>
         </div>
       </div>
     </div>
-  </div>
-</section>
 
+    <div class="col-md-3 mb-3">
+      <div class="card card-widget h-100 rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <span class="widget-title">Servicios</span>
+            <i class="bi bi-lightning widget-icon"></i>
+          </div>
+          <div class="widget-value">{{ total_subestaciones }}</div>
+          <div class="widget-footer">Puntos energéticos</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card card-widget h-100 rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <span class="widget-title">Periodos activos</span>
+            <i class="bi bi-calendar-check widget-icon"></i>
+          </div>
+          <div class="widget-value">{{ periodos_activos }}</div>
+          <div class="widget-footer">Seguimiento actual</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-4 mb-3">
+      <div class="card shadow-sm rounded-4 h-100 bienvenida-card">
+        <div class="card-body d-flex flex-column justify-content-center">
+
+          <!-- Nombre de la UR -->
+          <h6 class="text-center mb-2 fw-semibold">
+            {{ ur_top_nombre }}
+          </h6>
+
+          <!-- Gráfica -->
+          <div id="pieChart" style="height:200px; width: 100%;"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="row">
+
+        <div class="col-md-6 mb-3">
+          <div class="card card-dashboard h-100 rounded-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <span class="card-title-small">Consumo total</span>
+                <i class="bi bi-lightning-charge card-icon"></i>
+              </div>
+              <h3 class="card-value">{{ consumo_total|floatformat:0 }}</h3>
+              <span class="card-trend">kWh acumulados</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <div class="card card-dashboard h-100 rounded-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <span class="card-title-small">Consumo promedio</span>
+                <i class="bi bi-activity card-icon"></i>
+              </div>
+              <h3 class="card-value">{{ consumo_promedio|floatformat:2 }}</h3>
+              <span class="card-trend">kWh por equipo</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <div class="card card-dashboard h-100 rounded-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <span class="card-title-small">Facturación total</span>
+                <i class="bi bi-cash-stack card-icon"></i>
+              </div>
+              <h3 class="card-value">${{ total_facturacion|floatformat:0 }} MXN</h3>
+              <span class="card-trend">MXN</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <div class="card card-dashboard h-100 rounded-4">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <span class="card-title-small">Mayor facturación (mes)</span>
+                <i class="bi bi-trophy card-icon"></i>
+              </div>
+
+              <h3 class="card-value">
+                ${{ ur_top_monto|floatformat:0 }} MXN
+              </h3>
+
+              <span class="card-trend">{{ ur_top_nombre_facturacion }}</span>
+            </div>
+          </div>
+        </div> 
+      </div>
+    </div>
+
+    
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 mb-3">
+    <div class="card shadow-sm rounded-4 h-100">
+      <div class="card-body">
+
+        <!-- Filtro por año -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="titulo-graficas mb-2 fw-semibold">
+            Costos por mes / Consumo por mes
+          </h6>
+
+          <form method="GET">
+            <div class="material-input mt-3">
+              <select name="anio" class=" form-select-sm" onchange="this.form.submit()">
+                {% for a in anios_disponibles %}
+                  <option value="{{ a }}" {% if a == anio_actual %}selected{% endif %}>
+                    {{ a }}
+                  </option>
+                {% endfor %}
+              </select>
+              <label for="">Año</label>
+            </div>
+          </form>
+        </div>
+
+        <!-- Chart -->
+        <div id="lineChart" style="height:300px;"></div>
+
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <!-- UR -->
+    <div class="col-md-4 mb-3">
+      <div class="card card-dashboard h-100 rounded-4">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between">
+            <span class="card-title-small">Unidad con mayor consumo</span>
+            <i class="bi bi-building card-icon"></i>
+          </div>
+
+          <h5 class="mt-2 top_dato">{{ top_ur }}</h5>
+
+          <div class="card-value">
+            {{ top_ur_consumo|floatformat:0 }} kWh
+          </div>
+
+          <span class="card-trend">Mayor demanda energética</span>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIFICIO -->
+    <div class="col-md-4 mb-3">
+      <div class="card card-dashboard h-100 rounded-4">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between">
+            <span class="card-title-small">Edificio con mayor consumo</span>
+            <i class="bi bi-house-door card-icon"></i>
+          </div>
+
+          <h5 class="mt-2 top_dato">{{ top_edificio }}</h5>
+
+          <div class="card-value">
+            {{ top_edificio_consumo|floatformat:0 }} kWh
+          </div>
+
+          <span class="card-trend">Alto uso energético</span>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- AREA -->
+    <div class="col-md-4 mb-3">
+      <div class="card card-dashboard h-100 rounded-4">
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between">
+            <span class="card-title-small">Área con más equipos</span>
+            <i class="bi bi-diagram-3 card-icon"></i>
+          </div>
+
+          <h5 class="mt-2 top_dato">{{ top_area }}</h5>
+
+          <div class="card-value">
+            {{ top_area_equipos }}
+          </div>
+
+          <span class="card-trend">Alta densidad operativa</span>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const chartDom = document.getElementById('pieChart');
+    const myChart = echarts.init(chartDom);
+
+    // Datos desde Django
+    const data = JSON.parse('{{ donut_ur_data|escapejs }}');
+
+    const option = {
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        bottom: 0,
+        left: 'center',
+        type: 'scroll', // Scroll clave para diseños responsivos
+        orient: 'horizontal',
+        textStyle: {
+          fontSize: 12
+        }
+      },
+      series: [
+        {
+          name: 'Inventario',
+          type: 'pie',
+          radius: ['45%', '75%'],
+          center: ['50%', '50%'],
+          avoidLabelOverlap: false,
+
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+
+          label: {
+            show: false,
+            position: 'center'
+          },
+
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: 16,
+              fontWeight: 'bold',
+              formatter: '{b}\n{c}'
+            }
+          },
+
+          labelLine: {
+            show: false
+          },
+
+          data: data
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+
+    window.addEventListener('resize', function () {
+      myChart.resize();
+    });
+
+  });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const chartDom = document.getElementById('lineChart');
+  const myChart = echarts.init(chartDom);
+
+  const meses = JSON.parse('{{ meses_labels|escapejs }}');
+  const consumo = JSON.parse('{{ consumo_data|escapejs }}');
+  const costo = JSON.parse('{{ costo_data|escapejs }}');
+
+  const option = {
+    tooltip: {
+      trigger: 'axis'
+    },
+    legend: {
+      data: ['Consumo (kWh)', 'Costo (MXN)']
+    },
+    xAxis: {
+      type: 'category',
+      data: meses
+    },
+    yAxis: [
+      {
+        type: 'value',
+        name: 'kWh'
+      },
+      {
+        type: 'value',
+        name: 'MXN'
+      }
+    ],
+    series: [
+      {
+        name: 'Consumo (kWh)',
+        type: 'line',
+        smooth: true,
+        data: consumo
+      },
+      {
+        name: 'Costo (MXN)',
+        type: 'line',
+        smooth: true,
+        yAxisIndex: 1,
+        data: costo
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+
+  window.addEventListener('resize', function () {
+    myChart.resize();
+  });
+
+});
+</script>
 {% endblock content %}

@@ -48,3 +48,6 @@ dist/
 
 # Archivo de diagrama de clases para MongoEngine
 modelo_mongoengine.puml
+
+# Archivos solo de configuraciíon local (no deben subirse)
+almacen.html

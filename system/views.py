@@ -21,54 +21,74 @@ def Login(request):
 
         usuario = Usuario.objects(email=email).first()
 
-        if usuario and usuario.is_active and usuario.check_password(password):
+        if usuario:
 
-            request.session['user_id'] = str(usuario.id)
-            request.session['rol'] = usuario.rol
-            request.session['email'] = usuario.email
-            request.session['nombres'] = usuario.nombres
-            request.session['apellidos'] = usuario.apellidos
+            if usuario.esta_bloqueado():
+                return render(request, 'systemsigo/login.html', {
+                    'error': 'Tu cuenta está bloqueada temporalmente. Intenta más tarde.',
+                    'bloqueado_hasta': usuario.bloqueado_hasta.isoformat()
+                })
 
-            urs = usuario.unidad_responsable
+            if usuario.is_active and usuario.check_password(password):
 
-            if urs:
-                # si es lista (nuevo modelo)
-                if isinstance(urs, (list, tuple)) or hasattr(urs, '__iter__'):
-                    request.session['unidad_responsable_ids'] = [str(u.id) for u in urs]
-                    request.session['unidad_responsable_nombres'] = [u.nombre for u in urs]
+                usuario.resetear_intentos()
 
-                    # UR activa por defecto = primera
-                    request.session['ur_activa_id'] = str(urs[0].id)
-                    request.session['ur_activa_nombre'] = urs[0].nombre
+                request.session['user_id'] = str(usuario.id)
+                request.session['rol'] = usuario.rol
+                request.session['email'] = usuario.email
+                request.session['nombres'] = usuario.nombres
+                request.session['apellidos'] = usuario.apellidos
 
+                urs = usuario.unidad_responsable
+
+                if urs:
+                    if isinstance(urs, (list, tuple)) or hasattr(urs, '__iter__'):
+                        request.session['unidad_responsable_ids'] = [str(u.id) for u in urs]
+                        request.session['unidad_responsable_nombres'] = [u.nombre for u in urs]
+                        request.session['ur_activa_id'] = str(urs[0].id)
+                        request.session['ur_activa_nombre'] = urs[0].nombre
+                    else:
+                        request.session['unidad_responsable_ids'] = [str(urs.id)]
+                        request.session['unidad_responsable_nombres'] = [urs.nombre]
+                        request.session['ur_activa_id'] = str(urs.id)
+                        request.session['ur_activa_nombre'] = urs.nombre
                 else:
-                    # compatibilidad con modelo viejo (1 sola UR)
-                    request.session['unidad_responsable_ids'] = [str(urs.id)]
-                    request.session['unidad_responsable_nombres'] = [urs.nombre]
-                    request.session['ur_activa_id'] = str(urs.id)
-                    request.session['ur_activa_nombre'] = urs.nombre
+                    request.session['unidad_responsable_ids'] = []
+                    request.session['unidad_responsable_nombres'] = []
+                    request.session['ur_activa_id'] = None
+                    request.session['ur_activa_nombre'] = None
+
+                destino = {
+                    'admin': 'inicio',
+                    'admin_energia': 'admin_energia_inicio',
+                    'admin_ambiental': 'admin_ambiental_inicio',
+                    'capturista': 'capturista',
+                    'encargado_ur': 'encargado_ur',
+                    'rector': 'rector',
+                    'director': 'director',
+                    'auditor': 'auditor'
+                }.get(usuario.rol, 'inicio')
+
+                return render(request, 'systemsigo/login.html', {
+                    'login_success': True,
+                    'redirect_url': destino
+                })
 
             else:
-                request.session['unidad_responsable_ids'] = []
-                request.session['unidad_responsable_nombres'] = []
-                request.session['ur_activa_id'] = None
-                request.session['ur_activa_nombre'] = None
 
-            destino = {
-                'admin': 'inicio',
-                'admin_energia': 'admin_energia_inicio',
-                'admin_ambiental': 'admin_ambiental_inicio',
-                'capturista': 'capturista',
-                'encargado_ur': 'encargado_ur',
-                'rector': 'rector',
-                'director': 'director',
-                'auditor': 'auditor'
-            }.get(usuario.rol, 'inicio')
+                usuario.registrar_fallo_login()
 
-            return render(request, 'systemsigo/login.html', {
-                'login_success': True,
-                'redirect_url': destino
-            })
+                intentos_restantes = 3 - usuario.intentos_fallidos
+
+                if intentos_restantes > 0:
+                    return render(request, 'systemsigo/login.html', {
+                        'error': f'Contraseña incorrecta. Te quedan {intentos_restantes} intento(s).'
+                    })
+                else:
+                    return render(request, 'systemsigo/login.html', {
+                        'error': 'Cuenta bloqueada por múltiples intentos fallidos. Revisa tu correo.',
+                        'bloqueado_hasta': usuario.bloqueado_hasta.isoformat()
+                    })
 
         return render(request, 'systemsigo/login.html', {
             'error': 'Correo o contraseña incorrectos.'

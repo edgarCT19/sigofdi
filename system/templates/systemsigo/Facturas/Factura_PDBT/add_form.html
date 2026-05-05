@@ -34,30 +34,26 @@
       </div>
     </div>
 
+    <div class="col-md-4 mb-3">
+      <div class="material-input">
+        <input type="month" name="periodo" required>
+        <label>Periodo:</label>
+      </div>
+    </div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" name="dias_periodo" required><label>Días del periodo:</label></div></div>
-    <div class="col-md-4 mb-3"><div class="material-input"><input type="text" name="periodo" required><label>Periodo:</label></div></div>
+    <div class="col-md-4 mb-3">
+      <div class="material-input">
+        <input type="date" name="fecha_vencimiento" required>
+        <label>Fecha de vencimiento:</label>
+      </div>
+    </div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="consumo" required><label>Consumo:</label></div></div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="cargo_energia" required><label>Cargo Energía:</label></div></div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="importe_demanda_maxima" required><label>Importe Demanda Máxima:</label></div></div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="dap" required><label>DAP:</label></div></div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="iva" required><label>IVA:</label></div></div>
     <div class="col-md-4 mb-3"><div class="material-input"><input type="number" step="0.01" name="total_a_pagar" required><label>Total a Pagar:</label></div></div>
-
-    <div class="col-md-6 mb-3">
-      <div class="material-input">
-        <input type="file" name="archivo_pdf" accept=".pdf" required>
-        <label>Archivo PDF:</label>
-      </div>
-    </div>
-
-    <div class="col-md-6 mb-3">
-      <div class="material-input">
-        <input type="date" name="fecha_vencimiento" required>
-        <label>Fecha de vencimiento:</label>
-      </div>
-    </div>
-
-    <div class="col-md-6 mb-3">
+    <div class="col-md-4 mb-3">
       <div class="material-input">
         <select name="status" required>
           <option value="Pagada">Pagada</option>
@@ -66,10 +62,16 @@
         <label>Status:</label>
       </div>
     </div>
+    <div class="col-md-4 mb-3">
+      <div class="material-input">
+        <input type="file" name="archivo_pdf" accept=".pdf" required>
+        <label>Archivo PDF:</label>
+      </div>
+    </div>
 
     <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
       <button type="submit" class="btn-uacam-primary-especial">Agregar</button>
-      <a href="{% url 'listar_facturas_admin' %}" class="btn btn-danger">Cancelar</a>
+      <a href="javascript:history.back()" class="btn btn-danger">Cancelar</a>
     </div>
   </form>
 </div>

@@ -50,8 +50,8 @@
                     <li><hr class="dropdown-divider"></li>
 
                     <li><a class="dropdown-item" href="{% url 'perfil_usuario' %}"><i class="bi bi-person-check"></i> Mi cuenta</a></li>
-                    <li><a class="dropdown-item" href="https://wa.me"><i class="bi bi-whatsapp"></i> WhatsApp</a></li>
-                    <li><a class="dropdown-item" href="https://mail.google.com/"><i class="bi bi-envelope-at"></i> Gmail</a></li>
+                    <li><a class="dropdown-item" href="https://wa.me" target="_blank" rel="noopener noreferrer"><i class="bi bi-whatsapp"></i> WhatsApp</a></li>
+                    <li><a class="dropdown-item" href="https://mail.google.com/" target="_blank" rel="noopener noreferrer"><i class="bi bi-envelope-at"></i> Gmail</a></li>
 
                     <li><hr class="dropdown-divider"></li>
 
@@ -64,8 +64,8 @@
             </div>
             <!-- Botón hamburguesa solo visible en móvil -->
             <button class="btn btn-light btn-header d-md-none me-2 rounded rounded-circle" id="menu-toggle" 
-            data-bs-toggle="tooltip" data-bs-placement="bottom" title="Menú" style="background-color: var(--color-uacam-background-light);">
-                <i class="bi bi-list"></i>
+            data-bs-placement="bottom" style="background-color: var(--color-uacam-background-light);">
+                <i class="bi bi-arrow-bar-right"></i>
             </button>
         </div>        
     </nav>
@@ -269,8 +269,8 @@
                 <a href="#"><i class="bi bi-receipt"></i> Facturas</a>
                 <div class="submenu">
                     <a href="{% url 'listar_facturas_admin' %}">Filtro</a>
-                    <a href="#">GDMTH/GDMTO/GDBT</a>
-                    <a href="#">PDBT</a>
+                    <a href="{% url 'listar_facturas_triple_admin' %}">GDMTH/GDMTO/GDBT</a>
+                    <a href="{% url 'listar_facturas_pdbt_admin' %}">PDBT</a>
                 </div>
             </div>
             <!--<div class="has-submenu">
@@ -463,6 +463,12 @@
         {% endblock %}
         </div>
     </div>
+
+    <footer>
+        <p style="font-size: small;">© <a href="https://uacam.mx/"
+            target="_blank" rel="noopener noreferrer">Universidad Autónoma de Campeche</a> © {% now "Y" %} Desarrollado por <a href="https://fi.uacam.mx/"
+            target="_blank" rel="noopener noreferrer">Facultad de Ingeniería</a></p>
+    </footer>
     
     <script src="{% static 'libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'libs/fontawesome-free/js/all.min.js' %}"></script>
@@ -476,6 +482,7 @@
     <script src="{% static 'js/spinner.js' %}"></script>
     <script src="{% static 'js/pagination.js' %}"></script>
     <script src="{% static 'js/inputs_mayusculas.js' %}"></script>
+    <script src="{% static 'js/retroceso.js' %}"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -500,6 +507,23 @@
                 }
             });
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const btn = document.getElementById("menu-toggle");
+
+            btn.addEventListener("click", function () {
+                const icon = this.querySelector("i");
+
+                if (icon.classList.contains("bi-arrow-bar-right")) {
+                    icon.classList.remove("bi-arrow-bar-right");
+                    icon.classList.add("bi-arrow-bar-left");
+                } else {
+                    icon.classList.remove("bi-arrow-bar-left");
+                    icon.classList.add("bi-arrow-bar-right");
+                }
+            });
+        });
+
     </script>
 
 </body>

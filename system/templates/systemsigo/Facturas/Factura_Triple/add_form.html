@@ -3,7 +3,6 @@
 {% block content %}
 
 <div class=" mt-4">
-
   {% if error %}
     <div class="alert alert-danger">{{ error }}</div>
   {% endif %}
@@ -14,7 +13,7 @@
     <form method="POST" enctype="multipart/form-data" class="row g-3 mt-2">
       {% csrf_token %}
 
-      {% if user_rol == 'admin' %}
+      {% if user_rol == 'admin' or user_rol == 'admin_energia' or user_rol == 'admin_ambiental' %}
         <div class="col-md-6 mb-3">
           <div class="material-input">
             <select id="unidad_responsable" name="unidad_responsable" class="" required>
@@ -51,8 +50,15 @@
 
       <div class="col-md-4 mb-3">
         <div class="material-input">
-          <input type="text" class="" name="periodo" id="periodo" required>
+          <input type="month" class="" name="periodo" id="periodo" required>
           <label for="periodo" class="form-label">Periodo</label>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <div class="material-input">
+          <input type="date" class="" name="fecha_vencimiento" id="fecha_vencimiento" required>
+          <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
         </div>
       </div>
 
@@ -142,13 +148,6 @@
 
       <div class="col-md-6 mb-3">
         <div class="material-input">
-          <input type="date" class="" name="fecha_vencimiento" id="fecha_vencimiento" required>
-          <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
-        </div>
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <div class="material-input">
           <input type="file" class="" name="archivo_pdf" id="archivo_pdf" accept="application/pdf" required>
           <label for="archivo_pdf" class="form-label">Archivo PDF</label>
         </div>
@@ -156,7 +155,7 @@
 
       <div class="d-grid gap-2 mx-auto justify-content-center align-items-center">
         <button type="submit" class="btn-uacam-primary-especial">Guardar</button>
-        <a href="{% url 'listar_facturas_admin' %}" class="btn btn-danger">Cancelar</a>
+        <a href="javascript:history.back()" class="btn btn-danger">Cancelar</a>
       </div>
     </form>
   </div>

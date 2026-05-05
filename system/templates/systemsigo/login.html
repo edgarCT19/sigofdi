@@ -19,10 +19,26 @@
         color: var(--color-uacam-primary);
         text-decoration: none;
         transition: color 0.3s ease;
+        position: relative;
+    }
+
+    a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 0;
+        height: 2px;
+        background-color: var(--color-uacam-primary);
+        transition: width 0.3s ease;
     }
 
     a:hover {
-        color: var(--color-uacam-black);
+        color: var(--color-uacam-primary);
+    }
+
+    a:hover::after {
+        width: 100%;
     }
 
     .card-login {
@@ -58,7 +74,16 @@
 
         {% if error %}
         <div class="alert alert-danger mt-3 text-center">
-            {{ error }}
+
+            <div>{{ error }}</div>
+
+            {% if bloqueado_hasta %}
+                <hr style="margin: 10px 0;">
+                <div>
+                    Tiempo restante: <strong id="countdown"></strong>
+                </div>
+            {% endif %}
+
         </div>
         {% endif %}
 
@@ -147,6 +172,33 @@ function togglePasswordVisibility() {
     icon.classList.toggle('bi-eye-slash');
 }
 </script>
+
+{% if bloqueado_hasta %}
+<script>
+    const desbloqueo = new Date("{{ bloqueado_hasta }}").getTime();
+
+    function actualizarContador() {
+        const ahora = new Date().getTime();
+        const diferencia = desbloqueo - ahora;
+
+        if (diferencia <= 0) {
+            document.getElementById("countdown").innerHTML = "Ya puedes intentar nuevamente";
+            return;
+        }
+
+        const horas = Math.floor(diferencia / (1000 * 60 * 60));
+        const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML =
+            `${horas}h ${minutos}m ${segundos}s`;
+
+        setTimeout(actualizarContador, 1000);
+    }
+
+    actualizarContador();
+</script>
+{% endif %}
 
 </body>
 </html>

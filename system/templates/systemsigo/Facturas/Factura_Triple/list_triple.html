@@ -69,7 +69,7 @@
                 <td>{{ f.subestacion.unidad_responsable.nombre }}</td>
                 <td>{{ f.tipo_tarifa }}</td>
                 <td>{{ f.subestacion.no_servicio }} - {{ f.subestacion.no_medidor }}</td>
-                <td>{{ f.periodo }}</td>
+                <td>{{ f.periodo|date:"F Y" }}</td>
                 <td>{{ f.dias_periodo }}</td>
                 <td>{{ f.consumo }}</td>
                 <td>{{ f.demanda_maxima }}</td>

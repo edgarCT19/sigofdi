@@ -18,6 +18,14 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font, Border, Side, Alignment, PatternFill
 
+# Funciones auxiliares para parsear fechas desde los formularios, ya que se reciben como strings.
+def parse_month_input(value):
+    try:
+        anio, mes = map(int, value.split("-"))
+        return datetime(anio, mes, 1)
+    except:
+        return None
+
 # Funiones para gestionar facturas energéticas (Triple y PDBT) en el panel de administración.
 @never_cache
 @login_required_custom
@@ -213,7 +221,15 @@ def crear_factura_triple(request):
             tipo_tarifa = request.POST.get("tipo_tarifa")
 
             consumo = request.POST.get("consumo")
-            periodo = request.POST.get("periodo")
+
+            periodo_str = request.POST.get("periodo")
+
+            try:
+                anio, mes = map(int, periodo_str.split("-"))
+                periodo = datetime(anio, mes, 1)
+            except:
+                raise ValueError("El periodo es inválido")
+
             demanda_maxima = int(request.POST.get("demanda_maxima"))
             factor_potencia = request.POST.get("factor_potencia")
             factor_carga = int(request.POST.get("factor_carga"))
@@ -303,13 +319,12 @@ def editar_factura_triple_admin(request, f_id):
     if not factura:
         return render(request, "error.html", {"mensaje": "Factura no encontrada"})
 
-    # Validar permiso: admin puede editar todo
-    if user.rol != "admin":
-        if not factura.subestacion or factura.subestacion.unidad_responsable.id != user.unidad_responsable.id:
-            return render(request, "error.html", {"mensaje": "No tienes permiso para editar esta factura."})
-
-    # URs disponibles para el formulario
-    urs = UnidadResponsable.objects.all() if user.rol == "admin" else UnidadResponsable.objects(id=user.unidad_responsable.id)
+    # Usuarios administradores pueden ver todas las URs
+    if user and user.rol in ["admin", "admin_energia", "admin_ambiental"]:
+        urs = UnidadResponsable.objects.all()
+    # Usuarios normales ven solo su propia UR
+    else:
+        urs = UnidadResponsable.objects(id=user.unidad_responsable.id)
 
     if request.method == "POST":
         try:
@@ -323,11 +338,15 @@ def editar_factura_triple_admin(request, f_id):
             subestacion_validada = Subestacion.objects(id=sub_obj, unidad_responsable=ur_obj).first()
             if not subestacion_validada:
                 raise ValueError("La subestación no corresponde a la UR seleccionada.")
+            
+            periodo = parse_month_input(request.POST.get("periodo"))
+            if not periodo:
+                raise ValueError("Periodo inválido")
 
             factura.tipo_tarifa = tipo_tarifa
             factura.subestacion = subestacion_validada
             factura.dias_periodo = int(request.POST.get("dias_periodo"))
-            factura.periodo = request.POST.get("periodo")
+            factura.periodo = periodo
             factura.consumo = request.POST.get("consumo")
             factura.demanda_maxima = int(request.POST.get("demanda_maxima"))
             factura.factor_potencia = request.POST.get("factor_potencia")
@@ -476,16 +495,15 @@ def editar_factura_pdbt_admin(request, f_id):
     user = get_user(request)
     factura = FacturaPdbt.objects(id=f_id).first()
 
-    if not factura:
+    if not user or user.rol not in ["admin", "admin_energia", "admin_ambiental"]:
         return render(request, "error.html", {"mensaje": "Factura no encontrada"})
 
-    # Validación de permisos
-    if not user or user.rol not in ["admin", "admin_energia", "admin_ambiental"]:
-        if not factura.subestacion or factura.subestacion.unidad_responsable.id != user.unidad_responsable.id:
-            return render(request, "error.html", {"mensaje": "No tienes permiso para editar esta factura."})
-
-    # Unidades responsables disponibles para el usuario
-    urs = UnidadResponsable.objects.all() if user.rol == "admin" else UnidadResponsable.objects(id=user.unidad_responsable.id)
+    # Usuarios administradores pueden ver todas las URs
+    if user and user.rol in ["admin", "admin_energia", "admin_ambiental"]:
+        urs = UnidadResponsable.objects.all()
+    # Usuarios normales ven solo su propia UR
+    else:
+        urs = UnidadResponsable.objects(id=user.unidad_responsable.id)
 
     if request.method == "POST":
         try:
@@ -498,10 +516,14 @@ def editar_factura_pdbt_admin(request, f_id):
             subestacion_validada = Subestacion.objects(id=sub_obj, unidad_responsable=ur_obj).first()
             if not subestacion_validada:
                 raise ValueError("La subestación no corresponde a la UR seleccionada.")
+            
+            periodo = parse_month_input(request.POST.get("periodo"))
+            if not periodo:
+                raise ValueError("Periodo inválido")
 
             factura.subestacion = subestacion_validada
             factura.dias_periodo = int(request.POST.get("dias_periodo"))
-            factura.periodo = request.POST.get("periodo")
+            factura.periodo = periodo
             factura.consumo = request.POST.get("consumo")
             factura.cargo_energia = request.POST.get("cargo_energia")
             factura.importe_demanda_maxima = request.POST.get("importe_demanda_maxima")
@@ -552,7 +574,12 @@ def crear_factura_pdbt(request):
 
     user = get_user(request)
 
-    urs = UnidadResponsable.objects.all() if user.rol == "admin" else UnidadResponsable.objects(id=user.unidad_responsable.id)
+    # Usuarios administradores pueden ver todas las URs
+    if user and user.rol in ["admin", "admin_energia", "admin_ambiental"]:
+        urs = UnidadResponsable.objects.all()
+    # Usuarios normales ven solo su propia UR
+    else:
+        urs = UnidadResponsable.objects(id=user.unidad_responsable.id)
 
     if request.method == "POST":
         try:
@@ -565,11 +592,19 @@ def crear_factura_pdbt(request):
             subestacion_validada = Subestacion.objects(id=sub_obj, unidad_responsable=ur_obj).first()
             if not subestacion_validada:
                 raise ValueError("La subestación no pertenece a la UR seleccionada.")
+            
+            periodo_str = request.POST.get("periodo")
+
+            try:
+                anio, mes = map(int, periodo_str.split("-"))
+                periodo = datetime(anio, mes, 1)
+            except:
+                raise ValueError("El periodo es inválido")
 
             factura = FacturaPdbt(
                 subestacion=subestacion_validada,
                 dias_periodo=int(request.POST.get("dias_periodo")),
-                periodo=request.POST.get("periodo"),
+                periodo=periodo,
                 consumo=request.POST.get("consumo"),
                 cargo_energia=request.POST.get("cargo_energia"),
                 importe_demanda_maxima=request.POST.get("importe_demanda_maxima"),

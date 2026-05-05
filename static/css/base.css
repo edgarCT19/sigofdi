@@ -29,6 +29,9 @@
     --color-uacam-danger-hover: #f9d6d5;
     --color-uacam-table-header: #1e2943;
     --color-uacam-tuple: #f7f7f7;
+    --color-uacam-card-icon: #FF9000;
+    --color-uacam-usuario-nombre: #d4b200;
+    --color-uacam-datatext-success: #388e3c;
 }
 
 body.dark-mode {
@@ -53,6 +56,8 @@ body.dark-mode {
     --color-uacam-input-label: #dddddd;
     --color-uacam-table-header: #bbbbbb;
     --color-uacam-tuple: #2a2a2a; 
+    --color-uacam-card-icon: #ffffff;
+    --color-uacam-usuario-nombre: #1e2943;
 }
 
 body {
@@ -60,6 +65,10 @@ body {
     color: var(--color-uacam-sidebar-text);
     margin: 0;
     font-family: "Soberana Sans Regular", sans-serif;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* clave */
 }
 
 /* Estilo de scroll general */
@@ -79,6 +88,7 @@ body {
     padding: 20px;
     margin-top: 60px;
     transition: margin-left 0.3s ease;
+    flex: 1;
 }
 
 .card {
@@ -88,6 +98,34 @@ body {
 }
 
 p{
+    color: var(--color-uacam-black);
+}
+
+footer a {
+    text-decoration: none;
+    color: var(--color-uacam-primary);
+    position: relative;
+}
+
+footer a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
+    background-color: var(--color-uacam-primary);
+    transition: width 0.3s ease;
+}
+
+footer a:hover::after {
+    width: 100%;
+}
+
+footer {
+    margin-left: 260px; /* para que respete el sidebar */
+    padding: 10px;
+    text-align: center;
     color: var(--color-uacam-black);
 }
 
@@ -138,5 +176,11 @@ p{
 @media (min-width: 769px) {
     .menu-toggle {
         display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    footer {
+        margin-left: 0;
     }
 }
